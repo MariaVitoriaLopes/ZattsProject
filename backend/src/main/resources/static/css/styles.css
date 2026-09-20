@@ -488,3 +488,218 @@ footer {
 .footer-bottom p {
     color: #555;
 }
+
+/* !!!!!!!!!!!!!!!!! login !!!!!!!!!!!!!!!!!!*/
+
+.login{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: 100px;
+}
+
+.login .gradiente{
+    background-image: url("../images/gradiente_forms.svg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 34px;
+    height: 95vh;
+    width: 38vw;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 10px 25px;
+}
+
+.login .formulario{
+    height: 100vh;
+    width: 50vw;
+    display: flex;
+    flex-direction: column;
+    padding: 60px 0 0 0;
+    gap: 35px;
+}
+
+.formulario form{
+    display: flex;
+    flex-direction: column;
+}
+
+/* FORM LOGIN */
+
+.formulario .voltar{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--textos-pretos);
+    text-decoration: none;
+
+    font-size: 18px;
+}
+
+
+.boasvindas{
+    text-align: center;
+    margin-top: 40px;
+}
+
+
+.boasvindas h1{
+    font-family: "Cal Sans", sans-serif;
+    font-size: 42px;
+    margin: 0;
+    font-weight: 700;
+}
+
+
+.boasvindas h4{
+    font-size: 28px;
+    font-family: "Cal Sans", sans-serif;
+    margin-top: -5px;
+}
+
+
+/* FORM */
+
+.formulario form{
+    width: 70%;
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+
+.campo{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.campo label{
+    font-size: 20px;
+}
+
+
+.campo input{
+
+    height: 60px;
+
+    border: 1px solid #999;
+    border-radius: 12px;
+
+    padding: 0 20px;
+
+    font-size: 18px;
+
+    outline: none;
+}
+
+
+.campo input::placeholder{
+    color: #b3b3b3;
+}
+
+
+/* SENHA */
+
+.inputSenha{
+    position: relative;
+}
+
+
+.inputSenha span{
+    position: absolute;
+
+    right: 20px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #777;
+
+    cursor: pointer;
+}
+
+
+
+/* ESQUECI SENHA */
+
+.esqueci{
+
+    align-self: flex-end;
+
+    margin-top: -15px;
+
+    color: #777;
+
+    text-decoration: none;
+
+    font-size: 16px;
+
+}
+
+
+
+/* BOTÃO */
+
+.btnEntrar{
+
+    width: 240px;
+    height: 65px;
+
+    margin: 15px auto;
+
+    background-color: #181818;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 40px;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+
+.btnEntrar:hover{
+
+    background-color: var(--cor-primaria-400);
+
+    color: black;
+
+}
+
+
+
+/* CADASTRO */
+
+.cadastro{
+
+    text-align: center;
+
+    font-size: 18px;
+
+    color: #777;
+}
+
+
+.cadastro a{
+
+    color: #333;
+
+    font-weight: 500;
+
+    text-decoration: underline;
+
+}
