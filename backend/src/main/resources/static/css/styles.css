@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Cal+Sans&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 :root {
     --cor-primaria-400: #E6FB1A;
     --cor-primaria-950: #3B3903;
     --cor-secundaria-700: #3B1DE4;
     --cor-terciaria-600: #FF8000;
+    --fundo-0: #FFF;
     --fundo-50: #F5F5F5;
     --fundo-700: #434343;
     --fundo-900: #1A1A1A;
@@ -18,14 +21,18 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: var(--fundo-50);
+    font-family: Inter, sans-serif;
+    background-color: var(--fundo-0);
 }
 
 a{
     text-decoration: none;
     color: var(--textos-pretos);
     cursor: pointer;
+}
+
+h1 {
+    font-family: "Cal Sans";
 }
 
 p{
@@ -36,27 +43,23 @@ p{
 
 header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-
     padding: 20px 40px;
-
     position: sticky;
     top: 0;
-
     background-color: var(--fundo-50);
     backdrop-filter: blur(10px);
-
     z-index: 1000;
-
     transition: 0.3s ease;
 }
 
 nav{
     display: flex;
-    align-items: center;
+    width: 100%;
     justify-content: space-between;
-    gap: 100px;
+}
+
+nav img{
+    width: 100px;
 }
 
 nav ul{
@@ -64,14 +67,18 @@ nav ul{
     align-items: center;
     justify-content: space-between;
     gap: 50px;
+    margin: 0;
 }
 
 nav ul li{
     list-style: none;
+    font-weight: 500;
 }
 
 .botoesHeader{
-
+    font-size: 14px;
+    display: flex;
+    gap: 6px;
 }
 
 .botoesHeader a{
@@ -86,32 +93,33 @@ nav ul li{
 
 .hero {
     display: flex;
-    width: 95%;
     align-items: center;
     justify-content: center;
-    margin: 15px auto;
-    gap: 50px;
-
+    margin: 15px;
     background-image: url("../images/fundoBannerLandPage.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    border-radius: 34px;
+    padding: 0 100px;
 }
 
 .textosHero {
     display: flex;
     flex-direction: column;
     text-align: left;
-    width: 655px;
+    width: 100%;
     gap: 20px;
 }
 
 .textosHero h1{
-    font-size: 65px;
+    font-size: 56px;
+    font-family: "Cal Sans";
+    width: 600px;
 }
 
 .textosHero h2 {
-    font-size: 15px;
+    font-size: 14px;
     width: 365px;
 }
 
@@ -123,9 +131,11 @@ nav ul li{
 .textosHero a p{
     background-color: #000;
     color: #fff;
-    width: 120px;
+    width: fit-content;
     padding: 10px 20px;
     border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 .imgCasaBanner{
@@ -136,53 +146,58 @@ nav ul li{
 /*A PARTIR DAQUI É A SEÇÃO APLICATIVO*/
 
 .aplicativo{
+    width: 100%;
     display: flex;
-    align-items: center;
+    padding: 20px 40px;
+}
+
+.app-telefone {
+    width: 100%;
+    display: flex;
     justify-content: center;
-    width: 95%;
-    margin: 50px auto;
-    gap: 150px;
+    position: relative;
 }
 
 .mockupTelefone{
-    width: 400px;
+    width: 200px;
 }
 
 .hoverMockup{
-    left: 45px;
+    position: absolute;
     display: flex;
     flex-direction: column;
-    gap: 70px;
-    position: absolute;
-    width: 605px;
+    gap: 40px;
+    width: 100%;
+    left: 20%;
 }
 
 .hoverMockup button{
     background-color: var(--fundo-900);
     color: var(--textos-brancos);
-    padding: 10px 0;
-    width: 240px;
+    width: fit-content;
+    padding: 10px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     transition: background-color 0.5s ease, color 0.5s ease;
+    font-size: 12px;
 }
 
 .hoverMockup button:hover{
     background-color: var(--cor-primaria-400);
     color: var(--textos-pretos);
-    padding: 10px 0;
-    width: 240px;
-    border: none;
-    border-radius: 5px;
+    width: fit-content;
+    padding: 10px;
+    border-radius: 6px;
     box-shadow: 0 0 10px var(--cor-primaria-400);
 }
 
 .hoverMockup .r{
     position: relative;
-    left: 380px;
+    left: 180px;
 }
 
 .textosApp{
+    width: 100%;
     display: flex;
     gap: 10px;
     flex-direction: column;
@@ -216,18 +231,23 @@ nav ul li{
     align-items: center;
     justify-content: center;
     gap: 15px;
-    width: 260px;
-    padding: 5px 0px;
-    font-size: 10px;
+    width: fit-content;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
     word-spacing: 0;
-    border-radius: 10px;
+    border-radius: 12px;
+}
+
+#icon-android {
+    text-color: #FFF;
 }
 
 /*A PARTIR DAQUI É BENEFICIOS*/
 
 .beneficios{
-    width: 95%;
-    margin: auto;
+    margin: 45px 0;
+    padding: 20px;
 }
 
 .beneficios h1{
@@ -239,9 +259,12 @@ nav ul li{
 
 .cards{
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
-    gap: 60px;
+}
+
+.card {
+    border-radius: 24px;
 }
 
 /*A PARTIR DAQUI É INSTALAÇÃO RESIDENCIAL*/
@@ -249,17 +272,25 @@ nav ul li{
 .instalacaoResidencial{
     display: flex;
     flex-direction: column;
-    width: 95%;
     height: 500px;
-    align-items: center;
-    justify-content: center;
-    margin: 40px auto;
-    gap: 50px;
-
+    margin: 10px;
+    margin-bottom: 20px;
+    border-radius: 24px;
     background-image: url("../images/gradiente.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+.instalacaoResidencial-text {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 200px;
+    gap: 30px;
 }
 
 .instalacaoResidencial h1{
@@ -270,7 +301,7 @@ nav ul li{
 
 .instalacaoResidencial h4{
     color: var(--textos-brancos) !important;
-    font-size: 24px;
+    font-size: 18px;
 }
 
 .instalacaoResidencial a{
@@ -288,6 +319,7 @@ nav ul li{
     display: flex;
     flex-direction: column;
     gap: 15px;
+    margin: 45px;
 }
 
 .perguntasFreq h1{
@@ -360,12 +392,17 @@ nav ul li{
     border-color: transparent;
 }
 
+.accordion-flush > .accordion-item > .accordion-header .accordion-button.collapsed {
+    border-radius: 12px;
+}
+
 /*FOOTER*/
 
 footer {
     background-color: var(--fundo-50);
     padding: 60px 120px 30px;
-    margin: 40px 0 0;
+    margin: 10px;
+    border-radius: 24px;
 }
 
 
@@ -380,6 +417,9 @@ footer {
     width: 35%;
 }
 
+.footer-brand img{
+    width: 80px;
+}
 
 .footer-brand h2 {
     font-size: 32px;
