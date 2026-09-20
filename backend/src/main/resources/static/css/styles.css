@@ -405,13 +405,11 @@ footer {
     border-radius: 24px;
 }
 
-
 .footer-container {
     display: flex;
     justify-content: space-between;
     gap: 50px;
 }
-
 
 .footer-brand {
     width: 35%;
@@ -427,31 +425,26 @@ footer {
     color: var(--textos-pretos);
 }
 
-
 .footer-brand p {
     font-size: 18px;
     line-height: 1.5;
     margin-bottom: 60px;
 }
 
-
 .footer-brand h3 {
     font-size: 20px;
     margin-bottom: 20px;
 }
-
 
 .social-links {
     display: flex;
     gap: 20px;
 }
 
-
 .social-links a {
     text-decoration: none;
     color: var(--textos-pretos);
 }
-
 
 .footer-column {
     display: flex;
@@ -459,12 +452,10 @@ footer {
     gap: 25px;
 }
 
-
 .footer-column h3 {
     font-size: 22px;
     margin-bottom: 10px;
 }
-
 
 .footer-column a {
     text-decoration: none;
@@ -472,18 +463,15 @@ footer {
     transition: 0.3s;
 }
 
-
 .footer-column a:hover {
     color: var(--cor-primaria-400);
 }
-
 
 .footer-bottom {
     border-top: 1px solid #ddd;
     margin-top: 50px;
     padding-top: 30px;
 }
-
 
 .footer-bottom p {
     color: #555;
@@ -496,7 +484,7 @@ footer {
     align-items: center;
     justify-content: center;
     height: 100vh;
-    gap: 100px;
+    gap: clamp(30px, 5vw, 100px);
 }
 
 .login .gradiente{
@@ -534,19 +522,15 @@ footer {
     display: flex;
     align-items: center;
     gap: 10px;
-
     color: var(--textos-pretos);
     text-decoration: none;
-
     font-size: 18px;
 }
-
 
 .boasvindas{
     text-align: center;
     margin-top: 40px;
 }
-
 
 .boasvindas h1{
     font-family: "Cal Sans", sans-serif;
@@ -555,151 +539,119 @@ footer {
     font-weight: 700;
 }
 
-
 .boasvindas h4{
     font-size: 28px;
     font-family: "Cal Sans", sans-serif;
     margin-top: -5px;
 }
 
-
 /* FORM */
 
 .formulario form{
     width: 70%;
     margin: 0 auto;
-
     display: flex;
     flex-direction: column;
     gap: 25px;
 }
 
-
 .campo{
     display: flex;
     flex-direction: column;
     gap: 10px;
+    font-weight: 600;
 }
-
 
 .campo label{
     font-size: 20px;
 }
 
-
 .campo input{
-
-    height: 60px;
-
+    height: 50px;
     border: 1px solid #999;
     border-radius: 12px;
-
     padding: 0 20px;
-
     font-size: 18px;
-
     outline: none;
 }
-
-
 .campo input::placeholder{
     color: #b3b3b3;
 }
 
-
 /* SENHA */
-
 .inputSenha{
     position: relative;
 }
-
-
 .inputSenha span{
     position: absolute;
-
     right: 20px;
     top: 50%;
-
     transform: translateY(-50%);
-
     color: #777;
-
     cursor: pointer;
 }
-
-
 
 /* ESQUECI SENHA */
 
 .esqueci{
-
     align-self: flex-end;
-
     margin-top: -15px;
-
     color: #777;
-
     text-decoration: none;
-
     font-size: 16px;
-
 }
 
-
-
 /* BOTÃO */
-
 .btnEntrar{
-
     width: 240px;
     height: 65px;
-
     margin: 15px auto;
-
     background-color: #181818;
-
     color: white;
-
     border: none;
-
     border-radius: 40px;
-
     font-size: 20px;
-
     cursor: pointer;
-
     transition: .3s;
 }
 
 
 .btnEntrar:hover{
-
     background-color: var(--cor-primaria-400);
-
     color: black;
-
 }
-
-
 
 /* CADASTRO */
 
 .cadastro{
-
     text-align: center;
-
     font-size: 18px;
-
     color: #777;
 }
-
-
 .cadastro a{
-
     color: #333;
-
     font-weight: 500;
-
     text-decoration: underline;
 
 }
+.criarconta h4{
+    font-size: 18px;
+}
+.slogan{
+    font-family: "Cal Sans", sans-serif;
+    font-size: 48px;
+    color: #F5F5F5;
+}
+.requisitos {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 12px;
+}
+.requisitos p {
+    font-weight: bold;
+}
+.requisitos span {
+    color: #777;
+}
+

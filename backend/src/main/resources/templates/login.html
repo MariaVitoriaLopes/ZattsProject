@@ -12,12 +12,14 @@
 </head>
 <body class="login">
     <div class="gradiente">
-        <img th:src="@{/images/logotipo.svg}" alt="">
-        <p>Sua energia em suas mãos.</p>
+        <img th:src="@{/images/logotipoBranco.svg}" alt="Zatts">
+        <div class="slogan">
+            <p>Sua energia <br> em suas mãos.</p>
+        </div>
     </div>
     <div class="formulario">
 
-        <a class="voltar">
+        <a href="/" class="voltar">
             <span class="material-symbols-outlined">arrow_back</span>
             Voltar para Página Institucional
         </a>
@@ -48,7 +50,7 @@
             </div>
 
 
-            <a class="esqueci">
+            <a href="/recuperarSenha" class="esqueci">
                 Esqueci minha senha
             </a>
 

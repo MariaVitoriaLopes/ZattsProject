@@ -15,4 +15,9 @@ public class AutenticacaoController {
     public String cadastro() {
         return "cadastro";
     }
+
+    @GetMapping("/recuperarSenha")
+    public String recuperarSenha() {
+        return "recuperarSenha";
+    }
 }
