@@ -1,0 +1,807 @@
+@import url('https://fonts.googleapis.com/css2?family=Cal+Sans&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+:root {
+    --cor-primaria-400: #E6FB1A;
+    --cor-primaria-950: #3B3903;
+    --cor-secundaria-700: #3B1DE4;
+    --cor-terciaria-600: #FF8000;
+    --fundo-0: #FFF;
+    --fundo-50: #F5F5F5;
+    --fundo-700: #434343;
+    --fundo-900: #1A1A1A;
+    --fundo-950: #161611;
+    --textos-pretos: #000;
+    --textos-brancos: #fff;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Inter, sans-serif;
+    background-color: var(--fundo-0);
+}
+
+a{
+    text-decoration: none;
+    color: var(--textos-pretos);
+    cursor: pointer;
+}
+
+h1 {
+    font-family: "Cal Sans";
+}
+
+p{
+    cursor: default;
+}
+
+/*A PARTIR DAQUI É O HEADER*/
+
+header {
+    display: flex;
+    padding: 20px 40px;
+    position: sticky;
+    top: 0;
+    background-color: var(--fundo-50);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    transition: 0.3s ease;
+}
+
+nav{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+nav img{
+    width: 100px;
+}
+
+nav ul{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 50px;
+    margin: 0;
+}
+
+nav ul li{
+    list-style: none;
+    font-weight: 500;
+}
+
+.botoesHeader{
+    font-size: 14px;
+    display: flex;
+    gap: 6px;
+}
+
+.botoesHeader a{
+    background-color: var(--fundo-700);
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    color: var(--textos-brancos) !important;
+}
+
+/*A PARTIR DAQUI É A SECTION HERO*/
+
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 15px;
+    background-image: url("../images/fundoBannerLandPage.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 34px;
+    padding: 0 100px;
+}
+
+.textosHero {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    width: 100%;
+    gap: 20px;
+}
+
+.textosHero h1{
+    font-size: 56px;
+    font-family: "Cal Sans";
+    width: 600px;
+}
+
+.textosHero h2 {
+    font-size: 14px;
+    width: 365px;
+}
+
+.textosHero h3{
+    font-size: 15px;
+    color: var(--cor-primaria-950);
+}
+
+.textosHero a p{
+    background-color: #000;
+    color: #fff;
+    width: fit-content;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.imgCasaBanner{
+    width: 550px;
+    margin: 50px 0 50px 0;
+}
+
+/*A PARTIR DAQUI É A SEÇÃO APLICATIVO*/
+
+.aplicativo{
+    width: 100%;
+    display: flex;
+    padding: 20px 40px;
+}
+
+.app-telefone {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.mockupTelefone{
+    width: 200px;
+}
+
+.hoverMockup{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    width: 100%;
+    left: 20%;
+}
+
+.hoverMockup button{
+    background-color: var(--fundo-900);
+    color: var(--textos-brancos);
+    width: fit-content;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    transition: background-color 0.5s ease, color 0.5s ease;
+    font-size: 12px;
+}
+
+.hoverMockup button:hover{
+    background-color: var(--cor-primaria-400);
+    color: var(--textos-pretos);
+    width: fit-content;
+    padding: 10px;
+    border-radius: 6px;
+    box-shadow: 0 0 10px var(--cor-primaria-400);
+}
+
+.hoverMockup .r{
+    position: relative;
+    left: 180px;
+}
+
+.textosApp{
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
+.textosApp h1{
+    font-size: 40px;
+}
+
+.textosApp h2{
+    font-size: 20px;
+}
+
+.textosApp p{
+    width: 710px;
+    text-align: justify;
+    letter-spacing: 1px;
+    word-spacing: 10px;
+    margin-top: 20px;
+}
+
+.textosApp a p img{
+    width: 30px;
+}
+
+.textosApp a p{
+    cursor: pointer;
+    background: black;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    width: fit-content;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    word-spacing: 0;
+    border-radius: 12px;
+}
+
+#icon-android {
+    text-color: #FFF;
+}
+
+/*A PARTIR DAQUI É BENEFICIOS*/
+
+.beneficios{
+    margin: 45px 0;
+    padding: 20px;
+}
+
+.beneficios h1{
+    width: 90%;
+    margin: 20px auto;
+    font-weight: bold;
+    font-size: 35px;
+}
+
+.cards{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.card {
+    border-radius: 24px;
+}
+
+/*A PARTIR DAQUI É INSTALAÇÃO RESIDENCIAL*/
+
+.instalacaoResidencial{
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+    margin: 10px;
+    margin-bottom: 20px;
+    border-radius: 24px;
+    background-image: url("../images/gradiente.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.instalacaoResidencial-text {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 200px;
+    gap: 30px;
+}
+
+.instalacaoResidencial h1{
+    font-weight: bold;
+    color: var(--textos-brancos) !important;
+    font-size: 45px;
+}
+
+.instalacaoResidencial h4{
+    color: var(--textos-brancos) !important;
+    font-size: 18px;
+}
+
+.instalacaoResidencial a{
+    color: var(--textos-pretos) !important;
+    background-color: var(--cor-primaria-400);
+    border-radius: 5px;
+    padding: 10px 25px;
+    font-size: 16px;
+    box-shadow: 0 0 10px var(--cor-primaria-400);
+}
+
+/**/
+
+.perguntasFreq {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 45px;
+}
+
+.perguntasFreq h1{
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    margin: 0;
+}
+
+.perguntasFreq h3{
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.accordion{
+    width: 70%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Accordion fechado */
+.accordion-button {
+    background-color: #fff;
+    color: var(--textos-pretos);
+    box-shadow: 0 1px 2px var(--fundo-700);
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Hover */
+.accordion-button:hover {
+    background-color: #fff;
+    color: var(--textos-pretos);
+}
+
+/* Aberto */
+.accordion-button:not(.collapsed) {
+    color: var(--textos-pretos);
+}
+
+
+/* Somente a resposta abrindo */
+.accordion-body {
+    animation: abrirAccordion 0.4s ease;
+}
+
+@keyframes abrirAccordion {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Remove a borda azul ao clicar */
+.accordion-button:focus {
+    border-color: transparent;
+    box-shadow: none;
+}
+
+/* Remove bordas do item se quiser */
+.accordion-item {
+    border-color: transparent;
+}
+
+.accordion-flush > .accordion-item > .accordion-header .accordion-button.collapsed {
+    border-radius: 12px;
+}
+
+/*FOOTER*/
+
+footer {
+    background-color: var(--fundo-50);
+    padding: 60px 120px 30px;
+    margin: 10px;
+    border-radius: 24px;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+}
+
+.footer-brand {
+    width: 35%;
+}
+
+.footer-brand img{
+    width: 80px;
+}
+
+.footer-brand h2 {
+    font-size: 32px;
+    margin-bottom: 30px;
+    color: var(--textos-pretos);
+}
+
+.footer-brand p {
+    font-size: 18px;
+    line-height: 1.5;
+    margin-bottom: 60px;
+}
+
+.footer-brand h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.social-links {
+    display: flex;
+    gap: 20px;
+}
+
+.social-links a {
+    text-decoration: none;
+    color: var(--textos-pretos);
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.footer-column h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.footer-column a {
+    text-decoration: none;
+    color: var(--textos-pretos);
+    transition: 0.3s;
+}
+
+.footer-column a:hover {
+    color: var(--cor-primaria-400);
+}
+
+.footer-bottom {
+    border-top: 1px solid #ddd;
+    margin-top: 50px;
+    padding-top: 30px;
+}
+
+.footer-bottom p {
+    color: #555;
+}
+
+/* !!!!!!!!!!!!!!!!! login !!!!!!!!!!!!!!!!!!*/
+
+.login{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: clamp(30px, 5vw, 100px);
+}
+
+.login .gradiente{
+    background-image: url("../images/gradiente_forms.svg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 34px;
+    height: 95vh;
+    width: 38vw;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 10px 25px;
+}
+
+.login .formulario{
+    height: 100vh;
+    width: 50vw;
+    display: flex;
+    flex-direction: column;
+    padding: 60px 0 0 0;
+    gap: 35px;
+}
+
+.formulario form{
+    display: flex;
+    flex-direction: column;
+}
+
+/* FORM LOGIN */
+
+.formulario .voltar{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--textos-pretos);
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.boasvindas{
+    text-align: center;
+    margin-top: 40px;
+}
+
+.boasvindas h1{
+    font-family: "Cal Sans", sans-serif;
+    font-size: 42px;
+    margin: 0;
+    font-weight: 700;
+}
+
+.boasvindas h4{
+    font-size: 28px;
+    font-family: "Cal Sans", sans-serif;
+    margin-top: -5px;
+}
+
+/* FORM */
+
+.formulario form{
+    width: 70%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.campo{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-weight: 600;
+}
+
+.campo label{
+    font-size: 20px;
+}
+
+.campo input{
+    height: 50px;
+    border: 1px solid #999;
+    border-radius: 12px;
+    padding: 0 20px;
+    font-size: 18px;
+    outline: none;
+}
+.campo input::placeholder{
+    color: #b3b3b3;
+}
+
+/* SENHA */
+.inputSenha{
+    position: relative;
+}
+.inputSenha span{
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #777;
+    cursor: pointer;
+}
+
+/* ESQUECI SENHA */
+
+.esqueci{
+    align-self: flex-end;
+    margin-top: -15px;
+    color: #777;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+/* BOTÃO */
+.btnEntrar{
+    width: 240px;
+    height: 65px;
+    margin: 15px auto;
+    background-color: #181818;
+    color: white;
+    border: none;
+    border-radius: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+
+.btnEntrar:hover{
+    background-color: var(--cor-primaria-400);
+    color: black;
+}
+
+/* CADASTRO */
+
+.cadastro{
+    text-align: center;
+    font-size: 18px;
+    color: #777;
+}
+.cadastro a{
+    color: #333;
+    font-weight: 500;
+    text-decoration: underline;
+
+}
+.criarconta h4{
+    font-size: 18px;
+}
+.slogan{
+    font-family: "Cal Sans", sans-serif;
+    font-size: 48px;
+    color: #F5F5F5;
+}
+.requisitos {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 12px;
+}
+.requisitos p {
+    font-weight: bold;
+}
+.requisitos span {
+    color: #777;
+}
+
+/*HOME*/
+
+.cards-resumo {
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:20px;
+
+}
+
+
+
+.card-dashboard {
+
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:20px;
+
+    border:1px solid #EAECEF;
+
+    box-shadow:
+            0 4px 20px rgba(0,0,0,.03);
+
+
+    display:flex;
+
+    gap:15px;
+
+    transition:.3s;
+
+}
+
+
+
+.card-dashboard:hover {
+
+    border-color:#d1d5db;
+
+}
+
+
+
+
+.icone-card {
+
+    width:56px;
+
+    height:56px;
+
+    border-radius:14px;
+
+    background:#F3F4F6;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+
+
+.icone-card svg {
+
+    width:25px;
+
+}
+
+
+
+.card-dashboard span {
+
+    font-size:12px;
+
+    font-weight:600;
+
+    color:#6B7280;
+
+}
+
+
+
+.card-dashboard h2 {
+
+    margin:4px 0;
+
+    font-size:26px;
+
+    font-weight:800;
+
+    color:#111827;
+
+}
+
+
+
+.card-dashboard small {
+
+    font-size:14px;
+
+}
+
+
+
+.card-dashboard p {
+
+    margin:0;
+
+    font-size:11px;
+
+    font-weight:600;
+
+    color:#6B7280;
+
+}
+
+
+
+.vermelho {
+
+    color:#ef4444!important;
+
+}
+
+
+.amarelo {
+
+    color:#d97706!important;
+
+}
+
+
+.verde {
+
+    color:#059669!important;
+
+}
+
+section.titulo-dashboard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 50px;
+}

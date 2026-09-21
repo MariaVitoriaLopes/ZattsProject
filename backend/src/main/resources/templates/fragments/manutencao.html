@@ -1,0 +1,20 @@
+<div  th:fragment="manutencao" class="body-manutencao">
+    <div class="manutencao">
+        <div class="textosManutencao">
+            <h1>Ops!</h1>
+            <h2>Estamos em manutenção</h2>
+            <p>Estamos trabalhando para levar ainda mais energia e inovação até você. <br>
+                Em breve estaremos de volta!
+            </p>
+
+            <button th:onclick="|location.href='@{/}'|">Saiba Mais!</button>
+        </div>
+        <img th:src="@{/images/manutencao.png}" alt="">
+    </div>
+
+    <div class="rodapé">
+        <hr>
+        <p>ENERGIA INTELIGENTE PARA UM FUTURO MELHOR</p>
+        <hr>
+    </div>
+</div>

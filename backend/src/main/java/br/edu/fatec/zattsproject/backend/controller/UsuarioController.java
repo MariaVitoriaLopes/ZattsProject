@@ -14,11 +14,6 @@ public class UsuarioController {
 
     private final UsuarioRepository repository;
 
-    @PostMapping
-    public Usuario criar(@RequestBody Usuario usuario) {
-        return repository.save(usuario);
-    }
-
     @GetMapping
     public List<Usuario> listar() {
         return repository.findAll();

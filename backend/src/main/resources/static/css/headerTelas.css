@@ -1,0 +1,141 @@
+.header-telas {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 10px 50px;
+
+}
+
+
+
+.logo-zatts {
+
+    font-size: 32px;
+    font-weight: 800;
+    color: #111827;
+
+    display: flex;
+    align-items: center;
+
+}
+
+.logo-zatts img{
+        width: 100px;
+}
+
+
+
+.logo-zatts span {
+
+    width: 10px;
+    height: 10px;
+
+    background: #D2F500;
+
+    border-radius: 50%;
+
+    margin-left: 5px;
+
+}
+
+
+
+
+.menu-telas {
+    width: 50vw;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.7);
+    padding: 6px;
+    border-radius: 18px;
+    border:1px solid #EAECEF;
+}
+
+
+
+.menu-item {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:12px 16px;
+
+    border-radius:12px;
+
+    text-decoration:none;
+
+    color:#6B7280;
+
+    font-size:14px;
+
+    font-weight:500;
+
+    transition:.3s;
+
+}
+
+
+
+.menu-item svg {
+
+    width:18px;
+
+}
+
+
+
+.menu-item:hover {
+
+    background:white;
+
+    color:#111827;
+
+}
+
+
+
+.menu-item.ativo {
+
+    background:white;
+
+    color:#111827;
+
+    box-shadow: 0 -2px 0 #E6FB1A;
+
+}
+
+
+
+.notificacao {
+
+    position:relative;
+
+}
+
+
+
+.ponto {
+
+    position:absolute;
+
+    width:8px;
+
+    height:8px;
+
+    background:#D2F500;
+
+    border-radius:50%;
+
+    top:8px;
+
+    right:10px;
+
+}
