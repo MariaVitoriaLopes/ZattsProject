@@ -27,15 +27,24 @@
         <div class="boasvindas">
             <h1>Bem-vindo ao Zatts</h1>
             <h4>Acesse sua conta</h4>
+            <div th:if="${erro}" class="alert alert-danger">
+                <span th:text="${erro}"></span>
+            </div>
+
+
+            <div th:if="${sucesso}" class="alert alert-success">
+                <span th:text="${sucesso}"></span>
+            </div>
         </div>
 
 
-        <form action="" method="post">
+        <form action="/login" method="post">
 
             <div class="campo">
                 <label>E-mail</label>
                 <input
                         type="email"
+                        name="email"
                         placeholder="Digite seu e-mail">
             </div>
 
@@ -45,6 +54,7 @@
 
                     <input
                             type="password"
+                            name="senha"
                             placeholder="Digite sua senha">
 
             </div>
@@ -55,7 +65,7 @@
             </a>
 
 
-            <button class="btnEntrar">
+            <button class="btnEntrar" type="submit">
                 Entrar
             </button>
 

@@ -33,21 +33,21 @@
         </div>
     </div>
 
-    <form action="" method="post">
+    <form action="/cadastro" method="post">
 
         <div class="campo">
             <label>E-mail</label>
-            <input type="email" placeholder="Digite seu e-mail">
+            <input type="email"  name="email" placeholder="Digite seu e-mail">
         </div>
 
         <div class="campo senha">
             <label>Senha</label>
-            <input type="password" placeholder="Digite sua senha">
+            <input type="password" name="senha" placeholder="Digite sua senha">
         </div>
 
         <div class="campo senha">
             <label>Confirme sua senha</label>
-            <input type="password" placeholder="Digite sua senha">
+            <input type="password" name="confirmarSenha" placeholder="Digite sua senha">
 
             <div class="requisitos">
                 <p>A senha deve conter:</p>
@@ -59,7 +59,7 @@
             </div>
         </div>
 
-        <button class="btnEntrar">
+        <button class="btnEntrar" type="submit">
             Cadastrar
         </button>
 
