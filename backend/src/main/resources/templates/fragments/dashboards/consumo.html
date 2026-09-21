@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+
+<section th:fragment="consumo"
+         class="dashboard-card">
+
+
+    <div class="card-header-dashboard">
+
+        <div>
+
+            <h2>
+                Consumo de energia
+            </h2>
+
+            <p>
+                Veja o consumo de energia (kWh)
+                em tempo real
+            </p>
+
+        </div>
+
+
+        <span class="badge-dashboard">
+
+            <span></span>
+
+            Quadro 1
+
+        </span>
+
+
+    </div>
+
+
+
+    <div class="grafico">
+
+        <canvas id="chartConsumoRealtime"></canvas>
+
+    </div>
+
+
+
+</section>
+
+
+</html>

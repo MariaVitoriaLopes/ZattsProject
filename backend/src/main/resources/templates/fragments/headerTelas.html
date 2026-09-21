@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<header th:fragment="header" class="header-telas">
+
+    <div class="logo-zatts">
+        <img th:src="@{/images/logotipo.svg}" alt="">
+    </div>
+
+    <nav class="menu-telas">
+
+
+        <a href="/home"
+           class="menu-item"
+           th:classappend="${paginaAtual == 'home'} ? 'ativo' : ''">
+
+            <i data-lucide="home"></i>
+
+            Painel inicial
+
+        </a>
+
+
+
+        <a href="/historico"
+           class="menu-item"
+           th:classappend="${paginaAtual == 'historico'} ? 'ativo' : ''">
+
+            <i data-lucide="history"></i>
+
+            Histórico
+
+        </a>
+
+
+
+        <a href="/alertas"
+           class="menu-item"
+           th:classappend="${paginaAtual == 'alertas'} ? 'ativo' : ''">
+
+            <i data-lucide="triangle-alert"></i>
+
+            Alertas
+
+        </a>
+
+
+
+
+        <a href="/notificacoes"
+           class="menu-item notificacao"
+           th:classappend="${paginaAtual == 'notificacoes'} ? 'ativo' : ''">
+
+
+            <i data-lucide="bell"></i>
+
+            Notificações
+
+            <span class="ponto"></span>
+
+        </a>
+
+
+
+
+        <a href="/configuracoes"
+           class="menu-item"
+           th:classappend="${paginaAtual == 'configuracoes'} ? 'ativo' : ''">
+
+
+            <i data-lucide="settings"></i>
+
+            Configurações
+
+
+        </a>
+
+
+    </nav>
+
+</header>
+
+</html>

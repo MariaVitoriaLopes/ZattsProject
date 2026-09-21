@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Home</title>
+
+
+    <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboards.css}">
+
+
+</head>
+
+
+<body>
+
+<!-- HEADER -->
+<div th:replace="~{fragments/headerTelas :: header}"></div>
+
+<div class="container-dashboard">
+
+    <section class="titulo-dashboard">
+
+        <div>
+
+            <h1>
+                Dashboard
+            </h1>
+
+            <p>
+                Acompanhe o consumo elétrico da sua residência
+                de forma simples, inteligente e acessível.
+            </p>
+
+        </div>
+
+
+        <div class="data-hora">
+
+            <div>
+
+                <i data-lucide="clock"></i>
+
+                <strong id="live-clock">
+                    00:00:00
+                </strong>
+
+            </div>
+
+
+            <span id="live-date"></span>
+
+
+        </div>
+
+
+    </section>
+
+
+
+
+    <!-- CARDS -->
+
+    <div th:replace="~{fragments/cards :: cardsResumo}">
+    </div>
+
+
+
+
+
+    <section class="dashboard-grid">
+
+
+        <!-- CONSUMO -->
+
+        <div th:replace="~{fragments/dashboards/consumo :: consumo}">
+        </div>
+
+
+
+        <!-- COMPARATIVO -->
+
+        <div th:replace="~{fragments/dashboards/comparativo :: comparativo}">
+        </div>
+
+
+
+        <!-- VALOR CONTA -->
+
+        <div th:replace="~{fragments/dashboards/valorConta :: valor}">
+        </div>
+
+        <!-- META -->
+
+        <div th:replace="~{fragments/dashboards/metaConsumo :: meta}">
+        </div>
+
+    </section>
+
+
+</div>
+
+
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script th:src="@{/js/script.js}">
+</script>
+
+
+</body>
+
+</html>

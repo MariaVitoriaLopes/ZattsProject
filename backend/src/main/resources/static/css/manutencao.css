@@ -1,0 +1,300 @@
+/* ================================
+   TELA DE MANUTENÇÃO - ZATTS
+================================ */
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+
+/* CONTAINER PRINCIPAL */
+
+.manutencao {
+
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    min-height: 550px;
+
+
+    border-radius: 5px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 70px 80px;
+
+    overflow: hidden;
+
+    position: relative;
+
+}
+
+
+
+/* EFEITO DE FUNDO */
+
+.manutencao::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 350px;
+    height: 350px;
+
+    background: #f0f3ff;
+
+    border-radius: 50%;
+
+    right: 120px;
+    top: 80px;
+
+    z-index: 0;
+
+}
+
+
+
+
+/* TEXTOS */
+
+.textosManutencao {
+
+    width: 45%;
+
+    z-index: 1;
+
+}
+
+
+
+.textosManutencao h1 {
+
+    font-size: 90px;
+
+    font-weight: 800;
+
+    line-height: 0.9;
+
+    color: #151515;
+
+    position: relative;
+
+    display: inline-block;
+
+}
+
+
+
+.textosManutencao h1::after {
+
+    content: "";
+
+    position: absolute;
+
+    height: 12px;
+
+    width: 100%;
+
+    background: #e6fb1a;
+
+    bottom: 8px;
+
+    left: 0;
+
+    z-index: -1;
+
+}
+
+
+
+.textosManutencao h2 {
+
+    font-size: 32px;
+
+    font-weight: 700;
+
+    color: #161616;
+
+    margin-top: 10px;
+
+}
+
+
+
+.textosManutencao p {
+
+    margin-top: 25px;
+
+    color: #666;
+
+    font-size: 18px;
+
+    line-height: 1.6;
+
+    max-width: 400px;
+
+}
+
+
+
+/* BOTÃO */
+
+.textosManutencao button {
+
+    margin-top: 35px;
+
+    padding: 15px 35px;
+
+    border: none;
+
+    border-radius: 30px;
+
+    background: #e6fb1a;
+
+    color: #111;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition: .3s;
+
+}
+
+
+
+.textosManutencao button:hover {
+
+    background: #111;
+
+    color: #fff;
+
+}
+
+
+
+/* IMAGEM */
+
+.manutencao img {
+
+    width: 500px;
+
+    max-width: 50%;
+
+    z-index: 1;
+
+    object-fit: contain;
+
+}
+
+
+
+/* FRASE FINAL */
+
+body > p {
+
+    position: absolute;
+
+    bottom: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 25px;
+
+    color: #596174;
+
+    font-size: 14px;
+
+    letter-spacing: 4px;
+
+    font-weight: 600;
+
+}
+
+
+
+body > p hr {
+
+    width: 60px;
+
+    border: none;
+
+    height: 1px;
+
+    background: #9da6bb;
+
+}
+
+.rodapé {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 30px 0px 0px 0px;
+    gap: 20px;
+    color: #434343;
+}
+
+hr {
+    width: 200px;
+}
+
+
+
+/* RESPONSIVO */
+
+@media(max-width:900px){
+
+
+    .manutencao {
+
+        flex-direction: column;
+
+        padding: 40px;
+
+        text-align: center;
+
+    }
+
+
+    .textosManutencao {
+
+        width: 100%;
+
+    }
+
+
+    .textosManutencao h1 {
+
+        font-size: 65px;
+
+    }
+
+
+    .manutencao img {
+
+        max-width: 90%;
+
+        width: 400px;
+
+        margin-top: 30px;
+
+    }
+
+
+}

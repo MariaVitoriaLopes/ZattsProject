@@ -655,3 +655,153 @@ footer {
     color: #777;
 }
 
+/*HOME*/
+
+.cards-resumo {
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:20px;
+
+}
+
+
+
+.card-dashboard {
+
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:20px;
+
+    border:1px solid #EAECEF;
+
+    box-shadow:
+            0 4px 20px rgba(0,0,0,.03);
+
+
+    display:flex;
+
+    gap:15px;
+
+    transition:.3s;
+
+}
+
+
+
+.card-dashboard:hover {
+
+    border-color:#d1d5db;
+
+}
+
+
+
+
+.icone-card {
+
+    width:56px;
+
+    height:56px;
+
+    border-radius:14px;
+
+    background:#F3F4F6;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+
+
+.icone-card svg {
+
+    width:25px;
+
+}
+
+
+
+.card-dashboard span {
+
+    font-size:12px;
+
+    font-weight:600;
+
+    color:#6B7280;
+
+}
+
+
+
+.card-dashboard h2 {
+
+    margin:4px 0;
+
+    font-size:26px;
+
+    font-weight:800;
+
+    color:#111827;
+
+}
+
+
+
+.card-dashboard small {
+
+    font-size:14px;
+
+}
+
+
+
+.card-dashboard p {
+
+    margin:0;
+
+    font-size:11px;
+
+    font-weight:600;
+
+    color:#6B7280;
+
+}
+
+
+
+.vermelho {
+
+    color:#ef4444!important;
+
+}
+
+
+.amarelo {
+
+    color:#d97706!important;
+
+}
+
+
+.verde {
+
+    color:#059669!important;
+
+}
+
+section.titulo-dashboard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 50px;
+}
