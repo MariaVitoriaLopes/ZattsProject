@@ -1,7 +1,7 @@
 package br.edu.fatec.zattsproject.backend.controller;
 
 import br.edu.fatec.zattsproject.backend.model.Consumo;
-import br.edu.fatec.zattsproject.backend.repository.ConsumoRepository;
+import br.edu.fatec.zattsproject.backend.service.ConsumoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,15 +12,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ConsumoController {
 
-    private final ConsumoRepository repository;
+    private final ConsumoService service;
 
     @PostMapping
     public Consumo salvar(@RequestBody Consumo consumo) {
-        return repository.save(consumo);
+        return service.salvar(consumo);
     }
 
     @GetMapping("/usuario/{usuarioId}")
     public List<Consumo> listarPorUsuario(@PathVariable String usuarioId) {
-        return repository.findByUsuarioIdOrderByDataHoraDesc(usuarioId);
+        return service.listarPorUsuario(usuarioId);
     }
 }
