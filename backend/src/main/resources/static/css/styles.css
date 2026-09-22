@@ -60,6 +60,7 @@ nav{
 
 nav img{
     width: 100px;
+    cursor: pointer;
 }
 
 nav ul{
@@ -73,6 +74,10 @@ nav ul{
 nav ul li{
     list-style: none;
     font-weight: 500;
+}
+
+nav ul li a:hover{
+    text-shadow: 0 0 8px var(--cor-primaria-400);
 }
 
 .botoesHeader{
@@ -136,6 +141,11 @@ nav ul li{
     border-radius: 10px;
     font-size: 16px;
     cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.textosHero a p:hover{
+    box-shadow: 0 0 8px var(--cor-primaria-400);
 }
 
 .imgCasaBanner{
@@ -178,8 +188,9 @@ nav ul li{
     padding: 10px;
     border: none;
     border-radius: 6px;
-    transition: background-color 0.5s ease, color 0.5s ease;
+    transition: background-color 0.5s ease, color 0.5s ease, transform 0.3s ease;
     font-size: 12px;
+    cursor: default;
 }
 
 .hoverMockup button:hover{
@@ -189,6 +200,7 @@ nav ul li{
     padding: 10px;
     border-radius: 6px;
     box-shadow: 0 0 10px var(--cor-primaria-400);
+    transform: translateY(-3px);
 }
 
 .hoverMockup .r{
@@ -464,7 +476,7 @@ footer {
 }
 
 .footer-column a:hover {
-    color: var(--cor-primaria-400);
+    text-shadow: 0 0 8px var(--cor-primaria-400);
 }
 
 .footer-bottom {
@@ -479,7 +491,7 @@ footer {
 
 /* !!!!!!!!!!!!!!!!! login !!!!!!!!!!!!!!!!!!*/
 
-.login{
+.login, .cadastro{
     display: flex;
     align-items: center;
     justify-content: center;
@@ -487,7 +499,7 @@ footer {
     gap: clamp(30px, 5vw, 100px);
 }
 
-.login .gradiente{
+.login .gradiente, .cadastro .gradiente{
     background-image: url("../images/gradiente_forms.svg");
     background-size: cover;
     background-position: center;
@@ -507,8 +519,8 @@ footer {
     width: 50vw;
     display: flex;
     flex-direction: column;
-    padding: 60px 0 0 0;
-    gap: 35px;
+    padding: 75px 0 0 0;
+    gap: 30px;
 }
 
 .formulario form{
@@ -529,20 +541,21 @@ footer {
 
 .boasvindas{
     text-align: center;
-    margin-top: 40px;
+    color: var(--textos-pretos);
 }
 
 .boasvindas h1{
-    font-family: "Cal Sans", sans-serif;
     font-size: 42px;
     margin: 0;
-    font-weight: 700;
 }
 
 .boasvindas h4{
     font-size: 28px;
-    font-family: "Cal Sans", sans-serif;
-    margin-top: -5px;
+}
+
+.alert.alert-danger {
+    width: 30%;
+    margin: auto;
 }
 
 /* FORM */
@@ -562,16 +575,17 @@ footer {
     font-weight: 600;
 }
 
-.campo label{
-    font-size: 20px;
+.campo label {
+    font-size: 15px;
+    text-align: left;
 }
 
 .campo input{
-    height: 50px;
+    height: 45px;
     border: 1px solid #999;
     border-radius: 12px;
     padding: 0 20px;
-    font-size: 18px;
+    font-size: 15px;
     outline: none;
 }
 .campo input::placeholder{
@@ -591,6 +605,32 @@ footer {
     cursor: pointer;
 }
 
+span.material-symbols-outlined.visibility_off{
+    display: none;
+}
+
+.inputSenhaPassword{
+    height: 45px;
+    border: 1px solid #999;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    display: flex;
+    align-items: center;
+    transition:.3s;
+}
+
+.inputSenhaPassword input{
+    border: none;
+    width: 100%;
+    height: 40px;
+}
+
+span.material-symbols-outlined.visibility, span.material-symbols-outlined.visibility_off {
+    margin: 0 10px;
+    cursor: pointer;
+}
+
 /* ESQUECI SENHA */
 
 .esqueci{
@@ -598,14 +638,14 @@ footer {
     margin-top: -15px;
     color: #777;
     text-decoration: none;
-    font-size: 16px;
+    font-size: 15px;
 }
 
 /* BOTÃO */
 .btnEntrar{
-    width: 240px;
-    height: 65px;
-    margin: 15px auto;
+    width: 175px;
+    height: 45px;
+    margin: 10px auto;
     background-color: #181818;
     color: white;
     border: none;
@@ -623,9 +663,18 @@ footer {
 
 /* CADASTRO */
 
+.cadastro .formulario{
+    height: 100vh;
+    width: 50vw;
+    display: flex;
+    flex-direction: column;
+    padding: 35px 0 0 0;
+    gap: 30px;
+}
+
 .cadastro{
     text-align: center;
-    font-size: 18px;
+    font-size: 15px;
     color: #777;
 }
 .cadastro a{
@@ -635,24 +684,47 @@ footer {
 
 }
 .criarconta h4{
-    font-size: 18px;
+    font-size: 15px;
 }
 .slogan{
     font-family: "Cal Sans", sans-serif;
     font-size: 48px;
     color: #F5F5F5;
 }
+
+.slogan p{
+    text-align: left;
+}
+
 .requisitos {
     display: flex;
     flex-direction: column;
     gap: 2px;
     font-size: 12px;
+    text-align: left;
 }
 .requisitos p {
     font-weight: bold;
 }
+
+.requisitos div{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 10px;
+}
+
 .requisitos span {
-    color: #777;
+    color: var(--cor-terciaria-600);
+}
+
+p.cadastro {
+    /* width: 53%; */
+    display: flex;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 }
 
 /*HOME*/
@@ -671,32 +743,48 @@ footer {
 
 .card-dashboard {
 
+    background: white;
 
-    background:white;
+    border-radius: 20px;
 
-    border-radius:20px;
+    padding: 20px;
 
-    padding:20px;
-
-    border:1px solid #EAECEF;
+    border: 1px solid #EAECEF;
 
     box-shadow:
             0 4px 20px rgba(0,0,0,.03);
 
 
-    display:flex;
+    display: flex;
 
-    gap:15px;
+    gap: 15px;
 
-    transition:.3s;
 
+    transition:
+            border-color 0.3s ease,
+            box-shadow 0.3s ease,
+            transform 0.3s ease;
 }
 
 
 
 .card-dashboard:hover {
 
-    border-color:#d1d5db;
+    box-shadow:
+            0 0px 8px var(--cor-primaria-400);
+
+
+    transform: translateY(-3px);
+
+}
+
+
+
+.card-dashboard:hover .icone-card {
+
+    background-color: var(--cor-primaria-400);
+
+    transform: scale(1.05);
 
 }
 
@@ -718,15 +806,15 @@ footer {
     justify-content:center;
 
     align-items:center;
-
+    transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 
 
-.icone-card svg {
-
-    width:25px;
-
+.icone-card span {
+    font-size: 25px !important;
+    font-weight: normal !important;
+    color: var(--textos-pretos) !important;
 }
 
 
@@ -804,4 +892,194 @@ section.titulo-dashboard {
     align-items: center;
     justify-content: space-between;
     padding: 20px 50px;
+}
+
+/* ============================= */
+/* CONFIGURAÇÕES - USUÁRIO       */
+/* ============================= */
+
+
+.configuracoes-container {
+    padding: 40px 70px;
+}
+
+
+/* Título da página */
+.configuracoes-container .titulo-pagina {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 80px;
+}
+
+
+
+/* Títulos das sessões */
+
+.configuracoes-container .secao-titulo {
+
+    font-size: 24px;
+    font-weight: 700;
+
+    margin-bottom: 30px;
+}
+
+
+
+/* Mensagens */
+
+.configuracoes-container .mensagem-sucesso {
+
+    color: #198754;
+
+    margin-bottom: 20px;
+}
+
+
+.configuracoes-container .mensagem-erro {
+
+    color: #dc3545;
+
+    margin-bottom: 20px;
+}
+
+
+
+/* Formulário informações pessoais */
+
+.configuracoes-container .linha-campos {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 20px;
+
+}
+
+
+
+.configuracoes-container .campo {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+
+
+.configuracoes-container .campo label {
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+}
+
+
+
+.configuracoes-container .campo input {
+
+    height: 42px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 8px;
+
+    padding: 0 12px;
+
+    font-size: 14px;
+
+}
+
+.configEditar{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+}
+
+
+
+/* Área de senha */
+
+.configuracoes-container .linha-senha {
+
+    display: flex;
+
+    gap: 20px;
+
+}
+
+
+.configuracoes-container .linha-senha .campo {
+
+    width: 270px;
+
+}
+
+p.aviso {
+    font-size: 12px;
+    margin: 10px 0 0 0;
+    color: var(--fundo-700);
+}
+
+/* Botões */
+
+.configuracoes-container .btn-config {
+    border: none;
+    background: var(--textos-pretos);
+    color: var(--textos-brancos);
+    padding: 12px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+
+
+.configuracoes-container .btn-sair {
+
+    background: var();
+
+}
+
+
+
+.configuracoes-container .btn-excluir {
+
+    background: #b60011;
+
+}
+
+
+
+/* Separador */
+
+.configuracoes-container .divisor {
+
+    margin: 40px 0;
+
+    border-top: 1px solid var(--fundo-50);
+
+}
+
+
+
+/* Responsividade */
+
+@media(max-width: 900px){
+
+    .configuracoes-container .linha-campos {
+
+        grid-template-columns: 1fr;
+
+    }
+
 }

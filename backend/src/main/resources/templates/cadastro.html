@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 </head>
-<body class="login">
+<body class="cadastro">
 <div class="gradiente">
     <div class="logo">
     <img th:src="@{/images/logotipoBranco.svg}" alt="Zatts">
@@ -37,25 +37,58 @@
 
         <div class="campo">
             <label>E-mail</label>
-            <input type="email"  name="email" placeholder="Digite seu e-mail">
+            <input type="email" id="email" name="email" placeholder="Digite seu e-mail">
         </div>
 
         <div class="campo senha">
             <label>Senha</label>
-            <input type="password" name="senha" placeholder="Digite sua senha">
+            <div class="inputSenhaPassword">
+                <input type="password" id="senha" name="senha" placeholder="Digite sua senha">
+                <span class="material-symbols-outlined visibility" onclick="mostrarSenha('senha', this)">visibility</span>
+                <span class="material-symbols-outlined visibility_off" onclick="mostrarSenha('senha', this)">visibility_off</span>
+            </div>
         </div>
 
         <div class="campo senha">
             <label>Confirme sua senha</label>
-            <input type="password" name="confirmarSenha" placeholder="Digite sua senha">
+            <div class="inputSenhaPassword">
+                <input type="password" id="confirmarSenha" name="confirmarSenha" placeholder="Digite sua senha">
+                <span class="material-symbols-outlined visibility" onclick="mostrarSenha('confirmarSenha', this)">visibility</span>
+                <span class="material-symbols-outlined visibility_off" onclick="mostrarSenha('confirmarSenha', this)">visibility_off</span>
+            </div>
 
             <div class="requisitos">
+
                 <p>A senha deve conter:</p>
-                <span>○ Pelo menos 8 caracteres</span>
-                <span>○ Uma letra maiúscula</span>
-                <span>○ Uma letra minúscula</span>
-                <span>○ Um número</span>
-                <span>○ Um caractere especial</span>
+
+                <div>
+
+        <span id="req-tamanho">
+            ○ Pelo menos 8 caracteres
+        </span>
+
+                    <span id="req-maiuscula">
+            ○ Uma letra maiúscula
+        </span>
+
+                    <span id="req-minuscula">
+            ○ Uma letra minúscula
+        </span>
+
+                    <span id="req-numero">
+            ○ Um número
+        </span>
+
+                    <span id="req-especial">
+            ○ Um caractere especial
+        </span>
+
+                    <span id="req-confirmacao">
+            ○ As senhas devem coincidir
+        </span>
+
+                </div>
+
             </div>
         </div>
 
@@ -70,5 +103,7 @@
 
     </form>
 </div>
+
+<script th:src="@{/js/script.js}"></script>
 </body>
 </html>

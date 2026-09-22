@@ -1,17 +1,369 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
+
     <meta charset="UTF-8">
+
     <title>Configurações</title>
-    <link rel="stylesheet" th:href="@{/css/manutencao.css}">
+
+
+    <link rel="stylesheet" th:href="@{/css/modais.css}">
     <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
 </head>
+
+
 <body>
+
+
 <div th:replace="~{fragments/headerTelas :: header}"></div>
-<div th:replace="~{fragments/manutencao :: manutencao}"></div>
+
+
+
+<div class="configuracoes-container">
+
+
+
+    <h1 class="titulo-pagina">
+        Configurações
+    </h1>
+
+
+
+
+    <div th:if="${sucesso}"
+         class="mensagem-sucesso">
+
+        <span th:text="${sucesso}"></span>
+
+    </div>
+
+
+
+    <div th:if="${erro}"
+         class="mensagem-erro">
+
+        <span th:text="${erro}"></span>
+
+    </div>
+
+
+
+
+
+
+    <div class="card-configuracoes">
+
+
+
+
+
+        <h2 class="secao-titulo">
+            Informações pessoais
+        </h2>
+
+
+
+
+
+        <form th:action="@{/configuracoes/editar}"
+              method="post" class="configEditar">
+
+
+
+            <div class="linha-campos">
+
+
+
+                <div class="campo">
+
+                    <label>
+                        Nome completo
+                    </label>
+
+
+                    <input
+                            type="text"
+                            name="nome"
+                            th:value="${usuario.nome}"
+                            placeholder="Digite seu nome">
+
+                </div>
+
+
+
+
+
+
+                <div class="campo">
+
+                    <label>
+                        E-mail
+                    </label>
+
+
+                    <input
+                            type="email"
+                            name="email"
+                            th:value="${usuario.email}">
+
+                </div>
+
+
+
+
+
+
+                <div class="campo">
+
+                    <label>
+                        Telefone
+                    </label>
+
+
+                    <input
+                            type="text"
+                            id="telefone"
+                            name="telefone"
+                            th:value="${usuario.telefone}"
+                            placeholder="(00) 00000-0000">
+
+                </div>
+
+
+
+            </div>
+
+
+
+
+
+            <button
+                    type="submit"
+                    class="btn-config">
+
+                Salvar alterações
+
+            </button>
+
+
+
+        </form>
+
+
+
+
+
+
+        <div class="divisor"></div>
+
+
+
+
+
+
+        <h2 class="secao-titulo">
+            Gerenciar minha conta
+        </h2>
+
+
+
+
+
+
+        <form th:action="@{/configuracoes/senha}"
+              method="post" class="configEditar">
+
+
+
+            <div class="linha-senha">
+
+
+
+                <div class="campo">
+
+                    <label>
+                        Nova senha
+                    </label>
+
+
+                    <input
+                            type="password"
+                            name="senha">
+
+                </div>
+
+
+
+
+
+
+                <div class="campo">
+
+                    <label>
+                        Confirmação de senha
+                    </label>
+
+
+                    <input
+                            type="password"
+                            name="confirmarSenha">
+
+                </div>
+
+
+
+            </div>
+
+
+
+
+
+            <button
+                    type="submit"
+                    class="btn-config">
+
+                Alterar senha
+
+            </button>
+
+
+
+        </form>
+
+
+
+
+
+
+
+
+        <form th:action="@{/logout}"
+              method="get">
+
+
+            <button
+                    type="submit"
+                    class="btn-config btn-sair">
+
+                Sair desta sessão
+
+            </button>
+
+
+        </form>
+
+
+
+
+
+
+
+        <form id="formExcluir"
+              th:action="@{/configuracoes/excluir}"
+              method="post">
+
+
+            <button
+                    type="button"
+                    class="btn-config btn-excluir"
+                    onclick="abrirModalExcluir()">
+
+                <span class="material-symbols-outlined">delete</span>
+                Excluir minha conta
+
+            </button>
+
+
+
+        </form>
+
+
+
+
+
+        <p class="aviso">
+
+            Ao deletar sua conta você concorda em perder todos os seus dados.
+
+        </p>
+
+
+
+
+
+    </div>
+
+
+</div>
+
+<div id="modalExcluir" class="modal-excluir">
+
+
+    <div class="conteudo-modal">
+
+
+        <span class="material-symbols-outlined icone-alerta">
+            warning
+        </span>
+
+
+
+        <h2>
+            Excluir conta?
+        </h2>
+
+
+
+        <p>
+            Tem certeza que deseja excluir sua conta?
+            Essa ação não poderá ser desfeita.
+        </p>
+
+
+
+
+        <div class="botoes-modal">
+
+
+            <button
+                    type="button"
+                    class="btn-cancelar"
+                    onclick="fecharModalExcluir()">
+
+                Cancelar
+
+            </button>
+
+
+
+            <button
+                    type="button"
+                    class="btn-confirmar"
+                    onclick="confirmarExclusao()">
+
+                Sim, excluir
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+<script th:src="@{/js/script.js}"></script>
+<script th:src="@{/js/modais.js}"></script>
 </body>
+
 </html>

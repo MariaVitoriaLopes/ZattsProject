@@ -19,11 +19,19 @@ public class Usuario {
 
     @Id
     private String id;
+
     private String nome;
+
     private String email;
+
+    private String telefone;
+
+    private String fotoPerfil;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
 
     @Builder.Default
     private LocalDateTime criadoEm = LocalDateTime.now();
+
 }

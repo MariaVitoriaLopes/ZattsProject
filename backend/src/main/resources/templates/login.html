@@ -52,10 +52,15 @@
             <div class="campo senha">
                 <label>Senha</label>
 
+                <div class="inputSenhaPassword">
                     <input
                             type="password"
+                            id="senhaLogin"
                             name="senha"
                             placeholder="Digite sua senha">
+                    <span class="material-symbols-outlined visibility" onclick="mostrarSenha('senhaLogin', this)">visibility</span>
+                    <span class="material-symbols-outlined visibility_off" onclick="mostrarSenha('senhaLogin', this)">visibility_off</span>
+                </div>
 
             </div>
 
@@ -81,5 +86,7 @@
         </form>
 
     </div>
+
+    <script th:src="@{/js/script.js}"></script>
 </body>
 </html>

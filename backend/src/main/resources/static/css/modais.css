@@ -1,0 +1,127 @@
+/* MODAL EXCLUSÃO */
+
+.modal-excluir {
+
+    display:none;
+
+    position:fixed;
+
+    top:0;
+
+    left:0;
+
+    width:100%;
+
+    height:100%;
+
+    background:rgba(0,0,0,.45);
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:999;
+
+}
+
+
+
+.modal-excluir.ativo {
+
+    display:flex;
+
+}
+
+
+
+.conteudo-modal {
+
+
+    background:white;
+
+    width:420px;
+
+    padding:35px;
+
+    border-radius:20px;
+
+    text-align:center;
+
+}
+
+
+
+.icone-alerta {
+
+    font-size:45px;
+
+    color:#b60011;
+
+}
+
+
+
+.conteudo-modal h2 {
+
+    margin-top:15px;
+
+}
+
+
+
+.conteudo-modal p {
+
+    color:#777;
+
+    font-size:15px;
+
+}
+
+
+
+
+.botoes-modal {
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+    margin-top:25px;
+
+}
+
+
+
+.btn-cancelar,
+.btn-confirmar {
+
+
+    border:none;
+
+    padding:12px 25px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+}
+
+
+
+.btn-cancelar {
+
+    background:#eee;
+
+}
+
+
+
+.btn-confirmar {
+
+    background:#b60011;
+
+    color:white;
+
+}

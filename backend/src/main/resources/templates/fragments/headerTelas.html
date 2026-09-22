@@ -4,7 +4,7 @@
 <header th:fragment="header" class="header-telas">
 
     <div class="logo-zatts">
-        <img th:src="@{/images/logotipo.svg}" alt="">
+        <img th:src="@{/images/logotipo.svg}" alt="" onclick="location.href='/home'">
     </div>
 
     <nav class="menu-telas">
@@ -14,7 +14,7 @@
            class="menu-item"
            th:classappend="${paginaAtual == 'home'} ? 'ativo' : ''">
 
-            <i data-lucide="home"></i>
+            <span class="material-symbols-outlined">home</span>
 
             Painel inicial
 
@@ -26,7 +26,7 @@
            class="menu-item"
            th:classappend="${paginaAtual == 'historico'} ? 'ativo' : ''">
 
-            <i data-lucide="history"></i>
+            <span class="material-symbols-outlined">history</span>
 
             Histórico
 
@@ -38,7 +38,7 @@
            class="menu-item"
            th:classappend="${paginaAtual == 'alertas'} ? 'ativo' : ''">
 
-            <i data-lucide="triangle-alert"></i>
+            <span class="material-symbols-outlined">warning</span>
 
             Alertas
 
@@ -52,7 +52,7 @@
            th:classappend="${paginaAtual == 'notificacoes'} ? 'ativo' : ''">
 
 
-            <i data-lucide="bell"></i>
+            <span class="material-symbols-outlined">notifications</span>
 
             Notificações
 
@@ -68,7 +68,7 @@
            th:classappend="${paginaAtual == 'configuracoes'} ? 'ativo' : ''">
 
 
-            <i data-lucide="settings"></i>
+            <span class="material-symbols-outlined">settings</span>
 
             Configurações
 
