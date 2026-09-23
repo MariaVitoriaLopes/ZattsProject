@@ -1,7 +1,7 @@
 package br.edu.fatec.zattsproject.backend.controller;
 
 import br.edu.fatec.zattsproject.backend.model.Previsao;
-import br.edu.fatec.zattsproject.backend.repository.PrevisaoRepository;
+import br.edu.fatec.zattsproject.backend.service.PrevisaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,15 +12,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PrevisaoController {
 
-    private final PrevisaoRepository repository;
+    private final PrevisaoService service;
 
     @PostMapping
     public Previsao salvar(@RequestBody Previsao previsao) {
-        return repository.save(previsao);
+        return service.salvar(previsao);
     }
 
     @GetMapping("/usuario/{usuarioId}")
     public List<Previsao> listarPorUsuario(@PathVariable String usuarioId) {
-        return repository.findByUsuarioId(usuarioId);
+        return service.listarPorUsuario(usuarioId);
     }
 }

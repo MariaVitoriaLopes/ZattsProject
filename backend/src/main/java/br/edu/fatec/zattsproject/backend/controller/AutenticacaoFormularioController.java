@@ -1,24 +1,17 @@
 package br.edu.fatec.zattsproject.backend.controller;
 
-import br.edu.fatec.zattsproject.backend.model.Usuario;
-import br.edu.fatec.zattsproject.backend.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import jakarta.servlet.http.HttpSession;
+import br.edu.fatec.zattsproject.backend.service.AutenticacaoService;
 
 @Controller
 @RequiredArgsConstructor
 public class AutenticacaoFormularioController {
 
-
-    private final UsuarioRepository repository;
-    private final PasswordEncoder passwordEncoder;
-
-
+    private final AutenticacaoService autenticacaoService;
 
     @PostMapping("/cadastro")
     public String cadastrar(
@@ -27,198 +20,88 @@ public class AutenticacaoFormularioController {
             @RequestParam(required = false) String confirmarSenha,
             RedirectAttributes atributos) {
 
+        AutenticacaoService.ResultadoCadastro resultado =
+                autenticacaoService.cadastrar(email, senha, confirmarSenha);
 
-        // Verifica campos vazios
-        if (email == null || email.isBlank()
-                || senha == null || senha.isBlank()
-                || confirmarSenha == null || confirmarSenha.isBlank()) {
+        switch (resultado) {
+            case CAMPOS_OBRIGATORIOS:
+                atributos.addFlashAttribute(
+                        "erro",
+                        "E-mail, senha e confirmação de senha são obrigatórios."
+                );
+                return "redirect:/cadastro";
 
+            case EMAIL_INVALIDO:
+                atributos.addFlashAttribute(
+                        "erro",
+                        "E-mail inválido."
+                );
+                return "redirect:/cadastro";
 
-            atributos.addFlashAttribute(
-                    "erro",
-                    "E-mail, senha e confirmação de senha são obrigatórios."
-            );
+            case SENHAS_DIFERENTES:
+                atributos.addFlashAttribute(
+                        "erro",
+                        "As senhas não coincidem."
+                );
+                return "redirect:/cadastro";
 
+            case SENHA_INVALIDA:
+                atributos.addFlashAttribute(
+                        "erro",
+                        "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractere especial."
+                );
+                return "redirect:/cadastro";
 
-            return "redirect:/cadastro";
+            case EMAIL_JA_CADASTRADO:
+                atributos.addFlashAttribute(
+                        "erro",
+                        "E-mail já cadastrado."
+                );
+                return "redirect:/cadastro";
+
+            case SUCESSO:
+                atributos.addFlashAttribute(
+                        "sucesso",
+                        "Cadastro realizado com sucesso! Faça login."
+                );
+                return "redirect:/login";
         }
 
-
-
-        email = email.trim().toLowerCase();
-
-
-
-        // Validação de e-mail
-        if (!email.matches(
-                "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-
-
-            atributos.addFlashAttribute(
-                    "erro",
-                    "E-mail inválido."
-            );
-
-
-            return "redirect:/cadastro";
-        }
-
-
-
-        // Confirmação de senha
-        if (!senha.equals(confirmarSenha)) {
-
-
-            atributos.addFlashAttribute(
-                    "erro",
-                    "As senhas não coincidem."
-            );
-
-
-            return "redirect:/cadastro";
-        }
-
-
-
-        // Regras da senha
-        if (!senha.matches(
-                "^(?=\\S+$)(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$")) {
-
-
-            atributos.addFlashAttribute(
-                    "erro",
-                    "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractere especial."
-            );
-
-
-            return "redirect:/cadastro";
-        }
-
-
-
-
-        // Verifica se já existe usuário
-        if (repository.findByEmail(email).isPresent()) {
-
-
-            atributos.addFlashAttribute(
-                    "erro",
-                    "E-mail já cadastrado."
-            );
-
-
-            return "redirect:/cadastro";
-        }
-
-
-
-
-        // Cria usuário salvando senha com hash BCrypt
-        Usuario usuario = Usuario.builder()
-                .email(email)
-                .senha(passwordEncoder.encode(senha))
-                .build();
-
-
-
-        repository.save(usuario);
-
-
-
-        atributos.addFlashAttribute(
-                "sucesso",
-                "Cadastro realizado com sucesso! Faça login."
-        );
-
-
-
-        return "redirect:/login";
+        return "redirect:/cadastro";
     }
-
-
-
-
-
 
     @PostMapping("/login")
     public String autenticar(
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String senha,
-            RedirectAttributes atributos,
-            HttpSession session) {
+            RedirectAttributes atributos) {
 
+        AutenticacaoService.ResultadoLogin resultado =
+                autenticacaoService.autenticar(email, senha);
 
+        switch (resultado) {
+            case CAMPOS_OBRIGATORIOS:
+                atributos.addFlashAttribute(
+                        "erro",
+                        "E-mail e senha são obrigatórios."
+                );
+                return "redirect:/login";
 
-        // Verifica campos vazios
-        if (email == null || email.isBlank()
-                || senha == null || senha.isBlank()) {
+            case CREDENCIAIS_INVALIDAS:
+                atributos.addFlashAttribute(
+                        "erro",
+                        "E-mail ou senha inválidos."
+                );
+                return "redirect:/login";
 
-
-            atributos.addFlashAttribute(
-                    "erro",
-                    "E-mail e senha são obrigatórios."
-            );
-
-
-            return "redirect:/login";
+            case SUCESSO:
+                atributos.addFlashAttribute(
+                        "sucesso",
+                        "Login realizado com sucesso!"
+                );
+                return "redirect:/home";
         }
 
-
-
-
-        email = email.trim().toLowerCase();
-
-
-
-
-        // Busca usuário e compara senha com BCrypt
-        Usuario usuario = repository.findByEmail(email)
-                .filter(u ->
-                        passwordEncoder.matches(
-                                senha,
-                                u.getSenha()
-                        ))
-                .orElse(null);
-
-
-
-
-
-        // Login inválido
-        if (usuario == null) {
-
-
-            atributos.addFlashAttribute(
-                    "erro",
-                    "E-mail ou senha inválidos."
-            );
-
-
-            return "redirect:/login";
-        }
-
-
-
-
-
-        // Guarda usuário logado na sessão
-        session.setAttribute(
-                "usuarioLogado",
-                usuario
-        );
-
-
-
-
-
-        atributos.addFlashAttribute(
-                "sucesso",
-                "Login realizado com sucesso!"
-        );
-
-
-
-        return "redirect:/home";
+        return "redirect:/login";
     }
-
 }
