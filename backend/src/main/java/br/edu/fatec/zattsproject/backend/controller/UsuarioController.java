@@ -1,7 +1,7 @@
 package br.edu.fatec.zattsproject.backend.controller;
 
 import br.edu.fatec.zattsproject.backend.model.Usuario;
-import br.edu.fatec.zattsproject.backend.repository.UsuarioRepository;
+import br.edu.fatec.zattsproject.backend.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,15 +12,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UsuarioController {
 
-    private final UsuarioRepository repository;
+    private final UsuarioService service;
 
     @GetMapping
     public List<Usuario> listar() {
-        return repository.findAll();
+        return service.listar();
     }
 
     @GetMapping("/{id}")
     public Usuario buscarPorId(@PathVariable String id) {
-        return repository.findById(id).orElse(null);
+        return service.buscarPorId(id);
     }
 }
