@@ -77,29 +77,39 @@
 
     <section class="dashboard-grid">
 
+        <div class="ajuste">
 
-        <!-- CONSUMO -->
+            <!-- CONSUMO -->
 
-        <div th:replace="~{fragments/dashboards/consumo :: consumo}">
+            <div th:replace="~{fragments/dashboards/consumo :: consumo}">
+            </div>
+
+            <!-- META -->
+
+            <div th:replace="~{fragments/dashboards/metaConsumo :: meta}">
+            </div>
         </div>
-
-
 
         <!-- COMPARATIVO -->
 
         <div th:replace="~{fragments/dashboards/comparativo :: comparativo}">
         </div>
 
+        <div>
+            <!-- VALOR CONTA -->
 
+            <div th:replace="~{fragments/dashboards/valorConta :: valor}">
+            </div>
 
-        <!-- VALOR CONTA -->
+<!--            STATUS META-->
+            <div class="cardMeta">
+                <span class="material-symbols-outlined bandeiraMeta">flag_check</span>
+                <div class="textoMeta">
+                    <h2>Você está dentro da sua meta!</h2>
+                    <p>Comparativo dos últimos meses</p>
+                </div>
+            </div>
 
-        <div th:replace="~{fragments/dashboards/valorConta :: valor}">
-        </div>
-
-        <!-- META -->
-
-        <div th:replace="~{fragments/dashboards/metaConsumo :: meta}">
         </div>
 
     </section>

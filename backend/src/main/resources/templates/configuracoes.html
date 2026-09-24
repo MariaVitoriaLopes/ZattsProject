@@ -12,6 +12,8 @@
     <link rel="stylesheet" th:href="@{/css/modais.css}">
     <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/alerts_toasts.css}">
+
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,29 +37,22 @@
         Configurações
     </h1>
 
-
-
-
     <div th:if="${sucesso}"
-         class="mensagem-sucesso">
+         id="toastSucesso"
+         class="toast-mensagem toast-sucesso">
 
         <span th:text="${sucesso}"></span>
 
     </div>
 
 
-
     <div th:if="${erro}"
-         class="mensagem-erro">
+         id="toastErro"
+         class="toast-mensagem toast-erro">
 
         <span th:text="${erro}"></span>
 
     </div>
-
-
-
-
-
 
     <div class="card-configuracoes">
 
@@ -132,6 +127,7 @@
                             type="text"
                             id="telefone"
                             name="telefone"
+                            maxlength="15"
                             th:value="${usuario.telefone}"
                             placeholder="(00) 00000-0000">
 
@@ -179,7 +175,9 @@
 
 
         <form th:action="@{/configuracoes/senha}"
-              method="post" class="configEditar">
+              method="post"
+              id="formAlterarSenha"
+              class="configEditar">
 
 
 
@@ -193,10 +191,14 @@
                         Nova senha
                     </label>
 
-
-                    <input
-                            type="password"
-                            name="senha">
+                    <div class="senhasConfig">
+                        <input
+                                type="password"
+                                name="senha"
+                                id="novaSenha">
+                        <span class="material-symbols-outlined visibility" onclick="mostrarSenha('novaSenha', this)">visibility</span>
+                        <span class="material-symbols-outlined visibility_off" onclick="mostrarSenha('novaSenha', this)">visibility_off</span>
+                    </div>
 
                 </div>
 
@@ -211,10 +213,14 @@
                         Confirmação de senha
                     </label>
 
-
-                    <input
-                            type="password"
-                            name="confirmarSenha">
+                    <div class="senhasConfig">
+                        <input
+                                type="password"
+                                name="confirmarSenha"
+                                id="confirmarNovaSenha">
+                        <span class="material-symbols-outlined visibility" onclick="mostrarSenha('confirmarNovaSenha', this)">visibility</span>
+                        <span class="material-symbols-outlined visibility_off" onclick="mostrarSenha('confirmarNovaSenha', this)">visibility_off</span>
+                    </div>
 
                 </div>
 
@@ -364,6 +370,8 @@
 
 <script th:src="@{/js/script.js}"></script>
 <script th:src="@{/js/modais.js}"></script>
+<script th:src="@{/js/alerts_toasts.js}"></script>
+<script th:src="@{/js/validacoes.js}"></script>
 </body>
 
 </html>

@@ -104,22 +104,19 @@ span.material-symbols-outlined{
 .dashboard-grid {
 
 
-    margin-top:25px;
-
-
-    display:grid;
-
-
-    grid-template-columns:
-    repeat(12,1fr);
-
+    margin: 25px auto;
+    display: flex;
 
     gap:20px;
 
 
 }
 
-
+.dashboard-grid .ajuste {
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+}
 
 .dashboard-card {
 
@@ -143,7 +140,10 @@ span.material-symbols-outlined{
 
 }
 
-
+canvas#chartResumoComparativo{
+    width:550px !important;
+    height: 500px !important;
+}
 
 .dashboard-grid .dashboard-card:nth-child(1){
 
@@ -191,7 +191,7 @@ span.material-symbols-outlined{
 
 
 
-.card-header-dashboard h2 {
+.card-header-dashboard h2{
 
     margin:0;
 
@@ -201,7 +201,7 @@ span.material-symbols-outlined{
 
 
 
-.card-header-dashboard p {
+.card-header-dashboard p, .textoMeta p {
 
 
     margin:5px 0 0;
@@ -370,5 +370,32 @@ span.material-symbols-outlined{
 .bolinha-cinza {
 
     background:#ddd;
+
+}
+
+.cardMeta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:white;
+    border-radius:20px;
+    padding:30px;
+    gap: 20px;
+    border:1px solid #0D734C;
+    box-shadow:
+            0 4px 20px rgba(0,0,0,.03);
+    margin: 50px 0
+}
+
+span.material-symbols-outlined.bandeiraMeta {
+    font-size: 40px;
+    color: #0D734C;
+}
+
+.textoMeta h2{
+
+    margin:0;
+    color: #0D734C;
+    font-size:18px;
 
 }

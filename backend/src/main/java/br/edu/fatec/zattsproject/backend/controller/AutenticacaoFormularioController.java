@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import br.edu.fatec.zattsproject.backend.service.AutenticacaoService;
+import br.edu.fatec.zattsproject.backend.model.Usuario;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequiredArgsConstructor
@@ -74,34 +76,36 @@ public class AutenticacaoFormularioController {
     public String autenticar(
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String senha,
-            RedirectAttributes atributos) {
+            RedirectAttributes atributos,
+            HttpSession session) {
 
-        AutenticacaoService.ResultadoLogin resultado =
-                autenticacaoService.autenticar(email, senha);
 
-        switch (resultado) {
-            case CAMPOS_OBRIGATORIOS:
-                atributos.addFlashAttribute(
-                        "erro",
-                        "E-mail e senha são obrigatórios."
-                );
-                return "redirect:/login";
+        Usuario usuario = autenticacaoService.autenticar(email, senha);
 
-            case CREDENCIAIS_INVALIDAS:
-                atributos.addFlashAttribute(
-                        "erro",
-                        "E-mail ou senha inválidos."
-                );
-                return "redirect:/login";
 
-            case SUCESSO:
-                atributos.addFlashAttribute(
-                        "sucesso",
-                        "Login realizado com sucesso!"
-                );
-                return "redirect:/home";
+        if(usuario == null){
+
+            atributos.addFlashAttribute(
+                    "erro",
+                    "E-mail ou senha inválidos."
+            );
+
+            return "redirect:/login";
         }
 
-        return "redirect:/login";
+
+        session.setAttribute(
+                "usuarioLogado",
+                usuario
+        );
+
+
+        atributos.addFlashAttribute(
+                "sucesso",
+                "Login realizado com sucesso!"
+        );
+
+
+        return "redirect:/home";
     }
 }

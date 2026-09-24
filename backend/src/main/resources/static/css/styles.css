@@ -78,6 +78,7 @@ nav ul li{
 
 nav ul li a:hover{
     text-shadow: 0 0 8px var(--cor-primaria-400);
+    color: var(--fundo-700);
 }
 
 .botoesHeader{
@@ -87,11 +88,16 @@ nav ul li a:hover{
 }
 
 .botoesHeader a{
-    background-color: var(--fundo-700);
+    background-color: var(--textos-pretos);
     padding: 10px 15px;
     border: none;
     border-radius: 10px;
     color: var(--textos-brancos) !important;
+    transition: 0.3s ease;
+}
+
+.botoesHeader a:hover{
+    box-shadow: 0 0 8px var(--cor-primaria-400);
 }
 
 /*A PARTIR DAQUI É A SECTION HERO*/
@@ -178,7 +184,7 @@ nav ul li a:hover{
     flex-direction: column;
     gap: 40px;
     width: 100%;
-    left: 20%;
+    left: 27%;
 }
 
 .hoverMockup button{
@@ -477,6 +483,7 @@ footer {
 
 .footer-column a:hover {
     text-shadow: 0 0 8px var(--cor-primaria-400);
+    color: var(--fundo-700);
 }
 
 .footer-bottom {
@@ -900,7 +907,7 @@ section.titulo-dashboard {
 
 
 .configuracoes-container {
-    padding: 40px 70px;
+    padding: 20px 70px;
 }
 
 
@@ -1004,6 +1011,23 @@ section.titulo-dashboard {
 
 /* Área de senha */
 
+.senhasConfig{
+    height: 42px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+input#novaSenha, input#confirmarNovaSenha{
+    height: 40px;
+    border: none;
+    border-radius: 8px;
+    padding: 0 0px;
+}
+
 .configuracoes-container .linha-senha {
 
     display: flex;
@@ -1070,11 +1094,21 @@ p.aviso {
 
 }
 
+/*//RESPONSIVO*/
 
+.pos-f-t{
+    display: none;
+}
 
 /* Responsividade */
 
 @media(max-width: 900px){
+    header{
+        display: none;
+    }
+    .pos-f-t{
+        display: flex;
+    }
 
     .configuracoes-container .linha-campos {
 
