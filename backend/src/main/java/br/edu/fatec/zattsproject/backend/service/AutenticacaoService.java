@@ -57,31 +57,37 @@ public class AutenticacaoService {
         return ResultadoCadastro.SUCESSO;
     }
 
-    public ResultadoLogin autenticar(
+    public Usuario autenticar(
             String email,
             String senha) {
 
         if (email == null || email.isBlank()
                 || senha == null || senha.isBlank()) {
 
-            return ResultadoLogin.CAMPOS_OBRIGATORIOS;
+            return null;
         }
 
         email = email.trim().toLowerCase();
 
-        boolean loginValido = repository.findByEmail(email)
-                .filter(usuario ->
-                        passwordEncoder.matches(
-                                senha,
-                                usuario.getSenha()
-                        ))
-                .isPresent();
 
-        if (!loginValido) {
-            return ResultadoLogin.CREDENCIAIS_INVALIDAS;
+        Usuario usuario = repository.findByEmail(email)
+                .orElse(null);
+
+
+        if(usuario == null){
+            return null;
         }
 
-        return ResultadoLogin.SUCESSO;
+
+        if(!passwordEncoder.matches(
+                senha,
+                usuario.getSenha()
+        )){
+            return null;
+        }
+
+
+        return usuario;
     }
 
     public enum ResultadoCadastro {

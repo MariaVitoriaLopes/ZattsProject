@@ -1,21 +1,10 @@
-// =====================================================
-// Inicialização dos ícones Lucide
-// =====================================================
-
 document.addEventListener("DOMContentLoaded", () => {
-
-    if (typeof lucide !== "undefined") {
-        lucide.createIcons();
-    }
-
 
     iniciarRelogio();
 
     iniciarGraficos();
 
 });
-
-
 
 // =====================================================
 // Relógio em tempo real
@@ -792,3 +781,6 @@ function graficoConta(){
 
 
 }
+
+
+

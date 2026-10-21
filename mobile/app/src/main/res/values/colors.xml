@@ -1,5 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- CORES PRIMÁRIAS -->
+    <color name="cor_primaria_400">#E6FB1A</color>
+    <color name="cor_primaria_950">#3B3903</color>
+
+    <!-- CORES SECUNDÁRIAS -->
+    <color name="cor_secundaria_700">#3B1DE4</color>
+
+    <!-- CORES TERCIÁRIAS -->
+    <color name="cor_terciaria_600">#FF8000</color>
+
+    <!-- CORES DE FUNDO -->
+    <color name="fundo_0">#FFFFFF</color>
+    <color name="fundo_50">#F5F5F5</color>
+    <color name="fundo_700">#434343</color>
+    <color name="fundo_900">#1A1A1A</color>
+    <color name="fundo_950">#161611</color>
+
+    <!-- CORES DOS TEXTOS -->
+    <color name="textos_pretos">#000000</color>
+    <color name="textos_brancos">#FFFFFF</color>
+
+    <color name="nav_accent">#D4F700</color>
+    <color name="nav_selected_bg">#F9F9F9</color>
+    <color name="nav_icon">#4A4A4A</color>
 </resources>

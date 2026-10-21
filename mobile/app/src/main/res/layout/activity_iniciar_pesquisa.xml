@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".IniciarPesquisaActivity">
+
+    <!-- SETA PARA VOLTAR -->
+    <ImageButton
+        android:id="@+id/btn_voltarLogin"
+        android:layout_width="56dp"
+        android:layout_height="57dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="22dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="Voltar para login"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:src="@android:drawable/ic_media_previous"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#333333" />
+
+    <TextView
+        android:id="@+id/txv_voltarLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="Voltar para Página de Login"
+        android:textColor="#171717"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_voltarLogin"
+        app:layout_constraintStart_toEndOf="@+id/btn_voltarLogin"
+        app:layout_constraintTop_toTopOf="@+id/btn_voltarLogin" />
+
+    <!-- CONTEÚDO CENTRAL -->
+    <LinearLayout
+        android:id="@+id/layout_conteudo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="38dp"
+        android:layout_marginEnd="38dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/btn_comecarQuestionario"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txv_voltarLogin"
+        app:layout_constraintVertical_bias="0.48">
+
+        <TextView
+            android:id="@+id/txv_Titulo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="Vamos entender o uso de energia da sua casa?"
+            android:textColor="#000000"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:letterSpacing="-0.04" />
+
+        <TextView
+            android:id="@+id/txv_subTitulo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:text="Responda a 4 perguntas rápidas para podermos analisar seu perfil de consumo e gerar recomendações personalizadas."
+            android:textColor="#444444"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <!-- BOTÃO COMEÇAR QUESTIONÁRIO -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_comecarQuestionario"
+        android:layout_width="256dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="76dp"
+        android:backgroundTint="#DFFF00"
+        android:elevation="7dp"
+        android:text="Começar questionário   →"
+        android:textAllCaps="false"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/layout_confidencialidade"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- AVISO DE CONFIDENCIALIDADE -->
+    <LinearLayout
+        android:id="@+id/layout_confidencialidade"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="85dp"
+        android:gravity="top"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/txv_iconeInformacao"
+            android:layout_width="25dp"
+            android:layout_height="wrap_content"
+            android:text="ⓘ"
+            android:textColor="#444444"
+            android:textSize="23sp" />
+
+        <TextView
+            android:id="@+id/txv_confidencialidade"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:text="Suas informações são confidenciais e usadas apenas para tornar sua experiência mais completa. Não compartilhamos seus dados com terceiros."
+            android:textColor="#383838"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,50 @@
+.toast-mensagem {
+
+    position: fixed;
+
+    top: 90px;
+    right: 30px;
+
+    padding: 15px 25px;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+
+    z-index: 9999;
+
+    animation: aparecer .3s ease;
+
+}
+
+
+.toast-sucesso {
+
+    background: #d2f500;
+    color: #111;
+
+}
+
+
+.toast-erro {
+
+    background: #ff5757;
+    color: white;
+
+}
+
+
+
+@keyframes aparecer {
+
+    from {
+        opacity:0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity:1;
+        transform: translateY(0);
+    }
+
+}
