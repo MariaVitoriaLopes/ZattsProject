@@ -1,7 +1,5 @@
-
 package br.edu.fatec.zattsproject.backend.controller.mobile;
 
-import br.edu.fatec.zattsproject.backend.model.Usuario;
 import br.edu.fatec.zattsproject.backend.service.AutenticacaoService;
 
 import lombok.RequiredArgsConstructor;
@@ -82,19 +80,27 @@ public class AutenticacaoApiController {
             @RequestBody LoginRequest dados
     ) {
 
-        Usuario usuario = autenticacaoService.autenticar(
+        AutenticacaoService.ResultadoLogin resultado = autenticacaoService.autenticar(
                 dados.email(),
                 dados.senha()
         );
 
-        if (usuario == null) {
-            return ResponseEntity.status(401).body(
-                    Map.of("erro", "E-mail ou senha inválidos.")
-            );
-        }
+        return switch (resultado) {
 
-        return ResponseEntity.ok(
-                Map.of("mensagem", "Login realizado com sucesso!")
-        );
+            case CAMPOS_OBRIGATORIOS ->
+                    ResponseEntity.badRequest().body(
+                            Map.of("erro", "E-mail e senha são obrigatórios.")
+                    );
+
+            case CREDENCIAIS_INVALIDAS ->
+                    ResponseEntity.status(401).body(
+                            Map.of("erro", "E-mail ou senha inválidos.")
+                    );
+
+            case SUCESSO ->
+                    ResponseEntity.ok(
+                            Map.of("mensagem", "Login realizado com sucesso!")
+                    );
+        };
     }
 }

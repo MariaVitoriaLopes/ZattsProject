@@ -1,11 +1,11 @@
 package br.edu.fatec.zattsproject.backend.controller;
 
+import br.edu.fatec.zattsproject.backend.service.AutenticacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import br.edu.fatec.zattsproject.backend.service.AutenticacaoService;
 
 @Controller
 @RequiredArgsConstructor

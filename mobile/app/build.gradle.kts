@@ -65,11 +65,18 @@ dependencies {
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:okhttp-sse:4.12.0")
 
+    // Jackson ou Gson para converter o JSON recebido num objeto Kotlin
+    implementation("com.google.code.gson:gson:2.10.1")
     // Coroutines integradas ao ciclo de vida das Activities
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+
+
+
 }

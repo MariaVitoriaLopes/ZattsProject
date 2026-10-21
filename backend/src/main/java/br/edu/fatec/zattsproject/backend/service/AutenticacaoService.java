@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AutenticacaoService {
@@ -27,9 +29,7 @@ public class AutenticacaoService {
 
         email = email.trim().toLowerCase();
 
-        if (!email.matches(
-                "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-
+        if (!email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
             return ResultadoCadastro.EMAIL_INVALIDO;
         }
 
@@ -37,9 +37,7 @@ public class AutenticacaoService {
             return ResultadoCadastro.SENHAS_DIFERENTES;
         }
 
-        if (!senha.matches(
-                "^(?=\\S+$)(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$")) {
-
+        if (!senha.matches("^(?=\\S+$)(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$")) {
             return ResultadoCadastro.SENHA_INVALIDA;
         }
 
@@ -57,37 +55,31 @@ public class AutenticacaoService {
         return ResultadoCadastro.SUCESSO;
     }
 
-    public Usuario autenticar(
+    public ResultadoLogin autenticar(
             String email,
             String senha) {
 
         if (email == null || email.isBlank()
                 || senha == null || senha.isBlank()) {
 
-            return null;
+            return ResultadoLogin.CAMPOS_OBRIGATORIOS;
         }
 
         email = email.trim().toLowerCase();
 
+        Optional<Usuario> usuarioOpt = repository.findByEmail(email);
 
-        Usuario usuario = repository.findByEmail(email)
-                .orElse(null);
-
-
-        if(usuario == null){
-            return null;
+        if (usuarioOpt.isEmpty()) {
+            return ResultadoLogin.CREDENCIAIS_INVALIDAS;
         }
 
+        Usuario usuario = usuarioOpt.get();
 
-        if(!passwordEncoder.matches(
-                senha,
-                usuario.getSenha()
-        )){
-            return null;
+        if (!passwordEncoder.matches(senha, usuario.getSenha())) {
+            return ResultadoLogin.CREDENCIAIS_INVALIDAS;
         }
 
-
-        return usuario;
+        return ResultadoLogin.SUCESSO;
     }
 
     public enum ResultadoCadastro {
