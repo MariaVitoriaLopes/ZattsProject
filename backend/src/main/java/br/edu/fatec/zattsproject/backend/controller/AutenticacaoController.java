@@ -6,18 +6,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class AutenticacaoController {
 
-    @GetMapping("/login")
-    public String login() {
-        return "login";
-    }
+  //@GetMapping("/login")
+   // public String login() {
+   //     return "login";
+   // }
 
-    @GetMapping("/cadastro")
-    public String cadastro() {
-        return "cadastro";
-    }
+   // @GetMapping("/cadastro")
+   // public String cadastro() {
+    //    return "cadastro";
+  //  }
 
-    @GetMapping("/recuperarSenha")
-    public String recuperarSenha() {
-        return "recuperarSenha";
-    }
+   // @GetMapping("/recuperarSenha")
+   // public String recuperarSenha() {
+   //     return "recuperarSenha";
+    //}
 }

@@ -11,11 +11,14 @@ import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannel
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.messaging.MessageChannel;
 
+import java.util.UUID;
+
 @Configuration
 public class MqttConfig {
 
     private static final String MQTT_BROKER_URL = "ssl://z600fcff.ala.us-east-1.emqxsl.com:8883";
-    private static final String CLIENT_ID = "zatts-backend-subscriber";
+    // Gera um ID único a cada inicialização para evitar o "Lost connection" por conflito de Client ID
+    private static final String CLIENT_ID = "zatts-backend-sub-" + UUID.randomUUID().toString().substring(0, 8);
     private static final String TOPIC = "sensores/corrente/#";
 
     private static final String MQTT_USER = "useresp32";
@@ -31,6 +34,7 @@ public class MqttConfig {
         options.setPassword(MQTT_PASSWORD.toCharArray());
         options.setCleanSession(true);
         options.setAutomaticReconnect(true);
+        options.setKeepAliveInterval(30); // Mantém o ping ativo com o EMQX
 
         factory.setConnectionOptions(options);
         return factory;

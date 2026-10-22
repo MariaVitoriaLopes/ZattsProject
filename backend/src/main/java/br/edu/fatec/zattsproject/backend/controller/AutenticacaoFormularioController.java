@@ -1,8 +1,11 @@
 package br.edu.fatec.zattsproject.backend.controller;
 
+import br.edu.fatec.zattsproject.backend.model.Usuario;
 import br.edu.fatec.zattsproject.backend.service.AutenticacaoService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -12,6 +15,25 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AutenticacaoFormularioController {
 
     private final AutenticacaoService autenticacaoService;
+
+    // --- MÉTODOS GET (Carregam as páginas no navegador) ---
+
+    @GetMapping("/login")
+    public String exibirLogin() {
+        return "login"; // Abre templates/login.html
+    }
+
+    @GetMapping("/cadastro")
+    public String exibirCadastro() {
+        return "cadastro"; // Abre templates/cadastro.html
+    }
+
+    @GetMapping("/recuperarSenha")
+    public String exibirRecuperarSenha() {
+        return "recuperarSenha"; // Abre templates/recuperarSenha.html
+    }
+
+    // --- MÉTODOS POST (Processam os formulários enviados) ---
 
     @PostMapping("/cadastro")
     public String cadastrar(
@@ -74,6 +96,7 @@ public class AutenticacaoFormularioController {
     public String autenticar(
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String senha,
+            HttpSession session,
             RedirectAttributes atributos) {
 
         AutenticacaoService.ResultadoLogin resultado =
@@ -95,6 +118,11 @@ public class AutenticacaoFormularioController {
                 return "redirect:/login";
 
             case SUCESSO:
+                // Guarda o utilizador na sessão para o homeController permitir o acesso
+                Usuario usuario = new Usuario();
+                usuario.setEmail(email);
+                session.setAttribute("usuarioLogado", usuario);
+
                 atributos.addFlashAttribute(
                         "sucesso",
                         "Login realizado com sucesso!"
