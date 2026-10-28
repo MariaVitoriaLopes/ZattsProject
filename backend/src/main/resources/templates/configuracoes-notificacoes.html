@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações</title>
+    <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/configuracoes.css}">
+    <link rel="stylesheet" th:href="@{/css/configuracoes-notificacoes.css}">
+    <th:block th:replace="~{fragments/headTema :: tema}"></th:block>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+</head>
+
+<body>
+
+<main class="configuracoes-container">
+
+    <h1 class="titulo-pagina">Configurações</h1>
+
+    <div class="abas-config">
+        <a href="#" class="aba">Conta</a>
+        <a href="#" class="aba ativa">Notificações</a>
+        <a href="#" class="aba">Preferências</a>
+        <a href="#" class="aba">Dispositivos</a>
+        <a href="#" class="aba">Privacidade e Dados</a>
+        <a href="#" class="aba">Ajuda e Suporte</a>
+    </div>
+
+    <form class="cfg-notif-card">
+
+        <aside class="cfg-notif-lateral">
+            <h2 class="secao-titulo">Notificações</h2>
+
+            <nav class="cfg-notif-menu">
+                <a href="#gerais" class="ativo">Notificações Gerais</a>
+                <a href="#conta">Notificações de Conta</a>
+                <a href="#consumo">Notificações de Consumo</a>
+                <a href="#meta">Notificações de Meta</a>
+                <a href="#alerta">Notificações de Alerta</a>
+            </nav>
+        </aside>
+
+        <div class="cfg-notif-conteudo">
+
+            <section class="cfg-notif-secao" id="gerais">
+                <label class="cfg-notif-todas">
+                    <span>Desativar todas</span>
+                    <input type="checkbox" class="interruptor" checked>
+                </label>
+
+                <div class="cfg-notif-grupo">
+                    <div class="cfg-notif-linha cfg-notif-cabecalho">
+                        <h3>Notificações Gerais</h3>
+                        <span>Push</span>
+                        <span>E-mail</span>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Atualização de sistema</span>
+                        <input type="checkbox" aria-label="Push: Atualização de sistema" checked>
+                        <input type="checkbox" aria-label="E-mail: Atualização de sistema" checked>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Atualização dos termos</span>
+                        <input type="checkbox" aria-label="Push: Atualização dos termos">
+                        <input type="checkbox" aria-label="E-mail: Atualização dos termos" checked>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Contato com o suporte</span>
+                        <input type="checkbox" aria-label="Push: Contato com o suporte">
+                        <input type="checkbox" aria-label="E-mail: Contato com o suporte" checked>
+                    </div>
+                </div>
+            </section>
+
+            <section class="cfg-notif-secao" id="conta">
+                <label class="cfg-notif-todas">
+                    <span>Desativar todas</span>
+                    <input type="checkbox" class="interruptor" checked>
+                </label>
+
+                <div class="cfg-notif-grupo">
+                    <div class="cfg-notif-linha cfg-notif-cabecalho">
+                        <h3>Notificações de Conta</h3>
+                        <span>Push</span>
+                        <span>E-mail</span>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Atualização das informações pessoais</span>
+                        <input type="checkbox" aria-label="Push: Atualização das informações pessoais">
+                        <input type="checkbox" aria-label="E-mail: Atualização das informações pessoais" checked>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Endereço atualizado</span>
+                        <input type="checkbox" aria-label="Push: Endereço atualizado">
+                        <input type="checkbox" aria-label="E-mail: Endereço atualizado" checked>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Senha atualizada</span>
+                        <input type="checkbox" aria-label="Push: Senha atualizada" checked>
+                        <input type="checkbox" aria-label="E-mail: Senha atualizada" checked>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Conta deletada</span>
+                        <input type="checkbox" aria-label="Push: Conta deletada">
+                        <input type="checkbox" aria-label="E-mail: Conta deletada" checked>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Dispositivo conectado à sua conta</span>
+                        <input type="checkbox" aria-label="Push: Dispositivo conectado à sua conta" checked>
+                        <input type="checkbox" aria-label="E-mail: Dispositivo conectado à sua conta" checked>
+                    </div>
+                </div>
+            </section>
+
+            <section class="cfg-notif-secao" id="consumo">
+                <label class="cfg-notif-todas">
+                    <span>Desativar todas</span>
+                    <input type="checkbox" class="interruptor" checked>
+                </label>
+
+                <div class="cfg-notif-grupo">
+                    <div class="cfg-notif-linha cfg-notif-cabecalho">
+                        <h3>Notificações de Consumo</h3>
+                        <span>Push</span>
+                        <span>E-mail</span>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Pico alto de energia detectado</span>
+                        <input type="checkbox" aria-label="Push: Pico alto de energia detectado" checked>
+                        <input type="checkbox" aria-label="E-mail: Pico alto de energia detectado">
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Pico de queda de energia detectado</span>
+                        <input type="checkbox" aria-label="Push: Pico de queda de energia detectado" checked>
+                        <input type="checkbox" aria-label="E-mail: Pico de queda de energia detectado">
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Consumo contínuo elevado</span>
+                        <input type="checkbox" aria-label="Push: Consumo contínuo elevado" checked>
+                        <input type="checkbox" aria-label="E-mail: Consumo contínuo elevado">
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Consumo noturno anormal</span>
+                        <input type="checkbox" aria-label="Push: Consumo noturno anormal" checked>
+                        <input type="checkbox" aria-label="E-mail: Consumo noturno anormal">
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Quadro de energia desconectado</span>
+                        <input type="checkbox" aria-label="Push: Quadro de energia desconectado" checked>
+                        <input type="checkbox" aria-label="E-mail: Quadro de energia desconectado">
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+    </form>
+
+</main>
+
+</body>
+
+</html>

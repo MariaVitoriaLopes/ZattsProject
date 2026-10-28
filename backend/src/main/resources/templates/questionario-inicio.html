@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionário</title>
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/questionario.css}">
+    <th:block th:replace="~{fragments/headtema :: tema}"></th:block>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+</head>
+
+<body>
+
+<main class="quest-pagina">
+
+    <div class="quest-topo">
+        <a th:href="@{/login}" class="quest-voltar">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Voltar para Página de Login
+        </a>
+
+        <img th:src="@{/images/logotipo.svg}" alt="Zatts" class="quest-logo">
+    </div>
+
+    <section class="quest-conteudo">
+        <h1>Vamos entender o uso de energia da sua casa?</h1>
+
+        <p>Responda a 7 perguntas rápidas para podermos analisar seu perfil de consumo e gerar recomendações personalizadas.</p>
+        <a th:href="@{/questionario/perguntas}" class="quest-btn-primario">
+            Começar questionário
+            <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+    </section>
+
+    <p class="quest-privacidade">
+        <span class="material-symbols-outlined">info</span>
+        Suas informações são confidenciais e usadas apenas para tornar sua experiência mais completa. Não compartilhamos seus dados com terceiros.
+    </p>
+
+</main>
+
+</body>
+
+</html>

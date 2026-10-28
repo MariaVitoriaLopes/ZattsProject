@@ -63,4 +63,23 @@ public class homeController {
 
         return "configuracoes";
     }
+
+    @GetMapping("/configuracoes/preferencias")
+    public String configuracoesPreferencias(Model model, HttpSession session) {
+        if (!usuarioLogado(session)) {
+            return "redirect:/login";
+        }
+        model.addAttribute("paginaAtual", "configuracoes");
+        return "configuracoes-preferencias";
+    }
+
+    @GetMapping("/configuracoes/notificacoes")
+    public String configuracoesNotificacoes(Model model, HttpSession session) {
+        if (!usuarioLogado(session)) {
+            return "redirect:/login";
+        }
+        model.addAttribute("paginaAtual", "configuracoes");
+        return "configuracoes-notificacoes";
+    }
+
 }

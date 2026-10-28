@@ -6,6 +6,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+document.addEventListener("zatts:tema", () => {
+
+    if(typeof Chart !== "undefined"){
+        iniciarGraficos();
+    }
+
+});
 // =====================================================
 // Relógio em tempo real
 // =====================================================
@@ -105,11 +112,53 @@ function configurarChart(){
 
 
     Chart.defaults.color =
-        "#9CA3AF";
+        coresDoTema().texto;
 
+}
+function coresDoTema(){
+
+    const escuro =
+        document.documentElement.getAttribute("data-tema") === "escuro";
+
+    const destaque =
+        getComputedStyle(document.documentElement)
+            .getPropertyValue("--cor-primaria-400")
+            .trim() || "#E6FB1A";
+
+    return {
+        destaque: destaque,
+        texto: escuro ? "#A3A3A3" : "#9CA3AF",
+        grade: escuro ? "#2C2C2C" : "#F3F4F6",
+        tooltip: escuro ? "#2A2A2A" : "#1E293B"
+    };
 
 }
 
+function hexParaRgba(hex, alfa){
+
+    const limpo = hex.replace("#", "");
+
+    const completo = limpo.length === 3
+        ? limpo.split("").map(function(c){ return c + c; }).join("")
+        : limpo;
+
+    const r = parseInt(completo.substring(0, 2), 16);
+    const g = parseInt(completo.substring(2, 4), 16);
+    const b = parseInt(completo.substring(4, 6), 16);
+
+    return `rgba(${r},${g},${b},${alfa})`;
+
+}
+
+function destruirGrafico(elemento){
+
+    const existente = Chart.getChart(elemento);
+
+    if(existente){
+        existente.destroy();
+    }
+
+}
 
 
 
@@ -145,642 +194,261 @@ function iniciarGraficos(){
 // =====================================================
 // Gráfico Consumo em tempo real
 // =====================================================
-
-
 function graficoConsumo(){
 
-
-
     const elemento =
-        document.getElementById(
-            "chartConsumoRealtime"
-        );
-
-
+        document.getElementById("chartConsumoRealtime");
 
     if(!elemento){
         return;
     }
 
+    destruirGrafico(elemento);
 
+    const cores = coresDoTema();
 
-    new Chart(
-        elemento,
-        {
+    new Chart(elemento, {
 
-            type:"bar",
+        type: "bar",
 
+        data: {
 
-            data:{
+            labels: [
+                "5h", "6h", "7h", "8h", "9h", "10h",
+                "11h", "12h", "13h", "14h", "15h"
+            ],
 
+            datasets: [{
+                data: [4, 6, 10, 15, 22, 29, 19, 22, 12, 13, 16],
+                backgroundColor: cores.destaque,
+                borderRadius: 6,
+                borderSkipped: false,
+                barThickness: 16
+            }]
 
-                labels:[
-                    "5h",
-                    "6h",
-                    "7h",
-                    "8h",
-                    "9h",
-                    "10h",
-                    "11h",
-                    "12h",
-                    "13h",
-                    "14h",
-                    "15h"
-                ],
+        },
 
+        options: {
 
-                datasets:[{
+            responsive: true,
+            maintainAspectRatio: false,
 
+            plugins: {
 
-                    data:[
-                        4,
-                        6,
-                        10,
-                        15,
-                        22,
-                        29,
-                        19,
-                        22,
-                        12,
-                        13,
-                        16
-                    ],
+                legend: {
+                    display: false
+                },
 
-
-                    backgroundColor:
-                        "#D2F500",
-
-
-                    borderRadius:
-                        6,
-
-
-                    borderSkipped:
-                        false,
-
-
-                    barThickness:
-                        16
-
-
-                }]
-
+                tooltip: {
+                    backgroundColor: cores.tooltip,
+                    callbacks: {
+                        label: function(context){
+                            return `${context.raw} kWh`;
+                        }
+                    }
+                }
 
             },
 
+            scales: {
 
-
-            options:{
-
-
-                responsive:true,
-
-
-                maintainAspectRatio:false,
-
-
-
-                plugins:{
-
-
-                    legend:{
-                        display:false
-                    },
-
-
-                    tooltip:{
-
-
-                        backgroundColor:
-                            "#1E293B",
-
-
-                        callbacks:{
-
-
-                            label:
-                                function(context){
-
-                                    return `${context.raw} kWh`;
-
-                                }
-
-
-                        }
-
-
-                    }
-
-
+                x: {
+                    grid: { display: false },
+                    border: { display: false }
                 },
 
-
-
-                scales:{
-
-
-                    x:{
-
-
-                        grid:{
-                            display:false
-                        },
-
-
-                        border:{
-                            display:false
-                        }
-
-
-                    },
-
-
-
-                    y:{
-
-
-                        min:0,
-
-
-                        max:50,
-
-
-                        ticks:{
-                            stepSize:10
-                        },
-
-
-                        border:{
-                            display:false
-                        },
-
-
-                        grid:{
-                            color:"#F3F4F6"
-                        }
-
-
-                    }
-
-
-
+                y: {
+                    min: 0,
+                    max: 50,
+                    ticks: { stepSize: 10 },
+                    border: { display: false },
+                    grid: { color: cores.grade }
                 }
-
-
 
             }
 
-
-
         }
 
-    );
+    });
 
 }
-
-
-
-
-
-// =====================================================
-// Gráfico Comparativo últimos meses
-// =====================================================
 
 
 function graficoComparativo(){
 
-
-
     const elemento =
-        document.getElementById(
-            "chartResumoComparativo"
-        );
-
-
+        document.getElementById("chartResumoComparativo");
 
     if(!elemento){
         return;
     }
 
+    destruirGrafico(elemento);
 
+    const cores = coresDoTema();
 
     const contexto =
         elemento.getContext("2d");
 
-
-
     const gradiente =
-        contexto.createLinearGradient(
-            0,
-            0,
-            0,
-            300
-        );
+        contexto.createLinearGradient(0, 0, 0, 300);
 
+    gradiente.addColorStop(0, hexParaRgba(cores.destaque, 0.45));
+    gradiente.addColorStop(1, hexParaRgba(cores.destaque, 0.02));
 
+    new Chart(contexto, {
 
-    gradiente.addColorStop(
-        0,
-        "rgba(210,245,0,0.45)"
-    );
+        type: "line",
 
+        data: {
 
-    gradiente.addColorStop(
-        1,
-        "rgba(210,245,0,0.02)"
-    );
+            labels: [
+                "Abril", "Maio", "Junho",
+                "Julho", "Agosto", "Setembro"
+            ],
 
+            datasets: [{
+                data: [190, 170, 220, 260, 230, 166],
+                borderColor: cores.destaque,
+                backgroundColor: gradiente,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.2,
+                pointRadius: 5,
+                pointBackgroundColor: cores.destaque
+            }]
 
+        },
 
+        options: {
 
+            responsive: true,
+            maintainAspectRatio: false,
 
-    new Chart(
-        contexto,
-        {
+            plugins: {
 
+                legend: {
+                    display: false
+                },
 
-            type:"line",
-
-
-            data:{
-
-
-                labels:[
-
-                    "Abril",
-                    "Maio",
-                    "Junho",
-                    "Julho",
-                    "Agosto",
-                    "Setembro"
-
-                ],
-
-
-                datasets:[{
-
-
-                    data:[
-
-                        190,
-                        170,
-                        220,
-                        260,
-                        230,
-                        166
-
-                    ],
-
-
-                    borderColor:
-                        "#C2E200",
-
-
-                    backgroundColor:
-                    gradiente,
-
-
-                    borderWidth:
-                        3,
-
-
-                    fill:true,
-
-
-                    tension:
-                        0.2,
-
-
-                    pointRadius:
-                        5,
-
-
-                    pointBackgroundColor:
-                        "#B2D400"
-
-
-                }]
-
+                tooltip: {
+                    backgroundColor: cores.tooltip,
+                    callbacks: {
+                        label: function(context){
+                            return `${context.raw} kWh`;
+                        }
+                    }
+                }
 
             },
 
+            scales: {
 
-
-            options:{
-
-
-                responsive:true,
-
-
-                maintainAspectRatio:false,
-
-
-
-                plugins:{
-
-
-                    legend:{
-                        display:false
-                    },
-
-
-                    tooltip:{
-
-
-                        callbacks:{
-
-
-                            label:
-                                function(context){
-
-                                    return `${context.raw} kWh`;
-
-                                }
-
-
-                        }
-
-
-                    }
-
-
+                x: {
+                    grid: { display: false },
+                    border: { display: false }
                 },
 
-
-
-                scales:{
-
-
-                    x:{
-
-
-                        grid:{
-                            display:false
-                        },
-
-
-                        border:{
-                            display:false
-                        }
-
-
-                    },
-
-
-
-                    y:{
-
-
-                        min:0,
-
-
-                        max:300,
-
-
-                        ticks:{
-                            stepSize:50
-                        },
-
-
-                        border:{
-                            display:false
-                        },
-
-
-                        grid:{
-                            color:"#F3F4F6"
-                        }
-
-
-                    }
-
-
-
+                y: {
+                    min: 0,
+                    max: 300,
+                    ticks: { stepSize: 50 },
+                    border: { display: false },
+                    grid: { color: cores.grade }
                 }
-
 
             }
 
-
-
         }
 
-    );
-
+    });
 
 }
 
 
-
-
-
-
-
-
-// =====================================================
-// Gráfico Valor da conta
-// =====================================================
-
-
 function graficoConta(){
 
-
-
     const elemento =
-        document.getElementById(
-            "chartValorConta"
-        );
-
-
+        document.getElementById("chartValorConta");
 
     if(!elemento){
         return;
     }
 
+    destruirGrafico(elemento);
 
+    const cores = coresDoTema();
 
-    new Chart(
-        elemento,
-        {
+    new Chart(elemento, {
 
+        type: "bar",
 
-            type:"bar",
+        data: {
 
+            labels: ["Abr", "Mai", "Jun", "Jul", "Ago", "Set"],
 
-            data:{
+            datasets: [{
+                data: [160, 195, 142, 162, 108, 116],
+                backgroundColor: cores.destaque,
+                borderRadius: 6,
+                borderSkipped: false,
+                barThickness: 16
+            }]
 
+        },
 
-                labels:[
+        options: {
 
-                    "Abr",
-                    "Mai",
-                    "Jun",
-                    "Jul",
-                    "Ago",
-                    "Set"
+            responsive: true,
+            maintainAspectRatio: false,
 
-                ],
+            plugins: {
 
+                legend: {
+                    display: false
+                },
 
-
-                datasets:[{
-
-
-                    data:[
-
-                        160,
-                        195,
-                        142,
-                        162,
-                        108,
-                        116
-
-                    ],
-
-
-                    backgroundColor:
-                        "#D2F500",
-
-
-                    borderRadius:
-                        6,
-
-
-                    borderSkipped:false,
-
-
-                    barThickness:
-                        16
-
-
-                }]
-
+                tooltip: {
+                    backgroundColor: cores.tooltip,
+                    callbacks: {
+                        label: function(context){
+                            return `R$ ${context.raw},00`;
+                        }
+                    }
+                }
 
             },
 
+            scales: {
 
-
-            options:{
-
-
-                responsive:true,
-
-
-                maintainAspectRatio:false,
-
-
-
-                plugins:{
-
-
-                    legend:{
-                        display:false
-                    },
-
-
-                    tooltip:{
-
-
-                        callbacks:{
-
-
-                            label:
-                                function(context){
-
-                                    return `R$ ${context.raw},00`;
-
-                                }
-
-
-                        }
-
-
-                    }
-
-
+                x: {
+                    grid: { display: false },
+                    border: { display: false }
                 },
 
+                y: {
+                    min: 0,
+                    max: 300,
+                    ticks: {
+                        stepSize: 50,
+                        callback: function(valor){
 
+                            if(valor === 0){
+                                return "0";
+                            }
 
-                scales:{
+                            return `R$ ${valor}`;
 
-
-                    x:{
-
-
-                        grid:{
-                            display:false
-                        },
-
-
-                        border:{
-                            display:false
                         }
-
-
                     },
-
-
-
-                    y:{
-
-
-                        min:0,
-
-
-                        max:300,
-
-
-                        ticks:{
-
-
-                            stepSize:50,
-
-
-                            callback:
-                                function(valor){
-
-                                    if(valor === 0){
-                                        return "0";
-                                    }
-
-
-                                    return `R$ ${valor}`;
-
-                                }
-
-
-                        },
-
-
-                        border:{
-                            display:false
-                        },
-
-
-                        grid:{
-                            color:"#F3F4F6"
-                        }
-
-
-
-                    }
-
-
+                    border: { display: false },
+                    grid: { color: cores.grade }
                 }
-
-
 
             }
 
-
-
         }
 
-    );
-
+    });
 
 }
-
-
-
