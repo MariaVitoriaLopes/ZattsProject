@@ -1,3 +1,5 @@
+import java.io.File
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -73,10 +75,102 @@ dependencies {
     // Coroutines integradas ao ciclo de vida das Activities
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
 
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+}
 
 
+val sdkPathAdb = providers.environmentVariable("ANDROID_HOME")
+    .orElse(providers.environmentVariable("ANDROID_SDK_ROOT"))
+    .orElse(
+        providers.fileContents(
+            rootProject.layout.projectDirectory.file("local.properties")
+        ).asText.map { conteudo ->
+            Properties().apply {
+                load(conteudo.reader())
+            }.getProperty("sdk.dir")
+        }
+    )
 
+tasks.register("configurarAdbReverse") {
+    group = "development"
+    description = "Configura ADB reverse para todos os dispositivos"
+
+    val caminhoSdk = sdkPathAdb
+
+    doLast {
+        val sdkPath = caminhoSdk.orNull
+            ?: throw GradleException(
+                "Android SDK não encontrado."
+            )
+
+        val adb = File(
+            sdkPath,
+            "platform-tools/adb.exe"
+        )
+
+        if (!adb.exists()) {
+            throw GradleException(
+                "ADB não encontrado: ${adb.absolutePath}"
+            )
+        }
+
+        val lista = ProcessBuilder(
+            adb.absolutePath,
+            "devices"
+        )
+            .redirectErrorStream(true)
+            .start()
+
+        val saida = lista.inputStream
+            .bufferedReader()
+            .readText()
+
+        if (lista.waitFor() != 0) {
+            throw GradleException(
+                "Erro ao listar dispositivos: $saida"
+            )
+        }
+
+        val dispositivos = saida
+            .lines()
+            .filter { it.endsWith("\tdevice") }
+            .map { it.substringBefore("\t") }
+
+        if (dispositivos.isEmpty()) {
+            println("Nenhum dispositivo Android conectado.")
+        }
+
+        dispositivos.forEach { dispositivo ->
+            val processo = ProcessBuilder(
+                adb.absolutePath,
+                "-s",
+                dispositivo,
+                "reverse",
+                "tcp:8081",
+                "tcp:8081"
+            )
+                .inheritIO()
+                .start()
+
+            if (processo.waitFor() != 0) {
+                throw GradleException(
+                    "Erro ao configurar: $dispositivo"
+                )
+            }
+
+            println(
+                "ADB reverse configurado: $dispositivo"
+            )
+        }
+    }
+}
+
+tasks.matching {
+    it.name == "assembleDebug"
+}.configureEach {
+    finalizedBy("configurarAdbReverse")
 }

@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/corFundoTela"
     tools:context=".CadastroActivity">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -17,7 +18,9 @@
         android:contentDescription="Voltar para login"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="?attr/homeAsUpIndicator" />
+        app:srcCompat="?attr/homeAsUpIndicator"
+        app:backgroundTint="?attr/colorSurface"
+        app:tint="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_voltarLogin"
@@ -29,7 +32,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.072"
         app:layout_constraintStart_toEndOf="@+id/fab_login"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_Titulo"
@@ -40,7 +44,8 @@
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txv_voltarLogin" />
+        app:layout_constraintTop_toBottomOf="@+id/txv_voltarLogin"
+        android:textColor="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_subTitulo"
@@ -49,7 +54,8 @@
         android:text="Crie sua conta em menos de 2 minutos"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txv_Titulo" />
+        app:layout_constraintTop_toBottomOf="@+id/txv_Titulo"
+        android:textColor="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_labelEmail"
@@ -60,7 +66,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.089"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txv_subTitulo" />
+        app:layout_constraintTop_toBottomOf="@+id/txv_subTitulo"
+        android:textColor="?attr/colorOnSurface" />
 
     <EditText
         android:id="@+id/edt_emailLogin"
@@ -73,7 +80,9 @@
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txv_labelEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/txv_labelEmail"
+        android:textColor="?attr/colorOnSurface"
+        android:textColorHint="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_labelSenha"
@@ -84,7 +93,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.081"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edt_emailLogin" />
+        app:layout_constraintTop_toBottomOf="@+id/edt_emailLogin"
+        android:textColor="?attr/colorOnSurface" />
 
     <!-- CAMPO SENHA COM OLHINHO -->
     <com.google.android.material.textfield.TextInputLayout
@@ -95,7 +105,10 @@
         app:endIconMode="password_toggle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txv_labelSenha">
+        app:layout_constraintTop_toBottomOf="@+id/txv_labelSenha"
+        app:boxStrokeColor="?attr/colorPrimary"
+        app:hintTextColor="?attr/colorOnSurface"
+        app:endIconTint="?attr/colorOnSurface">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_senhaLogin"
@@ -103,7 +116,9 @@
             android:layout_height="wrap_content"
             android:hint="Ex.: Abcd1234."
             android:inputType="textPassword"
-            android:minHeight="48dp" />
+            android:minHeight="48dp"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurface" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -116,7 +131,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.118"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_senha" />
+        app:layout_constraintTop_toBottomOf="@+id/layout_senha"
+        android:textColor="?attr/colorOnSurface" />
 
     <!-- CONFIRMAR SENHA COM OLHINHO -->
     <com.google.android.material.textfield.TextInputLayout
@@ -127,7 +143,10 @@
         app:endIconMode="password_toggle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txv_labelConfirmarSenha">
+        app:layout_constraintTop_toBottomOf="@+id/txv_labelConfirmarSenha"
+        app:boxStrokeColor="?attr/colorPrimary"
+        app:hintTextColor="?attr/colorOnSurface"
+        app:endIconTint="?attr/colorOnSurface">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_confirmarSenha"
@@ -135,7 +154,9 @@
             android:layout_height="wrap_content"
             android:hint="Ex.: Abcd1234."
             android:inputType="textPassword"
-            android:minHeight="48dp" />
+            android:minHeight="48dp"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurface" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -148,7 +169,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.11"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_confirmarSenha" />
+        app:layout_constraintTop_toBottomOf="@+id/layout_confirmarSenha"
+        android:textColor="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_tamanho"
@@ -159,7 +181,8 @@
         android:text="• Pelo menos 8 caracteres"
         android:textSize="10sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txv_esqueciSenha" />
+        app:layout_constraintTop_toBottomOf="@+id/txv_esqueciSenha"
+        android:textColor="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_especial"
@@ -170,7 +193,8 @@
         android:text="• Um caractere especial"
         android:textSize="10sp"
         app:layout_constraintStart_toEndOf="@+id/txv_tamanho"
-        app:layout_constraintTop_toBottomOf="@+id/txv_esqueciSenha" />
+        app:layout_constraintTop_toBottomOf="@+id/txv_esqueciSenha"
+        android:textColor="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_maiuscula"
@@ -182,7 +206,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.531"
         app:layout_constraintStart_toEndOf="@+id/txv_especial"
-        app:layout_constraintTop_toBottomOf="@+id/txv_esqueciSenha" />
+        app:layout_constraintTop_toBottomOf="@+id/txv_esqueciSenha"
+        android:textColor="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_coincidem"
@@ -193,7 +218,8 @@
         android:text="• As senhas devem coincidir"
         android:textSize="10sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txv_tamanho" />
+        app:layout_constraintTop_toBottomOf="@+id/txv_tamanho"
+        android:textColor="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_numero"
@@ -204,7 +230,8 @@
         android:text="• Um número"
         android:textSize="10sp"
         app:layout_constraintStart_toEndOf="@+id/txv_coincidem"
-        app:layout_constraintTop_toBottomOf="@+id/txv_especial" />
+        app:layout_constraintTop_toBottomOf="@+id/txv_especial"
+        android:textColor="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_minuscula"
@@ -216,14 +243,16 @@
         android:textSize="10sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/txv_numero"
-        app:layout_constraintTop_toBottomOf="@+id/txv_maiuscula" />
+        app:layout_constraintTop_toBottomOf="@+id/txv_maiuscula"
+        android:textColor="?attr/colorOnSurface" />
 
     <Button
         android:id="@+id/btn_recuperarSenha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:backgroundTint="#000000"
+        android:backgroundTint="?attr/colorOnSurface"
+        android:textColor="?attr/colorSurface"
         android:text="Cadastrar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -238,7 +267,8 @@
         android:layout_marginTop="28dp"
         android:text="Já tem uma conta?"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_recuperarSenha" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_recuperarSenha"
+        android:textColor="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_linkLogin"
@@ -250,6 +280,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.043"
         app:layout_constraintStart_toEndOf="@+id/txv_label"
-        app:layout_constraintTop_toBottomOf="@+id/btn_recuperarSenha" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_recuperarSenha"
+        android:textColor="?attr/colorOnSurface" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

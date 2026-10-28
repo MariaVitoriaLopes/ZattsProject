@@ -1,0 +1,271 @@
+html[data-cor="laranja"] {
+    --cor-primaria-400: #FF8000;
+    --cor-primaria-950: #4D2600;
+}
+
+html[data-cor="vermelho"] {
+    --cor-primaria-400: #FF0000;
+    --cor-primaria-950: #4D0000;
+}
+
+html[data-cor="azul"] {
+    --cor-primaria-400: #3B1DE4;
+    --cor-primaria-950: #0F0847;
+}
+
+html[data-cor="roxo"] {
+    --cor-primaria-400: #9000D1;
+    --cor-primaria-950: #2B0040;
+}
+
+html[data-cor="outra"] {
+    --cor-primaria-950: color-mix(in srgb, var(--cor-primaria-400) 25%, black);
+}
+
+html[data-tema="escuro"] {
+    color-scheme: dark;
+}
+
+html[data-tema="escuro"] body,
+html[data-tema="escuro"] .configuracoes-container {
+    background-color: #121212;
+}
+
+html[data-tema="escuro"] .card-config,
+html[data-tema="escuro"] .card-preferencias,
+html[data-tema="escuro"] .cfg-notif-card,
+html[data-tema="escuro"] .card-notificacoes {
+    background-color: #1C1C1C;
+    border-color: #2C2C2C;
+}
+
+html[data-tema="escuro"] .cfg-notif-lateral {
+    border-color: #2C2C2C;
+}
+
+html[data-tema="escuro"] .titulo-pagina,
+html[data-tema="escuro"] .secao-titulo,
+html[data-tema="escuro"] .bloco-pref-info h3,
+html[data-tema="escuro"] .cfg-notif-cabecalho h3,
+html[data-tema="escuro"] .coluna-config .campo label,
+html[data-tema="escuro"] .cfg-notif-menu a,
+html[data-tema="escuro"] .cfg-notif-linha,
+html[data-tema="escuro"] .cfg-notif-todas,
+html[data-tema="escuro"] .notificacao-titulo,
+html[data-tema="escuro"] .opcao-modo strong,
+html[data-tema="escuro"] .opcao-cor,
+html[data-tema="escuro"] .abas-config .aba {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .bloco-pref-info p,
+html[data-tema="escuro"] .grupo-rotulo,
+html[data-tema="escuro"] .notificacao-tempo,
+html[data-tema="escuro"] .opcao-modo small,
+html[data-tema="escuro"] .contador-notificacoes,
+html[data-tema="escuro"] .sem-notificacoes,
+html[data-tema="escuro"] .dica-campo,
+html[data-tema="escuro"] .aviso {
+    color: #A3A3A3;
+}
+
+html[data-tema="escuro"] .configuracoes-container .campo-input input,
+html[data-tema="escuro"] .configuracoes-container .campo-input select {
+    background-color: #232323;
+    border-color: #333333;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .campo-input button,
+html[data-tema="escuro"] .seta-select,
+html[data-tema="escuro"] .opcao-modo .material-symbols-outlined {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .abas-config {
+    background-color: #232323;
+}
+
+html[data-tema="escuro"] .abas-config .aba.ativa {
+    background-color: #3A3A3A;
+}
+
+html[data-tema="escuro"] .opcao-modo,
+html[data-tema="escuro"] .opcao-cor {
+    background-color: #1C1C1C;
+    border-color: #333333;
+}
+
+html[data-tema="escuro"] .opcao-modo:has(input:checked),
+html[data-tema="escuro"] .opcao-cor:has(input:checked) {
+    border-color: var(--cor-primaria-400);
+}
+
+html[data-tema="escuro"] .divisor-pref,
+html[data-tema="escuro"] .cfg-notif-grupo,
+html[data-tema="escuro"] .notificacao {
+    border-color: #2C2C2C;
+}
+
+html[data-tema="escuro"] .lista-notificacoes .notificacao:nth-child(odd),
+html[data-tema="escuro"] .notificacao-icone {
+    background-color: #232323;
+}
+
+html[data-tema="escuro"] .lista-notificacoes .notificacao:hover {
+    background-color: #2A2A2A;
+}
+
+html[data-tema="escuro"] .notificacao-icone .material-symbols-outlined {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .interruptor {
+    background-color: #333333;
+}
+
+html[data-tema="escuro"] .interruptor:checked::before {
+    background-color: var(--cor-primaria-400);
+}
+
+html[data-tema="escuro"] .cfg-notif-linha input[type="checkbox"] {
+    background-color: #232323;
+    border-color: #444444;
+}
+
+html[data-tema="escuro"] .cfg-notif-linha input[type="checkbox"]:checked {
+    background-color: var(--cor-primaria-400);
+    border-color: var(--cor-primaria-400);
+}
+
+html[data-tema="escuro"] .cfg-notif-linha input[type="checkbox"]:checked::after {
+    border-color: var(--textos-pretos);
+}
+.menu-item.ativo {
+    box-shadow: 0 -2px 0 var(--cor-primaria-400);
+}
+
+.ponto {
+    background: var(--cor-primaria-400);
+}
+
+.logo-tema-escuro {
+    display: none;
+}
+
+html[data-tema="escuro"] .logo-tema-claro {
+    display: none;
+}
+
+html[data-tema="escuro"] .logo-tema-escuro {
+    display: block;
+}
+
+html[data-tema="escuro"] body {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] header {
+    background-color: #121212;
+}
+
+html[data-tema="escuro"] .menu-telas {
+    background: rgba(30, 30, 30, 0.85);
+    border-color: #2C2C2C;
+}
+
+html[data-tema="escuro"] .menu-item {
+    color: #A3A3A3;
+}
+
+html[data-tema="escuro"] .menu-item:hover,
+html[data-tema="escuro"] .menu-item.ativo {
+    background: #2A2A2A;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .card-dashboard {
+    background: #1C1C1C;
+    border-color: #2C2C2C;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+html[data-tema="escuro"] .card-dashboard:hover {
+    box-shadow: 0 0 8px var(--cor-primaria-400);
+}
+
+html[data-tema="escuro"] .card-dashboard h2 {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .card-dashboard span,
+html[data-tema="escuro"] .card-dashboard p {
+    color: #A3A3A3;
+}
+
+html[data-tema="escuro"] .icone-card {
+    background: #2A2A2A;
+}
+
+html[data-tema="escuro"] .icone-card span {
+    color: #F2F2F2 !important;
+}
+
+html[data-tema="escuro"] .card-dashboard:hover .icone-card span {
+    color: #000 !important;
+}
+.badge-dashboard span,
+.progresso-meta,
+.bolinha-verde {
+    background: var(--cor-primaria-400);
+}
+
+html[data-tema="escuro"] .dashboard-card {
+    background: #1C1C1C;
+    border-color: #2C2C2C;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+html[data-tema="escuro"] .cardMeta {
+    background: #1C1C1C;
+    border-color: #2FBF8A;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+html[data-tema="escuro"] .textoMeta h2,
+html[data-tema="escuro"] span.material-symbols-outlined.bandeiraMeta {
+    color: #2FBF8A;
+}
+
+html[data-tema="escuro"] .titulo-dashboard p,
+html[data-tema="escuro"] .data-hora span,
+html[data-tema="escuro"] .card-header-dashboard p,
+html[data-tema="escuro"] .textoMeta p {
+    color: #A3A3A3;
+}
+
+html[data-tema="escuro"] .meta-info {
+    color: #8A8A8A;
+}
+
+html[data-tema="escuro"] .badge-dashboard,
+html[data-tema="escuro"] .barra-meta {
+    background: #2A2A2A;
+}
+
+html[data-tema="escuro"] .bolinha-cinza {
+    background: #555555;
+}
+
+html[data-tema="escuro"] .conteudo-modal {
+    background: #1C1C1C;
+}
+
+html[data-tema="escuro"] .conteudo-modal p {
+    color: #A3A3A3;
+}
+
+html[data-tema="escuro"] .btn-cancelar {
+    background: #2A2A2A;
+    color: #F2F2F2;
+}

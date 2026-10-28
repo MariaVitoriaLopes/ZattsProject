@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações</title>
+
+    <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/configuracoes.css}">
+    <link rel="stylesheet" th:href="@{/css/preferencias.css}">
+    <th:block th:replace="~{fragments/headTema :: tema}"></th:block>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div th:replace="~{fragments/headerTelas :: header}"></div>
+
+<main class="configuracoes-container">
+
+    <h1 class="titulo-pagina">Configurações</h1>
+
+    <div class="abas-config">
+        <a th:href="@{/configuracoes}" class="aba">Conta</a>
+        <a th:href="@{/configuracoes/notificacoes}" class="aba">Notificações</a>
+        <a th:href="@{/configuracoes/preferencias}" class="aba ativa">Preferências</a>
+        <a href="#" class="aba">Dispositivos</a>
+        <a href="#" class="aba">Privacidade e Dados</a>
+        <a href="#" class="aba">Ajuda e Suporte</a>
+    </div>
+
+    <form class="card-preferencias">
+
+        <h2 class="secao-titulo">Preferências</h2>
+
+        <div class="bloco-pref">
+
+            <div class="bloco-pref-info">
+                <h3>Tema do Sistema</h3>
+                <p>Escolha um tema que seja confortável. Personalize o Zatts!</p>
+            </div>
+
+            <div class="bloco-pref-opcoes">
+
+                <div class="grupo-pref">
+                    <span class="grupo-rotulo">Modo</span>
+
+                    <div class="grade-modo">
+
+                        <label class="opcao-modo">
+                            <input type="radio" name="tema" value="automatico" checked>
+                            <span class="marca-radio"></span>
+                            <span class="material-symbols-outlined">brightness_auto</span>
+                            <strong>Automático</strong>
+                            <small>Escolhe o tema que acompanha o seu sistema</small>
+                        </label>
+
+                        <label class="opcao-modo">
+                            <input type="radio" name="tema" value="claro">
+                            <span class="marca-radio"></span>
+                            <span class="material-symbols-outlined">light_mode</span>
+                            <strong>Claro</strong>
+                            <small>Interface clara, ideal para o dia</small>
+                        </label>
+
+                        <label class="opcao-modo">
+                            <input type="radio" name="tema" value="escuro">
+                            <span class="marca-radio"></span>
+                            <span class="material-symbols-outlined">dark_mode</span>
+                            <strong>Escuro</strong>
+                            <small>Interface escura, ideal para a noite</small>
+                        </label>
+
+                    </div>
+                </div>
+
+                <div class="grupo-pref">
+                    <span class="grupo-rotulo">Cor de destaque</span>
+
+                    <div class="grade-cores">
+
+                        <label class="opcao-cor">
+                            <input type="radio" name="cor" value="padrao" checked>
+                            <span class="bolinha-cor cor-padrao"></span>
+                            <span>Padrão</span>
+                        </label>
+
+                        <label class="opcao-cor">
+                            <input type="radio" name="cor" value="laranja">
+                            <span class="bolinha-cor cor-laranja"></span>
+                            <span>Laranja</span>
+                        </label>
+
+                        <label class="opcao-cor">
+                            <input type="radio" name="cor" value="vermelho">
+                            <span class="bolinha-cor cor-vermelho"></span>
+                            <span>Vermelho</span>
+                        </label>
+
+                        <label class="opcao-cor">
+                            <input type="radio" name="cor" value="azul">
+                            <span class="bolinha-cor cor-azul"></span>
+                            <span>Azul</span>
+                        </label>
+
+                        <label class="opcao-cor">
+                            <input type="radio" name="cor" value="roxo">
+                            <span class="bolinha-cor cor-roxo"></span>
+                            <span>Roxo</span>
+                        </label>
+
+                        <label class="opcao-cor">
+                            <input type="radio" name="cor" value="outra">
+                            <span class="bolinha-cor cor-outra" id="bolinhaOutra"></span>
+                            <span>Outra</span>
+                            <input type="color" id="corPersonalizada" class="cor-personalizada-input" value="#E6FB1A" aria-label="Escolher cor personalizada">
+                        </label>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr class="divisor-pref">
+
+        <div class="bloco-pref">
+
+            <div class="bloco-pref-info">
+                <h3>Idioma</h3>
+                <p>Escolha um tema que seja confortável.</p>
+            </div>
+
+            <div class="bloco-pref-opcoes">
+                <div class="grupo-pref">
+                    <label class="grupo-rotulo" for="idioma">Escolha o idioma de preferência</label>
+
+                    <div class="campo-input select-idioma">
+                        <select id="idioma" name="idioma">
+                            <option value="pt-BR" selected>Português (Br)</option>
+                            <option value="en">English</option>
+                            <option value="es">Español</option>
+                        </select>
+                        <span class="material-symbols-outlined seta-select">expand_more</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+
+</main>
+
+<script th:src="@{/js/preferencias.js}"></script>
+
+</body>
+
+</html>

@@ -24,4 +24,16 @@
     <color name="nav_accent">#D4F700</color>
     <color name="nav_selected_bg">#F9F9F9</color>
     <color name="nav_icon">#4A4A4A</color>
+
+    <!-- CORES DINÂMICAS DO TEMA -->
+    <color name="tema_fundo">@color/fundo_0</color>
+    <color name="tema_superficie">@color/fundo_50</color>
+    <color name="tema_texto">@color/textos_pretos</color>
+    <color name="tema_texto_secundario">@color/fundo_700</color>
+    <color name="tema_grade">#DDDDDD</color>
+
+    <!-- CORES DINÂMICAS DA NAVBAR -->
+    <color name="tema_nav_fundo">@color/fundo_0</color>
+    <color name="tema_nav_selecionado">@color/nav_selected_bg</color>
+    <color name="tema_nav_icone">@color/nav_icon</color>
 </resources>

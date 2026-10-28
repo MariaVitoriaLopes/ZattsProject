@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="corBordaCard" format="color"/>
+    <attr name="corBordaTab" format="color"/>
+    <attr name="corFundoTela" format="color"/>
+    <attr name="corNavSelecionada" format="color"/>
+</resources>
