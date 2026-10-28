@@ -127,10 +127,10 @@ class LoginActivity : AppCompatActivity() {
                         "LOGIN - HTTP: ${resposta.code()}"
                     )
 
-                    Log.d(
-                        "ZATTS_API",
-                        "LOGIN - URL: ${resposta.raw().request().url()}"
-                    )
+//                    Log.d(
+//                        "ZATTS_API",
+//                        "LOGIN - URL: ${resposta.raw().request().url()}"
+//                    )
 
                     if (resposta.isSuccessful) {
 

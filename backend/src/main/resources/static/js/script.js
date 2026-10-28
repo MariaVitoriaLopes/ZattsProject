@@ -102,7 +102,7 @@ function iniciarRelogio() {
 function configurarChart(){
 
 
-    if(typeof Chart === "undefined"){
+    if  (typeof Chart === "undefined"){
         return;
     }
 
@@ -185,41 +185,40 @@ function iniciarGraficos(){
 
 }
 
-
-
-
-
-
+// conexão SSE pra alimentar apenas o gráfico de consumo
+let instanciaGraficoConsumo = null;
+let conexaoSSE = null;
 
 // =====================================================
 // Gráfico Consumo em tempo real
 // =====================================================
+
 function graficoConsumo(){
 
     const elemento =
         document.getElementById("chartConsumoRealtime");
 
-    if(!elemento){
+    if (!elemento) {
         return;
     }
 
-    destruirGrafico(elemento);
+//    destruirGrafico(elemento);
+    if (instanciaGraficoConsumo) {
+        instanciaGraficoConsumo.destroy();
+    }
 
     const cores = coresDoTema();
 
-    new Chart(elemento, {
+     instanciaGraficoConsumo = new Chart(elemento, {
 
         type: "bar",
 
         data: {
-
-            labels: [
-                "5h", "6h", "7h", "8h", "9h", "10h",
-                "11h", "12h", "13h", "14h", "15h"
-            ],
+            labels: [],
 
             datasets: [{
-                data: [4, 6, 10, 15, 22, 29, 19, 22, 12, 13, 16],
+                label: "Consumo de Energia",
+                data: [],
                 backgroundColor: cores.destaque,
                 borderRadius: 6,
                 borderSkipped: false,
@@ -271,6 +270,42 @@ function graficoConsumo(){
 
     });
 
+    if (conexaoSSE) {
+        conexaoSSE.close();
+    }
+
+    conexaoSSE = new EventSource("api/consumos/stream");
+
+    conexaoSSE.addEventListener("consumo-horario", event => {
+        const leitura = JSON.parse(event.data)
+        const data = new Date(leitura.dataHora)
+        const hora = String(data.getHours()).padStart(2,"0");
+        const label = `${hora}h`;
+
+        const labels = instanciaGraficoConsumo.data.labels;
+        const valores = instanciaGraficoConsumo.data.datasets[0].data;
+
+        let index = labels.indexOf(label);
+
+        if (index === -1) {
+            index = labels.length;
+            labels.push(label);
+            valores.push(0);
+        }
+
+        valores[index] = leitura.consumoKwh;
+
+        while (labels.length > 24) {
+            labels.shift();
+            valores.shift();
+        }
+
+        instanciaGraficoConsumo.update("none");
+    });
+
+    conexaoSSE.onerror = erro => {
+        console.error("Erro na conexão SSE: ", erro);
+    };
 }
 
 
