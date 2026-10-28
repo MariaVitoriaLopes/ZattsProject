@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="?attr/corFundoTela">
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -12,7 +12,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:paddingBottom="88dp"
-    android:background="#FFFFFF">
+    android:background="?attr/corFundoTela">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
             android:text="15:48:07"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#434343" />
+            android:textColor="?attr/colorOnSurface" />
 
         <TextView
             android:id="@+id/txv_data"
@@ -42,7 +42,7 @@
             android:text="Sábado, 19 de Setembro de 2026"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:textColor="#434343" />
+            android:textColor="?attr/colorOnSurface" />
 
         <TextView
             android:layout_width="match_parent"
@@ -51,7 +51,7 @@
             android:text="Dashboard"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#1A1A1A" />
+            android:textColor="?attr/colorOnSurface"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -59,7 +59,67 @@
             android:layout_marginTop="12dp"
             android:text="Acompanhe o consumo elétrico da sua residência de forma simples, inteligente e acessível."
             android:textSize="14sp"
-            android:textColor="#434343" />
+            android:textColor="?attr/colorOnSurface" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_card_home"
+            android:padding="22dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Meta de consumo mensal"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Acompanhe sua meta para economizar"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurface" />
+
+            <ProgressBar
+                android:id="@+id/progressoMeta"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_marginTop="18dp"
+                android:max="100"
+                android:progress="36"
+                android:progressTint="#E6FB1A"
+                android:progressBackgroundTint="#E5E5E5" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txv_consumoMensal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="90 kWh"
+                    android:textSize="12sp"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <TextView
+                    android:id="@+id/txv_metaMensal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="250 kWh"
+                    android:textSize="12sp"
+                    android:textColor="?attr/colorOnSurface" />
+            </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -81,7 +141,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Consumo Total Diário"
-                    android:textColor="#1A1A1A"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="12sp" />
 
                 <TextView
@@ -90,7 +150,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="32,8 kWh"
-                    android:textColor="#1A1A1A"
+                    android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold"
                     android:textSize="21sp" />
 
@@ -118,7 +178,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Custo Diário"
-                    android:textColor="#1A1A1A"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="12sp" />
 
                 <TextView
@@ -127,7 +187,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="R$ 3,57"
-                    android:textColor="#1A1A1A"
+                    android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold"
                     android:textSize="21sp" />
 
@@ -161,7 +221,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Meta de Gasto"
-                    android:textColor="#1A1A1A"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="12sp" />
 
                 <TextView
@@ -170,7 +230,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="250 kWh"
-                    android:textColor="#1A1A1A"
+                    android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold"
                     android:textSize="21sp" />
 
@@ -198,7 +258,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Economia Estimada"
-                    android:textColor="#1A1A1A"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="12sp" />
 
                 <TextView
@@ -207,7 +267,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="R$ 3,45"
-                    android:textColor="#1A1A1A"
+                    android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold"
                     android:textSize="21sp" />
 
@@ -243,7 +303,7 @@
                 android:minWidth="48dp"
                 android:minHeight="48dp"
                 android:text="Consumo"
-                android:textColor="#1A1A1A"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="13sp" />
 
             <TextView
@@ -253,7 +313,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Resumo"
-                android:textColor="#1A1A1A"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="13sp"
                 android:clickable="true"
                 android:focusable="true" />
@@ -265,7 +325,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Valor da conta"
-                android:textColor="#1A1A1A"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="13sp"
                 android:clickable="true"
                 android:focusable="true" />
@@ -286,7 +346,7 @@
                 android:text="Consumo de energia"
                 android:textSize="17sp"
                 android:textStyle="bold"
-                android:textColor="#1A1A1A" />
+                android:textColor="?attr/colorOnSurface" />
 
             <TextView
                 android:id="@+id/txv_subtituloGrafico"
@@ -295,73 +355,13 @@
                 android:layout_marginTop="5dp"
                 android:text="Veja o consumo de energia (kWh) por horário"
                 android:textSize="12sp"
-                android:textColor="#777777" />
+                android:textColor="?attr/colorOnSurface" />
 
             <com.zattsproject.mobile.View.GraficoConsumoView
                 android:id="@+id/graficoConsumo"
                 android:layout_width="match_parent"
                 android:layout_height="260dp"
                 android:layout_marginTop="16dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:background="@drawable/bg_card_home"
-            android:padding="22dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Meta de consumo mensal"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:textColor="#1A1A1A" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Acompanhe sua meta para economizar"
-                android:textSize="12sp"
-                android:textColor="#777777" />
-
-            <ProgressBar
-                android:id="@+id/progressoMeta"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:layout_marginTop="18dp"
-                android:max="100"
-                android:progress="36"
-                android:progressTint="#E6FB1A"
-                android:progressBackgroundTint="#E5E5E5" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/txv_consumoMensal"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="90 kWh"
-                    android:textSize="12sp"
-                    android:textColor="#434343" />
-
-                <TextView
-                    android:id="@+id/txv_metaMensal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="250 kWh"
-                    android:textSize="12sp"
-                    android:textColor="#434343" />
-            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
@@ -373,6 +373,6 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_gravity="bottom"
-        android:background="@android:color/white" />
+        android:background="?attr/corFundoTela" />
 
 </FrameLayout>

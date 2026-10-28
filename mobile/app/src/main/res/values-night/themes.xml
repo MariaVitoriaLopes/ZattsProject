@@ -1,7 +1,24 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Mobile" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+<resources>
+    <style name="Base.Theme.Mobile"
+        parent="Theme.Material3.DayNight.NoActionBar">
+
+        <item name="colorPrimary">@color/cor_primaria_400</item>
+        <item name="colorSurface">@color/fundo_900</item>
+        <item name="colorOnSurface">@color/textos_brancos</item>
+
+        <item name="android:windowBackground">@color/fundo_950</item>
+        <item name="android:statusBarColor">@color/fundo_950</item>
+        <item name="android:navigationBarColor">@color/fundo_950</item>
+
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+
+        <!-- CORES DINÂMICAS -->
+        <item name="corFundoTela">@color/fundo_950</item>
+        <item name="corBordaCard">@color/fundo_700</item>
+        <item name="corBordaTab">@color/fundo_700</item>
+        <item name="corNavSelecionada">@color/fundo_900</item>
     </style>
+
+    <style name="Theme.Mobile" parent="Base.Theme.Mobile" />
 </resources>

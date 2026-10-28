@@ -6,7 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="?attr/corFundoTela"
     tools:context=".IniciarPesquisaActivity">
 
     <!-- SETA PARA VOLTAR -->
@@ -23,7 +23,7 @@
         android:src="@android:drawable/ic_media_previous"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="#333333" />
+        app:tint="?attr/colorOnSurface" />
 
     <TextView
         android:id="@+id/txv_voltarLogin"
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:text="Voltar para Página de Login"
-        android:textColor="#171717"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/btn_voltarLogin"
         app:layout_constraintStart_toEndOf="@+id/btn_voltarLogin"
@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             android:text="Vamos entender o uso de energia da sua casa?"
-            android:textColor="#000000"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="30sp"
             android:textStyle="bold"
             android:letterSpacing="-0.04" />
@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="26dp"
             android:text="Responda a 4 perguntas rápidas para podermos analisar seu perfil de consumo e gerar recomendações personalizadas."
-            android:textColor="#444444"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="16sp" />
 
     </LinearLayout>
@@ -79,11 +79,11 @@
         android:layout_width="256dp"
         android:layout_height="60dp"
         android:layout_marginBottom="76dp"
-        android:backgroundTint="#DFFF00"
+        android:backgroundTint="?attr/colorPrimary"
         android:elevation="7dp"
         android:text="Começar questionário   →"
         android:textAllCaps="false"
-        android:textColor="#000000"
+        android:textColor="?attr/colorOnPrimary"
         android:textSize="16sp"
         android:textStyle="bold"
         app:cornerRadius="16dp"
@@ -110,7 +110,7 @@
             android:layout_width="25dp"
             android:layout_height="wrap_content"
             android:text="ⓘ"
-            android:textColor="#444444"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="23sp" />
 
         <TextView
@@ -120,7 +120,7 @@
             android:layout_marginStart="10dp"
             android:layout_weight="1"
             android:text="Suas informações são confidenciais e usadas apenas para tornar sua experiência mais completa. Não compartilhamos seus dados com terceiros."
-            android:textColor="#383838"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="12sp" />
 
     </LinearLayout>
