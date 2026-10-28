@@ -1,49 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/corFundoTela"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/txv_textoini"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:text="Monitore o seu consumo em tempo real"
-        android:textAlignment="center"
-        android:textColor="#000000"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imv_logo" />
-
+    <!-- LOGO ZATTS -->
     <ImageView
         android:id="@+id/imv_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="42dp"
-        android:layout_marginTop="200dp"
+        android:layout_width="150dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="100dp"
+        android:contentDescription="Logo Zatts"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@id/layout_textos"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.48"
         app:srcCompat="@drawable/logo_oficial_preta_exportada" />
 
-    <Button
-        android:id="@+id/btn_comecar"
-        android:layout_width="250dp"
+    <!-- TÍTULO E PERGUNTA -->
+    <LinearLayout
+        android:id="@+id/layout_textos"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:backgroundTint="#E6FB1A"
-        android:minHeight="58dp"
-        android:text="Começar agora!"
-        android:textColor="#000000"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="35dp"
+        android:layout_marginEnd="35dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/imv_logo"
+        app:layout_constraintBottom_toTopOf="@id/layout_botoes"
+        app:layout_constraintVertical_bias="0.52">
+
+        <TextView
+            android:id="@+id/txv_textoini"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:text="Monitore seu consumo&#10;em tempo real"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txv_pergunta"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="O dispositivo Zatts está&#10;instalado em sua residência?"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <!-- BOTÕES -->
+    <LinearLayout
+        android:id="@+id/layout_botoes"
+        android:layout_width="258dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/layout_textos"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txv_textoini" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.24">
+
+        <!-- BOTÃO TENHO -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_comecar"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:backgroundTint="?attr/colorPrimary"
+            android:text="Sim. Começar agora!"
+            android:textAllCaps="false"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            app:strokeWidth="0dp"
+            android:elevation="0dp" />
+
+        <!-- BOTÃO NÃO TENHO -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_naoTenhoDispositivo"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="?attr/colorSurfaceVariant"
+            android:text="Não tenho o dispositivo"
+            android:textAllCaps="false"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            app:strokeWidth="0dp"
+            android:elevation="0dp" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
