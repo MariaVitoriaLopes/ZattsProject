@@ -1,17 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notificações</title>
-    <link rel="stylesheet" th:href="@{/css/manutencao.css}">
+
     <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/configuracoes.css}">
+    <link rel="stylesheet" th:href="@{/css/notificacoes.css}">
+    <th:block th:replace="~{fragments/headTema :: tema}"></th:block>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
+
 <body>
-    <div th:replace="~{fragments/headerTelas :: header}"></div>
-    <div th:replace="~{fragments/manutencao :: manutencao}"></div>
+
+<div th:replace="~{fragments/headerTelas :: header}"></div>
+
+<main class="configuracoes-container">
+
+    <div class="topo-pagina">
+        <h1 class="titulo-pagina">Notificações</h1>
+        <span class="contador-notificacoes">8 notificações</span>
+    </div>
+
+    <nav class="abas-config">
+        <a href="#" class="aba ativa">Geral</a>
+        <a href="#" class="aba">Metas</a>
+        <a href="#" class="aba">Alertas personalizados</a>
+    </nav>
+
+    <section class="card-notificacoes">
+
+        <ul class="lista-notificacoes">
+
+            <li class="notificacao">
+                <div class="notificacao-icone">
+                    <span class="material-symbols-outlined">bolt</span>
+                </div>
+                <div class="notificacao-texto">
+                    <p class="notificacao-titulo">Queda de energia foi disparado</p>
+                    <small class="notificacao-tempo">1 hora atrás</small>
+                </div>
+                <button type="button" class="notificacao-excluir" aria-label="Excluir notificação">
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+            </li>
+
+            <li class="notificacao">
+                <div class="notificacao-icone">
+                    <span class="material-symbols-outlined">gpp_maybe</span>
+                </div>
+                <div class="notificacao-texto">
+                    <p class="notificacao-titulo">Alerta “Queda de energia” criado</p>
+                    <small class="notificacao-tempo">2 horas atrás</small>
+                </div>
+                <button type="button" class="notificacao-excluir" aria-label="Excluir notificação">
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+            </li>
+
+            <li class="notificacao">
+                <div class="notificacao-icone">
+                    <span class="material-symbols-outlined">flag</span>
+                </div>
+                <div class="notificacao-texto">
+                    <p class="notificacao-titulo">Meta criada para até 250 kWh</p>
+                    <small class="notificacao-tempo">6 de Outubro</small>
+                </div>
+                <button type="button" class="notificacao-excluir" aria-label="Excluir notificação">
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+            </li>
+
+            <li class="notificacao">
+                <div class="notificacao-icone">
+                    <span class="material-symbols-outlined">how_to_reg</span>
+                </div>
+                <div class="notificacao-texto">
+                    <p class="notificacao-titulo">Bem-vindo! Sua conta foi criada com sucesso</p>
+                    <small class="notificacao-tempo">27 de Dezembro de 2025</small>
+                </div>
+                <button type="button" class="notificacao-excluir" aria-label="Excluir notificação">
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+            </li>
+
+        </ul>
+
+        <p class="sem-notificacoes">Sem mais notificações</p>
+
+    </section>
+
+</main>
+
 </body>
+
 </html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionário</title>
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/questionario.css}">
+    <th:block th:replace="~{fragments/headtema :: tema}"></th:block>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+</head>
+
+<body>
+
+<main class="quest-pagina">
+
+    <div class="quest-progresso" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="14">
+        <div class="quest-progresso-barra"></div>
+    </div>
+
+    <div class="quest-topo">
+        <a th:href="@{/login}" class="quest-voltar">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Voltar para Página de Login
+        </a>
+    </div>
+
+    <form class="quest-form" id="formQuestionario" method="post" th:action="@{/questionario/perguntas}">
+
+        <fieldset class="quest-pergunta ativa">
+            <legend class="quest-numero">Questão 01</legend>
+            <h2 class="quest-enunciado">Quantas pessoas moram na residência?</h2>
+
+            <div class="quest-opcoes">
+                <label class="quest-opcao">
+                    <input type="radio" name="qtdPessoas" value="1" required>
+                    <span>1 pessoa</span>
+                </label>
+                <label class="quest-opcao">
+                    <input type="radio" name="qtdPessoas" value="2">
+                    <span>2 pessoas</span>
+                </label>
+                <label class="quest-opcao">
+                    <input type="radio" name="qtdPessoas" value="3">
+                    <span>3 pessoas</span>
+                </label>
+                <label class="quest-opcao">
+                    <input type="radio" name="qtdPessoas" value="4">
+                    <span>4 pessoas</span>
+                </label>
+                <label class="quest-opcao">
+                    <input type="radio" name="qtdPessoas" value="5">
+                    <span>5 ou mais pessoas</span>
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset class="quest-pergunta">
+            <legend class="quest-numero">Questão 02</legend>
+            <h2 class="quest-enunciado">Qual é a sua concessionária de energia?</h2>
+
+            <div class="quest-campo quest-campo-select">
+                <select name="concessionaria" aria-label="Concessionária de energia" required>
+                    <option value="" selected disabled>Selecione sua concessionária</option>
+                    <option value="edp">EDP</option>
+                    <option value="enel">Enel</option>
+                    <option value="cpfl">CPFL</option>
+                    <option value="elektro">Elektro</option>
+                    <option value="cemig">Cemig</option>
+                    <option value="light">Light</option>
+                    <option value="copel">Copel</option>
+                    <option value="outra">Outra</option>
+                </select>
+                <span class="material-symbols-outlined">expand_more</span>
+            </div>
+        </fieldset>
+
+        <fieldset class="quest-pergunta">
+            <legend class="quest-numero">Questão 03</legend>
+            <h2 class="quest-enunciado">Qual é a data de vencimento da sua última conta de energia?</h2>
+
+            <div class="quest-campo">
+                <input type="date" name="vencimentoUltimaConta" aria-label="Data de vencimento" required>
+            </div>
+        </fieldset>
+
+        <fieldset class="quest-pergunta">
+            <legend class="quest-numero">Questão 04</legend>
+            <h2 class="quest-enunciado">
+                Qual foi o valor da conta de energia de
+                <span data-meses-atras="1">setembro</span>?
+            </h2>
+
+            <div class="quest-campo quest-moeda">
+                <span>R$</span>
+                <input type="text" name="valorMes1" inputmode="decimal" placeholder="0,00" pattern="\d+([.,]\d{1,2})?" title="Digite um valor, por exemplo 250,00" aria-label="Valor da conta" required>
+            </div>
+        </fieldset>
+
+        <fieldset class="quest-pergunta">
+            <legend class="quest-numero">Questão 05</legend>
+            <h2 class="quest-enunciado">
+                Qual foi o valor da conta de energia de
+                <span data-meses-atras="2">agosto</span>?
+            </h2>
+
+            <div class="quest-campo quest-moeda">
+                <span>R$</span>
+                <input type="text" name="valorMes2" inputmode="decimal" placeholder="0,00" pattern="\d+([.,]\d{1,2})?" title="Digite um valor, por exemplo 250,00" aria-label="Valor da conta" required>
+            </div>
+        </fieldset>
+
+        <fieldset class="quest-pergunta">
+            <legend class="quest-numero">Questão 06</legend>
+            <h2 class="quest-enunciado">
+                Qual foi o valor da conta de energia de
+                <span data-meses-atras="3">julho</span>?
+            </h2>
+
+            <div class="quest-campo quest-moeda">
+                <span>R$</span>
+                <input type="text" name="valorMes3" inputmode="decimal" placeholder="0,00" pattern="\d+([.,]\d{1,2})?" title="Digite um valor, por exemplo 250,00" aria-label="Valor da conta" required>
+            </div>
+        </fieldset>
+
+        <fieldset class="quest-pergunta">
+            <legend class="quest-numero">Questão 07</legend>
+            <h2 class="quest-enunciado">Você deseja definir uma meta mensal de consumo de energia?</h2>
+
+            <div class="quest-opcoes">
+                <label class="quest-opcao">
+                    <input type="radio" name="definirMeta" id="metaSim" value="sim" required>
+                    <span>Sim</span>
+                </label>
+                <label class="quest-opcao">
+                    <input type="radio" name="definirMeta" id="metaNao" value="nao">
+                    <span>Não</span>
+                </label>
+            </div>
+
+            <div class="quest-condicional">
+                <label class="quest-rotulo" for="valorMeta">Qual seria o valor em R$?</label>
+                <div class="quest-campo quest-moeda">
+                    <span>R$</span>
+                    <input type="text" id="valorMeta" name="valorMeta" inputmode="decimal" placeholder="0,00" pattern="\d+([.,]\d{1,2})?" title="Digite um valor, por exemplo 250,00">
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="quest-navegacao">
+            <button type="button" class="quest-btn-secundario" id="btnAnterior" disabled>
+                <span class="material-symbols-outlined">arrow_back</span>
+                Anterior
+            </button>
+
+            <button type="button" class="quest-btn-primario" id="btnProxima">
+                <span id="textoProxima">Próxima</span>
+                <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+        </div>
+
+    </form>
+
+</main>
+
+<script th:src="@{/js/questionario.js}"></script>
+
+</body>
+
+</html>

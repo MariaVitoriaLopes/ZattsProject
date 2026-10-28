@@ -24,7 +24,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/historico",
                         "/alertas",
                         "/notificacoes",
-                        "/configuracoes"
+                        "/configuracoes",
+                        "/configuracoes/**"
                 );
 
     }

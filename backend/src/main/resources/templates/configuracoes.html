@@ -1,377 +1,203 @@
 <!DOCTYPE html>
-<html lang="pt-br"
+<html lang="pt-BR"
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-
     <meta charset="UTF-8">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configurações</title>
 
-
-    <link rel="stylesheet" th:href="@{/css/modais.css}">
     <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
-    <link rel="stylesheet" th:href="@{/css/alerts_toasts.css}">
-
-
+    <link rel="stylesheet" th:href="@{/css/configuracoes.css}">
+    <th:block th:replace="~{fragments/headTema :: tema}"></th:block>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
-
 
 <body>
 
-
 <div th:replace="~{fragments/headerTelas :: header}"></div>
 
+<main class="configuracoes-container">
 
+    <h1 class="titulo-pagina">Configurações</h1>
 
-<div class="configuracoes-container">
-
-
-
-    <h1 class="titulo-pagina">
-        Configurações
-    </h1>
-
-    <div th:if="${sucesso}"
-         id="toastSucesso"
-         class="toast-mensagem toast-sucesso">
-
-        <span th:text="${sucesso}"></span>
-
+    <div class="abas-config">
+        <a th:href="@{/configuracoes}" class="aba">Conta</a>
+        <a th:href="@{/configuracoes/notificacoes}" class="aba">Notificações</a>
+        <a th:href="@{/configuracoes/preferencias}" class="aba">Preferências</a>
+        <a href="#" class="aba">Dispositivos</a>
+        <a href="#" class="aba">Privacidade e Dados</a>
+        <a href="#" class="aba">Ajuda e Suporte</a>
     </div>
 
+    <form class="card-config">
 
-    <div th:if="${erro}"
-         id="toastErro"
-         class="toast-mensagem toast-erro">
+        <div class="coluna-config">
+            <h2 class="secao-titulo">Informações pessoais</h2>
 
-        <span th:text="${erro}"></span>
-
-    </div>
-
-    <div class="card-configuracoes">
-
-
-
-
-
-        <h2 class="secao-titulo">
-            Informações pessoais
-        </h2>
-
-
-
-
-
-        <form th:action="@{/configuracoes/editar}"
-              method="post" class="configEditar">
-
-
-
-            <div class="linha-campos">
-
-
-
-                <div class="campo">
-
-                    <label>
-                        Nome completo
-                    </label>
-
-
-                    <input
-                            type="text"
-                            name="nome"
-                            th:value="${usuario.nome}"
-                            placeholder="Digite seu nome">
-
+            <div class="campo">
+                <label for="nomeCompleto">Nome completo</label>
+                <div class="campo-input">
+                    <input type="text" id="nomeCompleto" name="nomeCompleto" value="emailusuario@gmail.com">
+                    <button type="button" aria-label="Editar nome completo">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
                 </div>
-
-
-
-
-
-
-                <div class="campo">
-
-                    <label>
-                        E-mail
-                    </label>
-
-
-                    <input
-                            type="email"
-                            name="email"
-                            th:value="${usuario.email}">
-
-                </div>
-
-
-
-
-
-
-                <div class="campo">
-
-                    <label>
-                        Telefone
-                    </label>
-
-
-                    <input
-                            type="text"
-                            id="telefone"
-                            name="telefone"
-                            maxlength="15"
-                            th:value="${usuario.telefone}"
-                            placeholder="(00) 00000-0000">
-
-                </div>
-
-
-
             </div>
 
-
-
-
-
-            <button
-                    type="submit"
-                    class="btn-config">
-
-                Salvar alterações
-
-            </button>
-
-
-
-        </form>
-
-
-
-
-
-
-        <div class="divisor"></div>
-
-
-
-
-
-
-        <h2 class="secao-titulo">
-            Gerenciar minha conta
-        </h2>
-
-
-
-
-
-
-        <form th:action="@{/configuracoes/senha}"
-              method="post"
-              id="formAlterarSenha"
-              class="configEditar">
-
-
-
-            <div class="linha-senha">
-
-
-
-                <div class="campo">
-
-                    <label>
-                        Nova senha
-                    </label>
-
-                    <div class="senhasConfig">
-                        <input
-                                type="password"
-                                name="senha"
-                                id="novaSenha">
-                        <span class="material-symbols-outlined visibility" onclick="mostrarSenha('novaSenha', this)">visibility</span>
-                        <span class="material-symbols-outlined visibility_off" onclick="mostrarSenha('novaSenha', this)">visibility_off</span>
-                    </div>
-
+            <div class="campo">
+                <label for="email">E-mail</label>
+                <div class="campo-input">
+                    <input type="email" id="email" name="email" value="emailusuario@gmail.com">
+                    <button type="button" aria-label="Editar e-mail">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
                 </div>
-
-
-
-
-
-
-                <div class="campo">
-
-                    <label>
-                        Confirmação de senha
-                    </label>
-
-                    <div class="senhasConfig">
-                        <input
-                                type="password"
-                                name="confirmarSenha"
-                                id="confirmarNovaSenha">
-                        <span class="material-symbols-outlined visibility" onclick="mostrarSenha('confirmarNovaSenha', this)">visibility</span>
-                        <span class="material-symbols-outlined visibility_off" onclick="mostrarSenha('confirmarNovaSenha', this)">visibility_off</span>
-                    </div>
-
-                </div>
-
-
-
             </div>
 
-
-
-
-
-            <button
-                    type="submit"
-                    class="btn-config">
-
-                Alterar senha
-
-            </button>
-
-
-
-        </form>
-
-
-
-
-
-
-
-
-        <form th:action="@{/logout}"
-              method="get">
-
-
-            <button
-                    type="submit"
-                    class="btn-config btn-sair">
-
-                Sair desta sessão
-
-            </button>
-
-
-        </form>
-
-
-
-
-
-
-
-        <form id="formExcluir"
-              th:action="@{/configuracoes/excluir}"
-              method="post">
-
-
-            <button
-                    type="button"
-                    class="btn-config btn-excluir"
-                    onclick="abrirModalExcluir()">
-
-                <span class="material-symbols-outlined">delete</span>
-                Excluir minha conta
-
-            </button>
-
-
-
-        </form>
-
-
-
-
-
-        <p class="aviso">
-
-            Ao deletar sua conta você concorda em perder todos os seus dados.
-
-        </p>
-
-
-
-
-
-    </div>
-
-
-</div>
-
-<div id="modalExcluir" class="modal-excluir">
-
-
-    <div class="conteudo-modal">
-
-
-        <span class="material-symbols-outlined icone-alerta">
-            warning
-        </span>
-
-
-
-        <h2>
-            Excluir conta?
-        </h2>
-
-
-
-        <p>
-            Tem certeza que deseja excluir sua conta?
-            Essa ação não poderá ser desfeita.
-        </p>
-
-
-
-
-        <div class="botoes-modal">
-
-
-            <button
-                    type="button"
-                    class="btn-cancelar"
-                    onclick="fecharModalExcluir()">
-
-                Cancelar
-
-            </button>
-
-
-
-            <button
-                    type="button"
-                    class="btn-confirmar"
-                    onclick="confirmarExclusao()">
-
-                Sim, excluir
-
-            </button>
-
-
+            <div class="campo">
+                <label for="telefone">Telefone</label>
+                <div class="campo-input">
+                    <input type="tel" id="telefone" name="telefone" value="(00) 00000-0000">
+                    <button type="button" aria-label="Editar telefone">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="fusoHorario">Fuso Horário</label>
+                <div class="campo-input">
+                    <select id="fusoHorario" name="fusoHorario">
+                        <option value="UTC-3" selected>UTC-3 (Horário de Brasília)</option>
+                        <option value="UTC-4">UTC-4 (Horário do Amazonas)</option>
+                        <option value="UTC-5">UTC-5 (Horário do Acre)</option>
+                        <option value="UTC-2">UTC-2 (Fernando de Noronha)</option>
+                    </select>
+                    <span class="material-symbols-outlined seta-select">expand_more</span>
+                </div>
+            </div>
         </div>
 
+        <div class="coluna-config">
+            <h2 class="secao-titulo">Endereço</h2>
 
-    </div>
+            <div class="campo">
+                <label for="cep">CEP</label>
+                <div class="campo-input largura-30">
+                    <input type="text" id="cep" name="cep" value="00000-000">
+                    <button type="button" aria-label="Editar CEP">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                </div>
+            </div>
 
+            <div class="campo">
+                <label for="logradouro">Logradouro <span class="obrigatorio">*</span></label>
+                <div class="campo-input largura-66">
+                    <input type="text" id="logradouro" name="logradouro" value="Rua X">
+                    <button type="button" aria-label="Editar logradouro">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                </div>
+            </div>
 
-</div>
+            <div class="campo">
+                <label for="numero">Número <span class="obrigatorio">*</span></label>
+                <div class="campo-input largura-23">
+                    <input type="text" id="numero" name="numero" value="01">
+                    <button type="button" aria-label="Editar número">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                </div>
+            </div>
 
-<script th:src="@{/js/script.js}"></script>
-<script th:src="@{/js/modais.js}"></script>
-<script th:src="@{/js/alerts_toasts.js}"></script>
-<script th:src="@{/js/validacoes.js}"></script>
+            <div class="campo">
+                <label for="complemento">Complemento <span class="obrigatorio">*</span></label>
+                <div class="campo-input largura-27">
+                    <input type="text" id="complemento" name="complemento" value="01">
+                    <button type="button" aria-label="Editar complemento">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="bairro">Bairro <span class="obrigatorio">*</span></label>
+                <div class="campo-input largura-43">
+                    <input type="text" id="bairro" name="bairro" value="Rua X">
+                    <button type="button" aria-label="Editar bairro">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="cidade">Cidade <span class="obrigatorio">*</span></label>
+                <div class="campo-input largura-45">
+                    <input type="text" id="cidade" name="cidade" value="Rua X">
+                    <button type="button" aria-label="Editar cidade">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="uf">UF <span class="obrigatorio">*</span></label>
+                <div class="campo-input largura-25">
+                    <input type="text" id="uf" name="uf" value="Rua X">
+                    <button type="button" aria-label="Editar UF">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="coluna-config">
+            <h2 class="secao-titulo">Gerenciar minha conta</h2>
+
+            <div class="campo">
+                <label for="senha">Senha</label>
+                <div class="campo-input largura-80">
+                    <input type="password" id="senha" name="senha" value="1234567890">
+                    <button type="button" aria-label="Editar senha">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="confirmarSenha">
+                    Confirmação de senha
+                    <small class="dica-campo">Senha coincide com atual</small>
+                </label>
+                <div class="campo-input largura-80">
+                    <input type="password" id="confirmarSenha" name="confirmarSenha" value="1234567890">
+                    <button type="button" aria-label="Editar confirmação de senha">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="acoes-conta">
+                <button type="button" class="btn-config btn-sair">Sair desta sessão</button>
+
+                <button type="button" class="btn-config btn-excluir">
+                    <span class="material-symbols-outlined">delete</span>
+                    Deletar minha conta
+                </button>
+
+                <p class="aviso">Ao deletar sua conta você concorda em perder todos os seus dados.</p>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
 </body>
 
 </html>
