@@ -8,9 +8,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Document(collection = "configuracoes")
 public class Configuracao {
 
@@ -18,7 +18,9 @@ public class Configuracao {
     private String id;
     private String usuarioId;
     private Double metaConsumoKwh;
-    private Double tarifaKwhReais;
-    private Boolean alertaPicoLigado;
-    private Double limiteNotificacaoReais;
+    private Double metaGastoReais;
+    private Boolean notificacoesAtivas;
+    private String distribuidora;
+    private String cidade;
+    private String uf;
 }
