@@ -368,7 +368,7 @@
 
 </ScrollView>
 
-    <com.zattsproject.mobile.View.AppNavBar
+    <com.zattsproject.mobile.AppNavBar
         android:id="@+id/navBar"
         android:layout_width="match_parent"
         android:layout_height="64dp"

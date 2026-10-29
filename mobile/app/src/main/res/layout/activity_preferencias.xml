@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/corFundoTela">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="18dp">
+
+        <TextView
+            android:id="@+id/btnVoltarPreferencias"
+            android:layout_width="42dp"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:text="‹"
+            android:textSize="36sp"
+            android:textColor="?attr/colorOnSurface"
+            android:contentDescription="Voltar"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Preferências"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="18dp"
+            android:paddingTop="34dp"
+            android:paddingBottom="30dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tema do Sistema"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Modo"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary"/>
+
+            <Spinner
+                android:id="@+id/spinnerTema"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/bg_campo_conta"
+                android:paddingHorizontal="12dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:text="Cor de destaque"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary"/>
+
+            <RadioGroup
+                android:id="@+id/grupoCores"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <RadioButton
+                    android:id="@+id/corPadrao"
+                    style="@style/ZattsCorOpcao"
+                    android:buttonTint="#E6FB1A"
+                    android:text="Padrão"/>
+
+                <RadioButton
+                    android:id="@+id/corLaranja"
+                    style="@style/ZattsCorOpcao"
+                    android:buttonTint="#FF8000"
+                    android:text="Laranja"/>
+
+                <RadioButton
+                    android:id="@+id/corVermelho"
+                    style="@style/ZattsCorOpcao"
+                    android:buttonTint="#FF0000"
+                    android:text="Vermelho"/>
+
+                <RadioButton
+                    android:id="@+id/corAzul"
+                    style="@style/ZattsCorOpcao"
+                    android:buttonTint="#4930FF"
+                    android:text="Azul"/>
+
+                <RadioButton
+                    android:id="@+id/corRoxo"
+                    style="@style/ZattsCorOpcao"
+                    android:buttonTint="#9000CC"
+                    android:text="Roxo"/>
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="46dp"
+                android:text="Idioma"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Escolha o idioma de preferência"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary"/>
+
+            <Spinner
+                android:id="@+id/spinnerIdioma"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/bg_campo_conta"
+                android:paddingHorizontal="12dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <com.zattsproject.mobile.AppNavBar
+        android:id="@+id/navBar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom"
+        android:background="?attr/corFundoTela" />
+
+</LinearLayout>

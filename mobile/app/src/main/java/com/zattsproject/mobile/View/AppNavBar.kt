@@ -1,4 +1,4 @@
-package com.zattsproject.mobile.View
+package com.zattsproject.mobile
 
 import com.zattsproject.mobile.R
 import android.content.Context
@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.transition.TransitionManager
+import android.content.res.ColorStateList
 import com.zattsproject.mobile.AlertsActivity
 import com.zattsproject.mobile.HistoryActivity
 import com.zattsproject.mobile.HomeActivity
@@ -94,13 +95,30 @@ class AppNavBar @JvmOverloads constructor(
     private fun render(animate: Boolean) {
         if (animate) TransitionManager.beginDelayedTransition(this)
 
+        val corSelecionada = AparenciaManager.corHex(context)
+
         items.forEach { (tab, item) ->
             val selected = tab == selectedTab
 
-            item.root.setBackgroundResource(if (selected) R.drawable.bg_nav_selected else 0)
-            item.label.visibility = if (selected) View.VISIBLE else View.GONE
+            item.root.setBackgroundResource(
+                if (selected) R.drawable.bg_nav_selected else 0
+            )
+
+            if (selected) {
+                item.icon.imageTintList =
+                    ColorStateList.valueOf(corSelecionada)
+            } else {
+                item.icon.imageTintList = null
+            }
+
+            item.label.visibility =
+                if (selected) View.VISIBLE else View.GONE
+
             item.dot.visibility =
-                if (tab == NavTab.NOTIFICATIONS && showNotificationDot) View.VISIBLE else View.GONE
+                if (tab == NavTab.NOTIFICATIONS && showNotificationDot)
+                    View.VISIBLE
+                else
+                    View.GONE
 
             item.root.layoutParams = LayoutParams(
                 if (selected) LayoutParams.WRAP_CONTENT else 0,

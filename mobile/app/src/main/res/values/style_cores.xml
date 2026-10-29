@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- VERDE-LIMÃO ORIGINAL DO ZATTS -->
+    <style name="ZattsAccentPadrao">
+        <item name="colorPrimary">@color/destaque_padrao</item>
+        <item name="corDestaque">@color/destaque_padrao</item>
+        <item name="colorOnPrimary">@color/textos_pretos</item>
+    </style>
+
+    <!-- LARANJA -->
+    <style name="ZattsAccentLaranja">
+        <item name="colorPrimary">@color/destaque_laranja</item>
+        <item name="corDestaque">@color/destaque_laranja</item>
+        <item name="colorOnPrimary">@color/textos_pretos</item>
+    </style>
+
+    <!-- VERMELHO -->
+    <style name="ZattsAccentVermelho">
+        <item name="colorPrimary">@color/destaque_vermelho</item>
+        <item name="corDestaque">@color/destaque_vermelho</item>
+        <item name="colorOnPrimary">@color/textos_brancos</item>
+    </style>
+
+    <!-- AZUL -->
+    <style name="ZattsAccentAzul">
+        <item name="colorPrimary">@color/destaque_azul</item>
+        <item name="corDestaque">@color/destaque_azul</item>
+        <item name="colorOnPrimary">@color/textos_brancos</item>
+    </style>
+
+    <!-- ROXO -->
+    <style name="ZattsAccentRoxo">
+        <item name="colorPrimary">@color/destaque_roxo</item>
+        <item name="corDestaque">@color/destaque_roxo</item>
+        <item name="colorOnPrimary">@color/textos_brancos</item>
+    </style>
+
+    <!-- ESTILO DAS OPÇÕES DE CORES NA TELA DE PREFERÊNCIAS -->
+    <style name="ZattsCorOpcao">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:button">?android:attr/listChoiceIndicatorSingle</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+</resources>

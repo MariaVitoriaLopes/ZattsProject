@@ -8,6 +8,7 @@ import androidx.core.view.WindowInsetsCompat
 
 class HistoryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        AparenciaManager.aplicarCor(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_history)

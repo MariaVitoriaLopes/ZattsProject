@@ -1,11 +1,18 @@
+
 <resources>
     <style name="Base.Theme.Mobile"
         parent="Theme.Material3.DayNight.NoActionBar">
 
+        <!-- COR DE DESTAQUE -->
+        <item name="corDestaque">@color/cor_primaria_400</item>
         <item name="colorPrimary">@color/cor_primaria_400</item>
+        <item name="colorOnPrimary">@color/textos_pretos</item>
+
+        <!-- SUPERFÍCIES E TEXTOS -->
         <item name="colorSurface">@color/fundo_900</item>
         <item name="colorOnSurface">@color/textos_brancos</item>
 
+        <!-- BARRAS DO ANDROID -->
         <item name="android:windowBackground">@color/fundo_950</item>
         <item name="android:statusBarColor">@color/fundo_950</item>
         <item name="android:navigationBarColor">@color/fundo_950</item>
@@ -18,6 +25,7 @@
         <item name="corBordaCard">@color/fundo_700</item>
         <item name="corBordaTab">@color/fundo_700</item>
         <item name="corNavSelecionada">@color/fundo_900</item>
+
     </style>
 
     <style name="Theme.Mobile" parent="Base.Theme.Mobile" />

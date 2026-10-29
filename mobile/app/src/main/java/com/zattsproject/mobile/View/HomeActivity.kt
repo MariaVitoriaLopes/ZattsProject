@@ -7,25 +7,25 @@ import android.os.Looper
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.zattsproject.mobile.View.GraficoConsumoView
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.Calendar
+import java.text.DateFormatSymbols
+import android.content.res.ColorStateList
 
 class HomeActivity : AppCompatActivity() {
 
+    private var corAplicada = ""
     private lateinit var txvHorario: TextView
     private lateinit var txvData: TextView
-
     private lateinit var btnConsumo: TextView
     private lateinit var btnResumo: TextView
     private lateinit var btnValorConta: TextView
-
     private lateinit var txvTituloGrafico: TextView
     private lateinit var txvSubtituloGrafico: TextView
     private lateinit var grafico: GraficoConsumoView
-
     private val handler = Handler(Looper.getMainLooper())
 
     private val atualizarRelogio = object : Runnable {
@@ -36,6 +36,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AparenciaManager.aplicarCor(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
@@ -54,6 +55,20 @@ class HomeActivity : AppCompatActivity() {
         configurarBotoes()
 
         mostrarConsumo()
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+
+        val corAtual = AparenciaManager.obterCor(this)
+
+        if (corAplicada.isNotEmpty() && corAtual != corAplicada) {
+            recreate()
+            return
+        }
+
+        corAplicada = corAtual
     }
 
     private fun atualizarDataHora() {
@@ -117,9 +132,17 @@ class HomeActivity : AppCompatActivity() {
             R.id.txv_metaMensal
         ).text = "250 kWh"
 
-        findViewById<ProgressBar>(
-            R.id.progressoMeta
-        ).progress = porcentagem.coerceIn(0, 100)
+        val progressoMeta = findViewById<ProgressBar>(R.id.progressoMeta)
+
+        // Pega a cor escolhida pelo usuário nas Preferências
+        val corSelecionada = AparenciaManager.corHex(this)
+
+        // Aplica a cor na barra de progresso
+        progressoMeta.progressTintList =
+            ColorStateList.valueOf(corSelecionada)
+
+        // Atualiza o progresso normalmente
+        progressoMeta.progress = porcentagem.coerceIn(0, 100)
     }
 
     private fun configurarBotoes() {
@@ -175,20 +198,52 @@ class HomeActivity : AppCompatActivity() {
     private fun mostrarResumo() {
         selecionarBotao(btnResumo)
 
-        txvTituloGrafico.text = "Resumo semanal"
+        txvTituloGrafico.text = "Resumo comparativo"
 
         txvSubtituloGrafico.text =
-            "Consumo diário de energia nos últimos 7 dias"
+            "Veja o gasto em kWh durante os últimos 6 meses"
 
-        grafico.atualizarGrafico(
-            listOf(
-                22f, 27f, 19f, 34f,
-                29f, 25f, 33f
-            ),
-            listOf(
-                "Seg", "Ter", "Qua", "Qui",
-                "Sex", "Sáb", "Dom"
-            )
+        val calendario = Calendar.getInstance()
+        val idioma = Locale("pt", "BR")
+
+        // Começa cinco meses antes do mês atual.
+        calendario.add(Calendar.MONTH, -5)
+
+        val nomesMeses = DateFormatSymbols(idioma).months
+
+        val rotulos = mutableListOf<String>()
+
+        repeat(6) {
+            val indiceMes = calendario.get(Calendar.MONTH)
+
+            val nomeMes = nomesMeses[indiceMes]
+                .replaceFirstChar { it.titlecase(idioma) }
+
+            rotulos.add(nomeMes)
+
+            calendario.add(Calendar.MONTH, 1)
+        }
+
+        // DADOS TEMPORÁRIOS
+        // TODO: COLOQUE AQUI O CAMINHO DA API.
+        // Buscar no Spring Boot os consumos mensais
+        // dos últimos seis meses, incluindo o atual.
+        //
+        // A API deve devolver os valores na mesma
+        // ordem dos meses exibidos no gráfico.
+
+        val consumosMensais = listOf(
+            150f,
+            35f,
+            185f,
+            485f,
+            305f,
+            170f
+        )
+
+        grafico.atualizarGraficoLinha(
+            consumosMensais,
+            rotulos
         )
     }
 

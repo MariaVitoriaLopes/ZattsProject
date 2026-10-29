@@ -36,4 +36,11 @@
     <color name="tema_nav_fundo">@color/fundo_0</color>
     <color name="tema_nav_selecionado">@color/nav_selected_bg</color>
     <color name="tema_nav_icone">@color/nav_icon</color>
+
+    <!-- CORES DISPONÍVEIS NAS PREFERÊNCIAS -->
+    <color name="destaque_padrao">@color/cor_primaria_400</color>
+    <color name="destaque_laranja">@color/cor_terciaria_600</color>
+    <color name="destaque_vermelho">#FF0000</color>
+    <color name="destaque_azul">#4930FF</color>
+    <color name="destaque_roxo">#9000CC</color>
 </resources>
