@@ -1,25 +1,28 @@
 package br.edu.fatec.zattsproject.backend.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Document(collection = "consumos")
+@Document(collection = "consumo")
 public class Consumo {
 
     @Id
     private String id;
 
-    private String dispositivoId;  // Identificador da placa ESP32 (ex: "dispositivo-01")
-    private String usuarioId;
+    private String dispositivoId;
+    private String usuarioId; // ID do utilizador dono do dispositivo/leitura
 
-    private Double correnteAmperes; // Valor da corrente recebida do ESP32
+    private Double correnteAmperes;
     private Double voltagem;
     private Double potenciaWatts;
     private Double consumoKwh;
