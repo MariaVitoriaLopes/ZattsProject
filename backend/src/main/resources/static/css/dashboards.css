@@ -271,7 +271,7 @@ canvas#chartResumoComparativo{
 
 .conta {
 
-    height:250px;
+    height:400px;
 
 }
 
@@ -397,5 +397,224 @@ span.material-symbols-outlined.bandeiraMeta {
     margin:0;
     color: #0D734C;
     font-size:18px;
+
+}
+
+
+/* NOVO LAYOUT DO DASHBOARD */
+
+.container-dashboard {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 4% 40px;
+}
+
+.titulo-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin: 25px 0;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1.45fr 0.95fr;
+    gap: 20px;
+    align-items: stretch;
+    margin: 22px auto;
+}
+
+.coluna-central {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.dashboard-grid > .dashboard-card,
+.coluna-central > .dashboard-card {
+    min-width: 0;
+    grid-column: auto !important;
+}
+
+.dashboard-card {
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.card-consumo-atual {
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+}
+
+.card-consumo-diario {
+    min-height: 310px;
+}
+
+.card-meta-consumo {
+    min-height: 165px;
+}
+
+.grafico-atual {
+    flex: 1;
+    min-height: 350px;
+}
+
+.grafico-diario {
+    height: 210px;
+}
+
+.grafico canvas,
+canvas#chartResumoComparativo,
+canvas#chartConsumoRealtime {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+canvas#chartValorConta {
+    height: 380px !important;
+}
+
+.estado-grafico {
+    min-height: 18px;
+    margin: 8px 0 0;
+    color: #888;
+    font-size: 11px;
+}
+
+.estado-grafico:empty {
+    display: none;
+}
+
+/* META MENSAL */
+
+.barra-meta {
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.progresso-meta {
+    width: 0%;
+    max-width: 100%;
+    transition: width 0.4s ease, background 0.3s ease;
+}
+
+.card-meta-consumo .legenda-meta {
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
+/* STATUS DA META */
+
+.cardMeta {
+    margin: 0;
+    padding: 20px 26px;
+    min-width: 310px;
+    border-radius: 14px;
+    justify-content: flex-start;
+    gap: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.textoMeta h2 {
+    font-size: 17px;
+    line-height: 1.3;
+}
+
+.textoMeta p {
+    font-size: 13px;
+}
+
+.status-verde {
+    border-color: #0D734C;
+}
+
+.status-verde .bandeiraMeta,
+.status-verde .textoMeta h2 {
+    color: #0D734C;
+}
+
+.status-laranja {
+    border-color: #F59E0B;
+}
+
+.status-laranja .bandeiraMeta,
+.status-laranja .textoMeta h2 {
+    color: #C76A00;
+}
+
+.status-vermelho {
+    border-color: #DC2626;
+}
+
+.status-vermelho .bandeiraMeta,
+.status-vermelho .textoMeta h2 {
+    color: #DC2626;
+}
+
+.status-sem-meta {
+    border-color: #9CA3AF;
+}
+
+.status-sem-meta .bandeiraMeta,
+.status-sem-meta .textoMeta h2 {
+    color: #6B7280;
+}
+
+body:has(.status-verde) .progresso-meta {
+    background: #D2F500;
+}
+
+body:has(.status-laranja) .progresso-meta {
+    background: #F59E0B;
+}
+
+body:has(.status-vermelho) .progresso-meta {
+    background: #DC2626;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 1150px) {
+
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .dashboard-grid > :last-child {
+        grid-column: 1 / -1 !important;
+    }
+
+    .cardMeta {
+        min-width: 0;
+    }
+
+}
+
+@media (max-width: 750px) {
+
+    .titulo-dashboard {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-grid > :last-child {
+        grid-column: auto !important;
+    }
+
+    .card-consumo-atual {
+        min-height: 350px;
+    }
+
+    .grafico-atual {
+        min-height: 260px;
+    }
 
 }

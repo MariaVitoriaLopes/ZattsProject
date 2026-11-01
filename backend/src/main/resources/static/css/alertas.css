@@ -1,0 +1,393 @@
+
+[hidden] {
+    display: none !important;
+}
+
+.pagina-alertas {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 30px 4% 48px;
+    color: var(--fundo-900, #1a1a1a);
+}
+
+/* CABEÇALHO */
+
+.alertas-cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.alertas-cabecalho h1 {
+    font-size: 29px;
+    margin: 0 0 8px;
+}
+
+.alertas-cabecalho p {
+    margin: 0;
+    color: #444;
+}
+
+.alertas-contagem {
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* BARRA DE AÇÕES */
+
+.alertas-barra {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.alertas-barra h2 {
+    font-size: 18px;
+    margin: 0 0 4px;
+}
+
+.alertas-barra p {
+    margin: 0;
+    color: #666;
+    font-size: 13px;
+}
+
+
+.botao-criar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: 0;
+    border-radius: 9px;
+    background: var(--cor-primaria-400);
+    color: var(--cor-primaria-950);
+    padding: 11px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+}
+
+.botao-criar:hover {
+    filter: brightness(0.92);
+}
+
+
+/* TABELA */
+
+.alertas-tabela {
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    overflow: hidden;
+    min-height: 540px;
+    background: #fff;
+}
+
+.alerta-linha {
+    display: grid;
+    grid-template-columns: 2fr 1.15fr 1fr .85fr 90px;
+    align-items: stretch;
+    border-bottom: 1px solid #d8d8d8;
+    min-height: 82px;
+}
+
+.alerta-linha:nth-child(odd) {
+    background: #f6f6f6;
+}
+
+.alerta-linha > div {
+    padding: 16px 20px;
+    border-right: 1px solid #e5e5e5;
+}
+
+.alerta-linha > div:last-child {
+    border-right: 0;
+}
+
+/* DESCRIÇÃO */
+
+.alerta-descricao {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.icone-alerta {
+    background: white;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.alerta-descricao strong,
+.alerta-condicao strong,
+.alerta-canal strong,
+.alerta-ativacao strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.alerta-descricao small {
+    display: block;
+    color: #777;
+    font-size: 11px;
+}
+
+/* CONDIÇÕES */
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border: 1px solid #e2e2e2;
+    border-radius: 25px;
+    background: #fff;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.chip .material-symbols-outlined {
+    font-size: 14px;
+}
+
+/* BOTÕES DE AÇÃO */
+
+.alerta-acoes {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 10px;
+}
+
+.alerta-acoes button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+.excluir-alerta button {
+    color: #d22;
+}
+
+/* INTERRUPTOR */
+
+.switch {
+    position: relative;
+    display: block;
+    width: 36px;
+    height: 19px;
+    margin-top: 6px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch span {
+    position: absolute;
+    inset: 0;
+    background: #bbb;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.switch span:before {
+    content: "";
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    left: 2px;
+    top: 2px;
+    border-radius: 50%;
+    background: #fff;
+    transition: .2s;
+}
+
+.switch input:checked + span {
+    background: #c9d661;
+}
+
+.switch input:checked + span:before {
+    transform: translateX(17px);
+    background: #525b00;
+}
+
+/* ESTADOS DA LISTA */
+
+.alertas-fim,
+.alertas-vazio {
+    text-align: center;
+    color: #777;
+    font-size: 12px;
+    padding: 180px 16px 30px;
+}
+
+.aviso {
+    padding: 10px;
+    background: #eff7e3;
+    border-radius: 8px;
+}
+
+.aviso-erro {
+    background: #ffeaea;
+    color: #a00;
+}
+
+/* MODAL */
+
+.fundo-modal {
+    position: fixed;
+    inset: 0;
+    background: #0008;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+.modal-conteudo {
+    width: 100%;
+    max-width: 480px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    max-height: 90vh;
+    overflow: auto;
+}
+
+.modal-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.modal-topo h2 {
+    margin: 0;
+}
+
+.modal-topo button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+/* CAMPOS DO FORMULÁRIO */
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.campo label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.campo input:not([type=checkbox]),
+.campo select {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.campo-ativo {
+    flex-direction: row;
+    align-items: center;
+}
+
+/* BOTÕES DO MODAL */
+
+.modal-botoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-botoes button {
+    padding: 11px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.botao-cancelar {
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+
+.botao-salvar {
+    border: 0;
+    background: var(--cor-primaria-400);
+    color: var(--cor-primaria-950);
+    font-weight: 600;
+    transition: filter 0.2s ease;
+}
+
+.botao-salvar:hover {
+    filter: brightness(0.92);
+}
+
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 1000px) {
+
+    .alerta-linha {
+        grid-template-columns: 1.5fr 1fr 1fr;
+    }
+
+    .alerta-ativacao,
+    .alerta-acoes {
+        border-top: 1px solid #eee;
+    }
+
+    .alerta-linha > div {
+        padding: 12px;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .alertas-cabecalho,
+    .alertas-barra {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .alerta-linha {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .alerta-descricao {
+        grid-column: 1 / -1;
+    }
+
+    .alerta-acoes {
+        justify-content: flex-start;
+    }
+
+    .alertas-tabela {
+        min-height: 400px;
+    }
+
+}

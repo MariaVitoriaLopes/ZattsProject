@@ -52,7 +52,7 @@ public class AlertaWebController {
                 break;
         }
 
-        return "redirect:/notificacoes#personalizados";
+        return "redirect:/alertas";
     }
 
     @PostMapping("/{id}/editar")
@@ -80,7 +80,7 @@ public class AlertaWebController {
             redirect.addFlashAttribute("erro", "Não foi possível atualizar o alerta.");
         }
 
-        return "redirect:/notificacoes#personalizados";
+        return "redirect:/alertas";
     }
 
     @PostMapping("/{id}/excluir")
@@ -106,6 +106,6 @@ public class AlertaWebController {
             redirect.addFlashAttribute("erro", "Alerta não encontrado.");
         }
 
-        return "redirect:/notificacoes#personalizados";
+        return "redirect:/alertas";
     }
 }

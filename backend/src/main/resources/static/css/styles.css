@@ -722,7 +722,7 @@ span.material-symbols-outlined.visibility, span.material-symbols-outlined.visibi
 }
 
 .requisitos span {
-    color: var(--cor-terciaria-600);
+    color: var(--fundo-700);
 }
 
 p.cadastro {

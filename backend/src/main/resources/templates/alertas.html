@@ -1,20 +1,296 @@
+
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
     <title>Alertas</title>
-    <link rel="stylesheet" th:href="@{/css/manutencao.css}">
+
     <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/alertas.css}">
+
     <th:block th:replace="~{fragments/headTema :: tema}"></th:block>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
+
 <body>
-    <div th:replace="~{fragments/headerTelas :: header}"></div>
-    <div th:replace="~{fragments/manutencao :: manutencao}"></div>
+
+<div th:replace="~{fragments/headerTelas :: header}"></div>
+
+<main class="pagina-alertas">
+
+    <div class="alertas-cabecalho">
+
+        <div>
+            <h1>Alertas</h1>
+            <p>Defina regras personalizadas para os eventos que você quer acompanhar por meio de notificações</p>
+        </div>
+
+        <button type="button" id="btnCriarAlerta" class="botao-criar">
+            <span class="material-symbols-outlined">add</span>
+            Criar alerta
+        </button>
+
+    </div>
+
+    <p class="aviso"
+       th:if="${mensagem != null}"
+       th:text="${mensagem}"></p>
+
+    <p class="aviso aviso-erro"
+       th:if="${erro != null}"
+       th:text="${erro}"></p>
+
+    <section class="alertas-tabela">
+
+        <div class="alerta-linha" th:each="alerta : ${alertas}">
+
+            <div class="alerta-descricao">
+
+                <span class="icone-alerta material-symbols-outlined"
+                      th:text="${alerta.tipo == 'GASTO' ? 'payments' : 'bolt'}">
+                    bolt
+                </span>
+
+                <div>
+                    <strong th:text="${alerta.nome}">Consumo elevado</strong>
+
+                    <small th:text="${alerta.tipo == 'GASTO' ? 'Alerta de gastos de energia' : 'Alerta de consumo de energia'}">
+                        Alerta de consumo
+                    </small>
+                </div>
+
+            </div>
+
+            <div class="alerta-condicao">
+
+                <strong>Condição</strong>
+
+                <div class="chips">
+
+                    <span class="chip"
+                          th:text="${alerta.tipo == 'GASTO' ? 'Gastos (R$)' : 'Consumo (kWh)'}">
+                        Consumo (kWh)
+                    </span>
+
+                    <span class="chip"
+                          th:if="${alerta.valorLimite != null}"
+                          th:text="${alerta.tipo == 'GASTO' ? 'Limite: R$ ' + #numbers.formatDecimal(alerta.valorLimite, 1, 2) : 'Limite: ' + alerta.valorLimite + ' kWh'}">
+                        Limite
+                    </span>
+
+                    <span class="chip"
+                          th:if="${alerta.percentualLimite != null}"
+                          th:text="|Meta: ${alerta.percentualLimite}%|">
+                        Meta
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="alerta-canal">
+
+                <strong>Notificar por</strong>
+
+                <div class="chips">
+                    <span class="chip">
+                        <span class="material-symbols-outlined">notifications</span>
+                        Notificação
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="alerta-ativacao">
+
+                <strong>Ativar alerta</strong>
+
+                <label class="switch"
+                       th:attr="aria-label=|Ativar alerta ${alerta.nome}|">
+
+                    <input type="checkbox"
+                           class="toggle-alerta"
+                           th:checked="${alerta.ativo == true}"
+                           th:attr="data-id=${alerta.id}"
+                           aria-label="Ativar ou desativar alerta">
+
+                    <span></span>
+
+                </label>
+
+            </div>
+
+            <div class="alerta-acoes">
+
+                <button type="button"
+                        class="editar-alerta"
+                        aria-label="Editar alerta"
+                        th:attr="data-id=${alerta.id},
+                                 data-nome=${alerta.nome},
+                                 data-tipo=${alerta.tipo},
+                                 data-valor=${alerta.valorLimite},
+                                 data-percentual=${alerta.percentualLimite},
+                                 data-ativo=${alerta.ativo}">
+
+                    <span class="material-symbols-outlined">edit</span>
+
+                </button>
+
+                <form method="post"
+                      class="excluir-alerta"
+                      th:action="@{/notificacoes/alertas/{id}/excluir(id=${alerta.id})}">
+
+                    <input th:if="${_csrf != null}"
+                           type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <button type="submit" aria-label="Excluir alerta">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="alertas-vazio"
+             th:if="${alertas == null or #lists.isEmpty(alertas)}">
+            Nenhum alerta cadastrado. Clique em Criar alerta para começar.
+        </div>
+
+        <div class="alertas-fim"
+             th:if="${alertas != null and !#lists.isEmpty(alertas)}">
+            Sem mais alertas
+        </div>
+
+    </section>
+
+</main>
+
+<!-- MODAL CRIAR / EDITAR ALERTA -->
+
+<div class="fundo-modal" id="modalAlerta" hidden>
+
+    <div class="modal-conteudo"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="tituloModal">
+
+        <div class="modal-topo">
+
+            <h2 id="tituloModal">Criar alerta</h2>
+
+            <button type="button" id="btnFecharModal" aria-label="Fechar">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+        </div>
+
+        <form id="formAlerta"
+              method="post"
+              th:action="@{/notificacoes/alertas/criar}">
+
+            <input th:if="${_csrf != null}"
+                   type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
+
+            <div class="campo">
+                <label for="nomeAlerta">Nome do alerta</label>
+
+                <input id="nomeAlerta"
+                       name="nome"
+                       type="text"
+                       maxlength="100"
+                       required
+                       placeholder="Ex.: Consumo elevado">
+            </div>
+
+            <div class="campo">
+                <label for="tipoAlerta">Tipo do alerta</label>
+
+                <select id="tipoAlerta" name="tipo" required>
+                    <option value="CONSUMO">Consumo de energia (kWh)</option>
+                    <option value="GASTO">Gastos de energia (R$)</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label id="labelLimite" for="valorLimite">
+                    Limite de consumo (kWh)
+                </label>
+
+                <input id="valorLimite"
+                       name="valorLimite"
+                       type="number"
+                       min="0.01"
+                       step="0.01"
+                       required
+                       placeholder="Ex.: 200">
+            </div>
+
+            <div class="campo">
+                <label for="percentualLimite">
+                    Percentual da meta (opcional)
+                </label>
+
+                <input id="percentualLimite"
+                       name="percentualLimite"
+                       type="number"
+                       min="0.01"
+                       step="0.01"
+                       placeholder="Ex.: 80">
+            </div>
+
+            <div class="campo campo-ativo" id="campoAtivo" hidden>
+
+                <label for="ativoAlerta">Alerta ativo</label>
+
+                <input type="hidden"
+                       name="ativo"
+                       value="false"
+                       id="ativoFalso"
+                       disabled>
+
+                <input type="checkbox"
+                       name="ativo"
+                       value="true"
+                       id="ativoAlerta"
+                       checked>
+
+            </div>
+
+            <div class="modal-botoes">
+
+                <button type="button"
+                        id="btnCancelar"
+                        class="botao-cancelar">
+                    Cancelar
+                </button>
+
+                <button type="submit" class="botao-salvar">
+                    Salvar alerta
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script th:src="@{/js/alertas.js}"></script>
+
 </body>
 </html>

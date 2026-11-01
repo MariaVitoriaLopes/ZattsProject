@@ -74,7 +74,7 @@ function alterarStatus(elemento, valido){
 
     }else{
 
-        elemento.style.color = "#FF8000FF";
+        elemento.style.color = "#434343";
 
     }
 

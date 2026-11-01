@@ -17,6 +17,12 @@
     column-gap: 40px;
 }
 
+.grupo-pref {
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+}
+
 .bloco-pref-info h3 {
     margin-bottom: 18px;
     font-family: "Cal Sans", sans-serif;

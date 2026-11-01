@@ -1,61 +1,32 @@
+
 <!DOCTYPE html>
-<html lang="pt-BR"
-      xmlns:th="http://www.thymeleaf.org">
-
-
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 
 <section th:fragment="comparativo"
-         class="dashboard-card comparativo">
-
+         class="dashboard-card card-consumo-diario">
 
     <div class="card-header-dashboard">
 
-
         <div>
-
-
-            <h2>
-                Resumo comparativo
-            </h2>
-
-
-            <p>
-                Veja o gasto em kWh durante os últimos meses
-            </p>
-
-
+            <h2>Consumo de energia diário</h2>
+            <p>Veja o consumo de energia (kWh) por hora</p>
         </div>
 
-
-
         <span class="badge-dashboard">
-
-
             <span></span>
-
             Quadro 1
-
-
         </span>
 
-
     </div>
 
-
-
-
-    <div class="grafico grande">
-
-
+    <div class="grafico grafico-diario">
         <canvas id="chartResumoComparativo"></canvas>
-
-
     </div>
 
-
+    <p class="estado-grafico" id="estadoConsumoDiario">
+        Aguardando medições horárias...
+    </p>
 
 </section>
-
-
 
 </html>

@@ -1,134 +1,98 @@
-<!DOCTYPE html>
-<html lang="pt-BR"
-      xmlns:th="http://www.thymeleaf.org">
 
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
     <title>Home</title>
 
     <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <link rel="stylesheet" th:href="@{/css/dashboards.css}">
+
     <th:block th:replace="~{fragments/headTema :: tema}"></th:block>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
-
 
 <body>
 
-<!-- HEADER -->
 <div th:replace="~{fragments/headerTelas :: header}"></div>
 
-<div class="container-dashboard">
+<main class="container-dashboard">
+
+    <!-- CABEÇALHO -->
 
     <section class="titulo-dashboard">
 
         <div>
-
-            <h1>
-                Dashboard
-            </h1>
-
+            <h1>Dashboard</h1>
             <p>
                 Acompanhe o consumo elétrico da sua residência
                 de forma simples, inteligente e acessível.
             </p>
-
         </div>
 
+        <div class="cardMeta status-sem-meta" id="cardStatusMeta">
 
-        <div class="data-hora">
+            <span class="material-symbols-outlined bandeiraMeta"
+                  id="iconeStatusMeta">
+                flag
+            </span>
 
-            <div>
+            <div class="textoMeta">
 
-                <span class="material-symbols-outlined">nest_clock_farsight_analog</span>
+                <h2 id="textoStatusMeta">
+                    Carregando sua meta...
+                </h2>
 
-                <strong id="live-clock">
-                    00:00:00
-                </strong>
+                <p id="descricaoStatusMeta">
+                    Acompanhamento do consumo mensal
+                </p>
 
             </div>
 
-
-            <span id="live-date"></span>
-
-
         </div>
-
 
     </section>
 
+    <!-- CARDS DE RESUMO EXISTENTES -->
 
+    <div th:replace="~{fragments/cards :: cardsResumo}"></div>
 
-
-    <!-- CARDS -->
-
-    <div th:replace="~{fragments/cards :: cardsResumo}">
-    </div>
-
-
-
-
+    <!-- GRÁFICOS -->
 
     <section class="dashboard-grid">
 
-        <div class="ajuste">
+        <!-- CONSUMO EM TEMPO REAL -->
 
-            <!-- CONSUMO -->
+        <div th:replace="~{fragments/dashboards/consumo :: consumo}"></div>
 
-            <div th:replace="~{fragments/dashboards/consumo :: consumo}">
-            </div>
+        <!-- CONSUMO DIÁRIO E META -->
 
-            <!-- META -->
+        <div class="coluna-central">
 
-            <div th:replace="~{fragments/dashboards/metaConsumo :: meta}">
-            </div>
-        </div>
+            <div th:replace="~{fragments/dashboards/comparativo :: comparativo}"></div>
 
-        <!-- COMPARATIVO -->
-
-        <div th:replace="~{fragments/dashboards/comparativo :: comparativo}">
-        </div>
-
-        <div>
-            <!-- VALOR CONTA -->
-
-            <div th:replace="~{fragments/dashboards/valorConta :: valor}">
-            </div>
-
-<!--            STATUS META-->
-            <div class="cardMeta">
-                <span class="material-symbols-outlined bandeiraMeta">flag_check</span>
-                <div class="textoMeta">
-                    <h2>Você está dentro da sua meta!</h2>
-                    <p>Comparativo dos últimos meses</p>
-                </div>
-            </div>
+            <div th:replace="~{fragments/dashboards/metaConsumo :: meta}"></div>
 
         </div>
+
+        <!-- VALOR DA CONTA -->
+
+        <div th:replace="~{fragments/dashboards/valorConta :: valor}"></div>
 
     </section>
 
+</main>
 
-</div>
-
-
-
-<script src="https://unpkg.com/lucide@latest"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-<script th:src="@{/js/script.js}">
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<script th:src="@{/js/script.js}"></script>
 
 </body>
-
 </html>

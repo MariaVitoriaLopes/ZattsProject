@@ -23,10 +23,6 @@
     transition: 0.3s ease;
 }
 
-.quest-voltar:hover {
-    text-shadow: 0 0 8px var(--cor-primaria-400);
-    color: var(--fundo-700);
-}
 
 .quest-voltar .material-symbols-outlined {
     font-size: 28px;
@@ -213,10 +209,6 @@
     background-color: var(--fundo-900);
 }
 
-.quest-opcao:hover span {
-    text-shadow: 0 0 8px var(--cor-primaria-400);
-}
-
 .quest-campo {
     position: relative;
     display: flex;
@@ -238,16 +230,11 @@
     color: var(--textos-pretos);
     outline: none;
     transition: 0.3s ease;
+    cursor: pointer;
 }
 
 .quest-campo input::placeholder {
     color: #B3B3B3;
-}
-
-.quest-campo input:focus,
-.quest-campo select:focus {
-    border-color: var(--cor-primaria-400);
-    box-shadow: 0 0 6px var(--cor-primaria-400);
 }
 
 .quest-campo-select select {
@@ -255,6 +242,10 @@
     appearance: none;
     -webkit-appearance: none;
     cursor: pointer;
+}
+
+p.quest-aviso {
+    margin-bottom: 15px;
 }
 
 .quest-campo-select .material-symbols-outlined {
@@ -274,14 +265,13 @@
 }
 
 .quest-moeda input {
-    padding-left: 46px;
+    padding-left: 60px;
 }
 
 .quest-condicional {
     display: none;
     flex-direction: column;
-    gap: 12px;
-    margin-top: 32px;
+    margin: 32px 0;
 }
 
 .quest-pergunta:has(#metaSim:checked) .quest-condicional {
