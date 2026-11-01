@@ -1,8 +1,11 @@
+
 .configuracoes-container {
     padding: 30px 60px 60px;
     background-color: #F9F9F9;
     min-height: 100vh;
 }
+
+/* ABAS */
 
 .abas-config {
     display: inline-flex;
@@ -34,11 +37,13 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
+/* CARD PRINCIPAL */
+
 .card-config {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 40px;
-    padding: 80px 5.6% 70px;
+    padding: 40px 5.6% 70px;
     background-color: var(--fundo-0);
     border: 1px solid #ECECEC;
     border-radius: 28px;
@@ -59,7 +64,11 @@
     margin-bottom: 6px;
 }
 
+/* CAMPOS */
+
 .configuracoes-container .coluna-config .campo {
+    display: flex;
+    flex-direction: column;
     gap: 8px;
 }
 
@@ -94,7 +103,7 @@
 .configuracoes-container .campo-input select {
     width: 100%;
     height: 46px;
-    padding: 0 48px 0 16px;
+    padding: 0 16px;
     border: 1px solid #E6E6E6;
     border-radius: 10px;
     background-color: var(--fundo-0);
@@ -107,39 +116,27 @@
     transition: 0.3s ease;
 }
 
+.configuracoes-container .campo-input input::placeholder {
+    color: #A0A0A0;
+    opacity: 1;
+}
+
 .configuracoes-container .campo-input input:focus,
 .configuracoes-container .campo-input select:focus {
     border-color: var(--cor-primaria-400);
     box-shadow: 0 0 6px var(--cor-primaria-400);
 }
 
+.configuracoes-container .campo-input input[readonly],
+.configuracoes-container .campo-input select:disabled {
+    cursor: default;
+    background-color: var(--fundo-0);
+}
+
 .campo-input select {
     appearance: none;
     -webkit-appearance: none;
     cursor: pointer;
-}
-
-.campo-input button {
-    position: absolute;
-    right: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border: none;
-    background: none;
-    color: var(--fundo-900);
-    cursor: pointer;
-    transition: 0.3s ease;
-}
-
-.campo-input button:hover {
-    color: var(--fundo-700);
-    transform: scale(1.1);
-}
-
-.campo-input button .material-symbols-outlined {
-    font-size: 20px;
 }
 
 .seta-select {
@@ -150,6 +147,8 @@
     pointer-events: none;
 }
 
+/* LARGURAS DOS CAMPOS */
+
 .largura-23 { width: 23%; }
 .largura-25 { width: 25%; }
 .largura-27 { width: 27%; }
@@ -158,6 +157,65 @@
 .largura-45 { width: 45%; }
 .largura-66 { width: 66%; }
 .largura-80 { width: 80%; }
+
+/* BOTÕES GERAIS DE EDIÇÃO */
+
+.acoes-edicao {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: -15px;
+}
+
+#botoesEdicao {
+    display: flex;
+    gap: 10px;
+}
+
+#botoesEdicao[hidden],
+#btnEditarTudo[hidden] {
+    display: none;
+}
+
+.btn-editar-tudo,
+.btn-salvar-tudo,
+.btn-cancelar-tudo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn-editar-tudo,
+.btn-salvar-tudo {
+    background-color: var(--cor-primaria-400);
+    color: var(--textos-pretos);
+}
+
+.btn-editar-tudo:hover,
+.btn-salvar-tudo:hover {
+    filter: brightness(0.93);
+}
+
+.btn-cancelar-tudo {
+    background-color: var(--fundo-50);
+    color: var(--fundo-900);
+}
+
+.btn-cancelar-tudo:hover {
+    background-color: #E5E5E5;
+}
+
+/* AÇÕES DA CONTA */
 
 .acoes-conta {
     margin-top: auto;
@@ -168,13 +226,18 @@
 }
 
 .configuracoes-container .acoes-conta .btn-config {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-top: 0;
     padding: 14px 24px;
+    border: none;
     border-radius: 12px;
     font-size: 16px;
     font-weight: 600;
     background-color: var(--fundo-900);
     color: var(--textos-brancos);
+    cursor: pointer;
     transition: 0.3s ease;
 }
 
@@ -202,7 +265,30 @@
     color: #6B6B6B;
 }
 
+/* MENSAGENS */
+
+.mensagem-sucesso,
+.mensagem-erro {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.mensagem-sucesso {
+    background-color: #E5F5E8;
+    color: #246B35;
+}
+
+.mensagem-erro {
+    background-color: #FCE8E6;
+    color: #B3321B;
+}
+
+/* RESPONSIVIDADE */
+
 @media (max-width: 1100px) {
+
     .card-config {
         grid-template-columns: 1fr;
         padding: 40px 28px;
@@ -223,6 +309,7 @@
         border-radius: 12px;
         margin-bottom: 28px;
     }
+
     .abas-config .aba {
         white-space: nowrap;
         padding: 9px 20px;
@@ -230,5 +317,37 @@
 
     .acoes-conta {
         margin-top: 30px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .card-config {
+        padding: 28px 18px;
+        gap: 35px;
+    }
+
+    .acoes-edicao {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    #botoesEdicao {
+        flex-wrap: wrap;
+    }
+
+    .configuracoes-container .secao-titulo {
+        font-size: 24px;
+    }
+
+    .largura-23,
+    .largura-25,
+    .largura-27,
+    .largura-30,
+    .largura-43,
+    .largura-45,
+    .largura-66,
+    .largura-80 {
+        width: 100%;
     }
 }

@@ -1,3 +1,4 @@
+
 package br.edu.fatec.zattsproject.backend.model;
 
 import lombok.AllArgsConstructor;
@@ -21,12 +22,8 @@ public class Usuario {
     private String id;
 
     private String nome;
-
     private String email;
-
     private String telefone;
-
-    private String fotoPerfil;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
@@ -34,4 +31,6 @@ public class Usuario {
     @Builder.Default
     private LocalDateTime criadoEm = LocalDateTime.now();
 
+    @Builder.Default
+    private boolean questionarioRespondido = false;
 }

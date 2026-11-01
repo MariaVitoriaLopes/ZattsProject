@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR"
       xmlns:th="http://www.thymeleaf.org">
@@ -5,6 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
     <title>Questionário</title>
 
     <link rel="stylesheet" th:href="@{/css/styles.css}">
@@ -19,7 +21,11 @@
 
 <main class="quest-pagina">
 
-    <div class="quest-progresso" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="14">
+    <div class="quest-progresso"
+         role="progressbar"
+         aria-valuemin="0"
+         aria-valuemax="100"
+         aria-valuenow="14">
         <div class="quest-progresso-barra"></div>
     </div>
 
@@ -30,8 +36,25 @@
         </a>
     </div>
 
-    <form class="quest-form" id="formQuestionario" method="post" th:action="@{/questionario/perguntas}">
+    <!-- Mensagem de erro -->
+    <p th:if="${erro}"
+       th:text="${erro}"
+       role="alert"
+       style="color: #d32f2f; text-align: center;">
+    </p>
 
+    <form class="quest-form"
+          id="formQuestionario"
+          method="post"
+          th:action="@{/questionario/perguntas}">
+
+        <!-- Token CSRF -->
+        <input th:if="${_csrf != null}"
+               type="hidden"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}">
+
+        <!-- Questão 01 -->
         <fieldset class="quest-pergunta ativa">
             <legend class="quest-numero">Questão 01</legend>
             <h2 class="quest-enunciado">Quantas pessoas moram na residência?</h2>
@@ -60,12 +83,15 @@
             </div>
         </fieldset>
 
+        <!-- Questão 02 -->
         <fieldset class="quest-pergunta">
             <legend class="quest-numero">Questão 02</legend>
             <h2 class="quest-enunciado">Qual é a sua concessionária de energia?</h2>
 
             <div class="quest-campo quest-campo-select">
-                <select name="concessionaria" aria-label="Concessionária de energia" required>
+                <select name="concessionaria"
+                        aria-label="Concessionária de energia"
+                        required>
                     <option value="" selected disabled>Selecione sua concessionária</option>
                     <option value="edp">EDP</option>
                     <option value="enel">Enel</option>
@@ -80,85 +106,185 @@
             </div>
         </fieldset>
 
+        <!-- Questão 03 -->
         <fieldset class="quest-pergunta">
             <legend class="quest-numero">Questão 03</legend>
-            <h2 class="quest-enunciado">Qual é a data de vencimento da sua última conta de energia?</h2>
+            <h2 class="quest-enunciado">
+                Qual é a data de vencimento da sua última conta de energia?
+            </h2>
 
             <div class="quest-campo">
-                <input type="date" name="vencimentoUltimaConta" aria-label="Data de vencimento" required>
+                <input type="date"
+                       name="vencimentoUltimaConta"
+                       aria-label="Data de vencimento"
+                       required>
             </div>
         </fieldset>
 
+        <!-- Questão 04 - Obrigatória -->
         <fieldset class="quest-pergunta">
             <legend class="quest-numero">Questão 04</legend>
             <h2 class="quest-enunciado">
                 Qual foi o valor da conta de energia de
-                <span data-meses-atras="1">setembro</span>?
+                <span data-meses-atras="1">mês anterior</span>?
             </h2>
 
             <div class="quest-campo quest-moeda">
                 <span>R$</span>
-                <input type="text" name="valorMes1" inputmode="decimal" placeholder="0,00" pattern="\d+([.,]\d{1,2})?" title="Digite um valor, por exemplo 250,00" aria-label="Valor da conta" required>
+                <input type="text"
+                       name="valorMes1"
+                       inputmode="decimal"
+                       placeholder="0,00"
+                       pattern="\d+([.,]\d{1,2})?"
+                       title="Digite um valor, por exemplo 250,00"
+                       aria-label="Valor da conta do mês anterior"
+                       required>
             </div>
         </fieldset>
 
+        <!-- Questão 05 - Opcional -->
         <fieldset class="quest-pergunta">
             <legend class="quest-numero">Questão 05</legend>
             <h2 class="quest-enunciado">
                 Qual foi o valor da conta de energia de
-                <span data-meses-atras="2">agosto</span>?
+                <span data-meses-atras="2">dois meses atrás</span>?
             </h2>
+
+            <p class="quest-aviso">
+                Opcional. Informar mais meses ajuda a melhorar
+                a precisão da previsão dos próximos gastos.
+            </p>
 
             <div class="quest-campo quest-moeda">
                 <span>R$</span>
-                <input type="text" name="valorMes2" inputmode="decimal" placeholder="0,00" pattern="\d+([.,]\d{1,2})?" title="Digite um valor, por exemplo 250,00" aria-label="Valor da conta" required>
+                <input type="text"
+                       name="valorMes2"
+                       inputmode="decimal"
+                       placeholder="0,00"
+                       pattern="\d+([.,]\d{1,2})?"
+                       title="Digite um valor, por exemplo 250,00"
+                       aria-label="Valor da conta de dois meses atrás">
             </div>
         </fieldset>
 
+        <!-- Questão 06 - Opcional -->
         <fieldset class="quest-pergunta">
             <legend class="quest-numero">Questão 06</legend>
             <h2 class="quest-enunciado">
                 Qual foi o valor da conta de energia de
-                <span data-meses-atras="3">julho</span>?
+                <span data-meses-atras="3">três meses atrás</span>?
             </h2>
+
+            <p class="quest-aviso">
+                Opcional. Sem essa informação, a previsão ainda
+                poderá ser calculada, mas com maior incerteza.
+            </p>
 
             <div class="quest-campo quest-moeda">
                 <span>R$</span>
-                <input type="text" name="valorMes3" inputmode="decimal" placeholder="0,00" pattern="\d+([.,]\d{1,2})?" title="Digite um valor, por exemplo 250,00" aria-label="Valor da conta" required>
+                <input type="text"
+                       name="valorMes3"
+                       inputmode="decimal"
+                       placeholder="0,00"
+                       pattern="\d+([.,]\d{1,2})?"
+                       title="Digite um valor, por exemplo 250,00"
+                       aria-label="Valor da conta de três meses atrás">
             </div>
         </fieldset>
 
+        <!-- Questão 07 - Meta -->
         <fieldset class="quest-pergunta">
             <legend class="quest-numero">Questão 07</legend>
-            <h2 class="quest-enunciado">Você deseja definir uma meta mensal de consumo de energia?</h2>
+
+            <h2 class="quest-enunciado">
+                Você deseja definir uma meta mensal de energia?
+            </h2>
 
             <div class="quest-opcoes">
                 <label class="quest-opcao">
-                    <input type="radio" name="definirMeta" id="metaSim" value="sim" required>
+                    <input type="radio"
+                           name="definirMeta"
+                           id="metaSim"
+                           value="sim"
+                           required>
                     <span>Sim</span>
                 </label>
+
                 <label class="quest-opcao">
-                    <input type="radio" name="definirMeta" id="metaNao" value="nao">
+                    <input type="radio"
+                           name="definirMeta"
+                           id="metaNao"
+                           value="nao">
                     <span>Não</span>
                 </label>
             </div>
 
-            <div class="quest-condicional">
-                <label class="quest-rotulo" for="valorMeta">Qual seria o valor em R$?</label>
+            <!-- Escolha do tipo de meta -->
+            <div class="quest-condicional"
+                 id="escolhaTipoMeta"
+                 hidden>
+
+                <h2 class="quest-enunciado">
+                    Qual tipo de meta deseja definir?
+                </h2>
+
+                <div class="quest-opcoes">
+                    <label class="quest-opcao">
+                        <input type="radio"
+                               name="tipoMeta"
+                               id="tipoConsumo"
+                               value="CONSUMO">
+                        <span>Consumo (kWh)</span>
+                    </label>
+
+                    <label class="quest-opcao">
+                        <input type="radio"
+                               name="tipoMeta"
+                               id="tipoValor"
+                               value="VALOR">
+                        <span>Valor (R$)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Campo para informar a meta -->
+            <div class="quest-condicional"
+                 id="campoValorMeta"
+                 hidden>
+
+                <label class="quest-rotulo"
+                       for="valorMeta"
+                       id="rotuloValorMeta">
+                    Informe sua meta
+                </label>
+
                 <div class="quest-campo quest-moeda">
-                    <span>R$</span>
-                    <input type="text" id="valorMeta" name="valorMeta" inputmode="decimal" placeholder="0,00" pattern="\d+([.,]\d{1,2})?" title="Digite um valor, por exemplo 250,00">
+                    <span id="unidadeMeta">R$</span>
+
+                    <input type="text"
+                           id="valorMeta"
+                           name="valorMeta"
+                           inputmode="decimal"
+                           placeholder="0,00"
+                           pattern="\d+([.,]\d{1,2})?"
+                           title="Digite um valor positivo">
                 </div>
             </div>
         </fieldset>
 
+        <!-- Navegação -->
         <div class="quest-navegacao">
-            <button type="button" class="quest-btn-secundario" id="btnAnterior" disabled>
+            <button type="button"
+                    class="quest-btn-secundario"
+                    id="btnAnterior"
+                    disabled>
                 <span class="material-symbols-outlined">arrow_back</span>
                 Anterior
             </button>
 
-            <button type="button" class="quest-btn-primario" id="btnProxima">
+            <button type="button"
+                    class="quest-btn-primario"
+                    id="btnProxima">
                 <span id="textoProxima">Próxima</span>
                 <span class="material-symbols-outlined">arrow_forward</span>
             </button>
@@ -171,5 +297,4 @@
 <script th:src="@{/js/questionario.js}"></script>
 
 </body>
-
 </html>

@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <title>Redefinir senha</title>
+</head>
+<body>
+
+<h1>Redefinir senha</h1>
+
+<p th:if="${erro}" th:text="${erro}"></p>
+
+<form th:action="@{/redefinirSenha}" method="post">
+
+    <input type="hidden"
+           name="token"
+           th:value="${token}">
+
+    <input type="hidden"
+           th:if="${_csrf != null}"
+           th:name="${_csrf.parameterName}"
+           th:value="${_csrf.token}">
+
+    <label for="senha">Nova senha</label>
+    <input type="password"
+           id="senha"
+           name="senha"
+           placeholder="Digite sua nova senha"
+           autocomplete="new-password"
+           required>
+
+    <label for="confirmarSenha">Confirmar senha</label>
+    <input type="password"
+           id="confirmarSenha"
+           name="confirmarSenha"
+           placeholder="Confirme sua senha"
+           autocomplete="new-password"
+           required>
+
+    <button type="submit">Atualizar senha</button>
+
+</form>
+
+</body>
+</html>

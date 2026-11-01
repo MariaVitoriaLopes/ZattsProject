@@ -346,6 +346,10 @@
     font-size: 26px;
 }
 
+.quest-condicional[hidden] {
+    display: none !important;
+}
+
 @media (max-width: 900px) {
     .quest-topo {
         padding: 0 24px;

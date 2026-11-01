@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
     <title>Notificações</title>
 
     <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
@@ -12,6 +13,7 @@
     <link rel="stylesheet" th:href="@{/css/configuracoes.css}">
     <link rel="stylesheet" th:href="@{/css/notificacoes.css}">
     <th:block th:replace="~{fragments/headTema :: tema}"></th:block>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
@@ -25,16 +27,18 @@
 
     <div class="topo-pagina">
         <h1 class="titulo-pagina">Notificações</h1>
-        <span class="contador-notificacoes">8 notificações</span>
+        <span class="contador-notificacoes">4 notificações</span>
     </div>
 
     <nav class="abas-config">
-        <a href="#" class="aba ativa">Geral</a>
-        <a href="#" class="aba">Metas</a>
-        <a href="#" class="aba">Alertas personalizados</a>
+        <button type="button" class="aba ativa" data-aba="geral">Geral</button>
+        <button type="button" class="aba" data-aba="metas">Metas</button>
+        <button type="button" class="aba" data-aba="personalizados">Alertas personalizados</button>
     </nav>
 
-    <section class="card-notificacoes">
+    <!-- GERAL -->
+
+    <section class="card-notificacoes" id="aba-geral">
 
         <ul class="lista-notificacoes">
 
@@ -96,8 +100,327 @@
 
     </section>
 
+    <!-- METAS -->
+
+    <section class="card-notificacoes" id="aba-metas" hidden>
+
+        <div class="alertas-topo">
+            <div>
+                <h2>Minhas metas</h2>
+                <p class="alertas-subtitulo">Defina até uma meta de consumo e uma de gastos por mês.</p>
+            </div>
+
+            <button type="button" class="btn-criar-alerta" id="btnCriarMeta"
+                    th:if="${configuracao == null or configuracao.metaConsumoKwh == null or configuracao.metaGastoReais == null}">
+                <span class="material-symbols-outlined">add</span>
+                Criar meta
+            </button>
+        </div>
+
+        <p class="mensagem-alerta" th:if="${sucesso != null}" th:text="${sucesso}"></p>
+        <p class="mensagem-alerta mensagem-erro" th:if="${erro != null}" th:text="${erro}" role="alert"></p>
+
+        <ul class="lista-notificacoes"
+            th:if="${configuracao != null and (configuracao.metaConsumoKwh != null or configuracao.metaGastoReais != null)}">
+
+            <li class="notificacao" th:if="${configuracao.metaConsumoKwh != null}">
+                <div class="notificacao-icone">
+                    <span class="material-symbols-outlined">electric_bolt</span>
+                </div>
+                <div class="notificacao-texto alerta-informacoes">
+                    <p class="notificacao-titulo">Meta mensal de consumo</p>
+                    <small class="notificacao-tempo"
+                           th:text="|${#numbers.formatDecimal(configuracao.metaConsumoKwh, 1, 2)} kWh por mês|">200 kWh por mês</small>
+                </div>
+                <div class="alerta-acoes">
+                    <button type="button" class="btn-editar-meta"
+                            aria-label="Editar meta de consumo"
+                            data-tipo="CONSUMO"
+                            th:attr="data-valor=${configuracao.metaConsumoKwh}">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                    <form method="post" class="form-excluir-meta"
+                          th:action="@{/notificacoes/metas/excluir}"
+                          onsubmit="return confirm('Deseja excluir a meta de consumo?');">
+                        <input th:if="${_csrf != null}" type="hidden"
+                               th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <input type="hidden" name="tipoMeta" value="CONSUMO">
+                        <button type="submit" class="notificacao-excluir" aria-label="Excluir meta de consumo">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </form>
+                </div>
+            </li>
+
+            <li class="notificacao" th:if="${configuracao.metaGastoReais != null}">
+                <div class="notificacao-icone">
+                    <span class="material-symbols-outlined">payments</span>
+                </div>
+                <div class="notificacao-texto alerta-informacoes">
+                    <p class="notificacao-titulo">Meta mensal de gastos</p>
+                    <small class="notificacao-tempo"
+                           th:text="|R$ ${#numbers.formatDecimal(configuracao.metaGastoReais, 1, 2)} por mês|">R$ 250,00 por mês</small>
+                </div>
+                <div class="alerta-acoes">
+                    <button type="button" class="btn-editar-meta"
+                            aria-label="Editar meta de gastos"
+                            data-tipo="VALOR"
+                            th:attr="data-valor=${configuracao.metaGastoReais}">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                    <form method="post" class="form-excluir-meta"
+                          th:action="@{/notificacoes/metas/excluir}"
+                          onsubmit="return confirm('Deseja excluir a meta de gastos?');">
+                        <input th:if="${_csrf != null}" type="hidden"
+                               th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <input type="hidden" name="tipoMeta" value="VALOR">
+                        <button type="submit" class="notificacao-excluir" aria-label="Excluir meta de gastos">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+
+        <div class="alertas-vazio"
+             th:if="${configuracao == null or (configuracao.metaConsumoKwh == null and configuracao.metaGastoReais == null)}">
+            <span class="material-symbols-outlined">flag</span>
+            <h3>Nenhuma meta cadastrada</h3>
+            <p>Crie uma meta mensal de consumo ou de gastos para acompanhar sua energia.</p>
+        </div>
+
+        <p class="alertas-subtitulo"
+           th:if="${configuracao != null and configuracao.metaConsumoKwh != null and configuracao.metaGastoReais != null}">
+            Você já possui as duas metas permitidas. Pode editá-las ou excluí-las.
+        </p>
+    </section>
+
+    <!-- ALERTAS PERSONALIZADOS -->
+
+    <section class="card-notificacoes" id="aba-personalizados" hidden>
+
+        <div class="alertas-topo">
+            <div>
+                <h2>Meus alertas</h2>
+                <p class="alertas-subtitulo">Gerencie seus alertas personalizados.</p>
+            </div>
+
+            <button type="button" class="btn-criar-alerta" id="btnCriarAlerta">
+                <span class="material-symbols-outlined">add</span>
+                Criar alerta
+            </button>
+        </div>
+
+        <p class="mensagem-alerta"
+           th:if="${mensagem != null}"
+           th:text="${mensagem}"></p>
+
+        <p class="mensagem-alerta mensagem-erro"
+           th:if="${erro != null}"
+           th:text="${erro}"></p>
+
+        <ul class="lista-notificacoes" th:if="${alertas != null and !#lists.isEmpty(alertas)}">
+
+            <li class="notificacao"
+                th:each="alerta : ${alertas}">
+
+                <div class="notificacao-icone">
+                    <span class="material-symbols-outlined">notifications_active</span>
+                </div>
+
+                <div class="notificacao-texto alerta-informacoes">
+
+                    <p class="notificacao-titulo" th:text="${alerta.nome}"></p>
+
+                    <small class="notificacao-tempo"
+                           th:text="${alerta.tipo == 'CONSUMO' ? 'Consumo de energia' : (alerta.tipo == 'GASTO' ? 'Gastos de energia' : alerta.tipo)}">
+                    </small>
+
+                    <small class="notificacao-tempo"
+                           th:if="${alerta.valorLimite != null}"
+                           th:text="${alerta.tipo == 'GASTO' ? 'Limite: R$ ' + #numbers.formatDecimal(alerta.valorLimite, 1, 2) : 'Limite: ' + alerta.valorLimite + ' kWh'}">
+                    </small>
+
+                    <small class="notificacao-tempo"
+                           th:if="${alerta.percentualLimite != null}"
+                           th:text="|Percentual: ${alerta.percentualLimite}%|">
+                    </small>
+
+                    <span class="alerta-status"
+                          th:classappend="${alerta.ativo == true ? 'status-ativo' : 'status-inativo'}"
+                          th:text="${alerta.ativo == true ? 'Ativo' : 'Inativo'}">
+                    </span>
+
+                </div>
+
+                <div class="alerta-acoes">
+
+                    <button type="button"
+                            class="notificacao-editar"
+                            aria-label="Editar alerta"
+                            th:attr="data-id=${alerta.id},
+                                     data-nome=${alerta.nome},
+                                     data-tipo=${alerta.tipo},
+                                     data-valor=${alerta.valorLimite},
+                                     data-percentual=${alerta.percentualLimite},
+                                     data-ativo=${alerta.ativo}">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+
+                    <form th:action="@{/notificacoes/alertas/{id}/excluir(id=${alerta.id})}"
+                          method="post"
+                          class="form-excluir">
+
+                        <button type="submit"
+                                class="notificacao-excluir"
+                                aria-label="Excluir alerta">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </li>
+
+        </ul>
+
+        <div class="alertas-vazio"
+             th:if="${alertas == null or #lists.isEmpty(alertas)}">
+
+            <span class="material-symbols-outlined">notifications_off</span>
+            <h3>Nenhum alerta cadastrado</h3>
+            <p>Crie seu primeiro alerta personalizado para acompanhar seu consumo ou seus gastos.</p>
+
+        </div>
+
+    </section>
+
 </main>
 
-</body>
+<!-- MODAL CRIAR / EDITAR -->
 
+<div class="modal-alerta" id="modalAlerta" hidden>
+
+    <div class="modal-conteudo" role="dialog" aria-modal="true" aria-labelledby="tituloModal">
+
+        <div class="modal-topo">
+            <h2 id="tituloModal">Criar alerta</h2>
+
+            <button type="button" class="modal-fechar" id="btnFecharModal" aria-label="Fechar">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form id="formAlerta" method="post" th:action="@{/notificacoes/alertas/criar}">
+
+            <div class="campo-alerta">
+                <label for="nomeAlerta">Nome do alerta</label>
+                <input type="text"
+                       id="nomeAlerta"
+                       name="nome"
+                       placeholder="Ex.: Consumo elevado"
+                       maxlength="100"
+                       required>
+            </div>
+
+            <div class="campo-alerta">
+                <label for="tipoAlerta">Tipo do alerta</label>
+                <select id="tipoAlerta" name="tipo" required>
+                    <option value="CONSUMO">Consumo de energia (kWh)</option>
+                    <option value="GASTO">Gastos de energia (R$)</option>
+                </select>
+            </div>
+
+            <div class="campo-alerta">
+                <label for="valorLimite" id="labelLimite">Limite de consumo (kWh)</label>
+                <input type="number"
+                       id="valorLimite"
+                       name="valorLimite"
+                       min="0.01"
+                       step="0.01"
+                       placeholder="Ex.: 200"
+                       required>
+            </div>
+
+            <div class="campo-alerta">
+                <label for="percentualLimite">Percentual da meta (opcional)</label>
+                <input type="number"
+                       id="percentualLimite"
+                       name="percentualLimite"
+                       min="0.01"
+                       step="0.01"
+                       placeholder="Ex.: 80">
+            </div>
+
+            <div class="campo-alerta campo-ativo" id="campoAtivo" hidden>
+                <label for="ativoAlerta">Alerta ativo</label>
+                <input type="hidden" name="ativo" value="false" disabled id="ativoFalso">
+                <input type="checkbox" id="ativoAlerta" name="ativo" value="true" checked>
+            </div>
+
+            <div class="modal-acoes">
+                <button type="button" class="btn-cancelar" id="btnCancelar">
+                    Cancelar
+                </button>
+
+                <button type="submit" class="btn-salvar">
+                    Salvar alerta
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- MODAL CRIAR / EDITAR META -->
+<div class="modal-alerta" id="modalMeta" hidden>
+    <div class="modal-conteudo" role="dialog" aria-modal="true" aria-labelledby="tituloModalMeta">
+        <div class="modal-topo">
+            <h2 id="tituloModalMeta">Criar meta</h2>
+            <button type="button" class="modal-fechar" id="btnFecharModalMeta" aria-label="Fechar">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form id="formMeta" method="post" th:action="@{/notificacoes/metas/criar}"
+              th:attr="data-url-criar=@{/notificacoes/metas/criar},data-url-editar=@{/notificacoes/metas/editar}">
+            <input th:if="${_csrf != null}" type="hidden"
+                   th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <div class="campo-alerta">
+                <label for="tipoMetaFormulario">Tipo de meta</label>
+                <select id="tipoMetaFormulario" name="tipoMeta" required>
+                    <option value="" selected disabled>Selecione o tipo de meta</option>
+                    <option value="CONSUMO"
+                            th:attr="data-disponivel=${configuracao == null or configuracao.metaConsumoKwh == null}">
+                        Consumo de energia (kWh)
+                    </option>
+                    <option value="VALOR"
+                            th:attr="data-disponivel=${configuracao == null or configuracao.metaGastoReais == null}">
+                        Gastos de energia (R$)
+                    </option>
+                </select>
+            </div>
+
+            <div class="campo-alerta">
+                <label for="valorMetaFormulario" id="labelValorMeta">Valor da meta</label>
+                <input type="number" id="valorMetaFormulario" name="valorMeta"
+                       min="0.01" step="0.01" placeholder="Ex.: 250" required>
+            </div>
+
+            <div class="modal-acoes">
+                <button type="button" class="btn-cancelar" id="btnCancelarMeta">Cancelar</button>
+                <button type="submit" class="btn-salvar" id="btnSalvarMeta">Salvar meta</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:src="@{/js/notificacoes.js}"></script>
+<script th:src="@{/js/metas.js}"></script>
+
+</body>
 </html>

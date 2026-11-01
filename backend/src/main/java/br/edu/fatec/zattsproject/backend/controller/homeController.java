@@ -1,13 +1,22 @@
+
 package br.edu.fatec.zattsproject.backend.controller;
 
 import br.edu.fatec.zattsproject.backend.model.Usuario;
+import br.edu.fatec.zattsproject.backend.service.AlertaService;
+import br.edu.fatec.zattsproject.backend.service.ConfiguracaoService;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
+@RequiredArgsConstructor
 public class homeController {
+
+    private final ConfiguracaoService configuracaoService;
+
+    private final AlertaService alertaService;
 
     private boolean usuarioLogado(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
@@ -43,15 +52,26 @@ public class homeController {
 
     @GetMapping("/notificacoes")
     public String notificacoes(Model model, HttpSession session) {
-        if (!usuarioLogado(session)) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
+
+        if (usuario == null) {
             return "redirect:/login";
         }
+
         model.addAttribute("paginaAtual", "notificacoes");
+        model.addAttribute("alertas", alertaService.listar(usuario.getId()));
+        model.addAttribute(
+                "configuracao",
+                configuracaoService.buscarPorUsuario(usuario.getId())
+        );
+
         return "notificacoes";
     }
 
     @GetMapping("/configuracoes")
     public String configuracoes(Model model, HttpSession session) {
+
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
 
         if (usuario == null) {
@@ -60,6 +80,11 @@ public class homeController {
 
         model.addAttribute("paginaAtual", "configuracoes");
         model.addAttribute("usuario", usuario);
+
+        model.addAttribute(
+                "configuracao",
+                configuracaoService.buscarPorUsuario(usuario.getId())
+        );
 
         return "configuracoes";
     }
@@ -81,5 +106,4 @@ public class homeController {
         model.addAttribute("paginaAtual", "configuracoes");
         return "configuracoes-notificacoes";
     }
-
 }

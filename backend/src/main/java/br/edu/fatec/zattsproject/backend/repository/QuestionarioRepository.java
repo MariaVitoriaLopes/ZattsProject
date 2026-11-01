@@ -1,5 +1,5 @@
-package br.edu.fatec.zattsproject.backend.repository;
 
+package br.edu.fatec.zattsproject.backend.repository;
 
 import br.edu.fatec.zattsproject.backend.model.Questionario;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -7,8 +7,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface QuestionarioRepository extends MongoRepository<Questionario, String> {
-        List<Questionario> findByUsuarioId(String usuarioId);
-    }
 
+    List<Questionario> findByUsuarioId(String usuarioId);
 
-
+    boolean existsByUsuarioIdAndStatus(String usuarioId, String status);
+}

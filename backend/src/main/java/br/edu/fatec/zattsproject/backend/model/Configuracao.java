@@ -1,3 +1,4 @@
+
 package br.edu.fatec.zattsproject.backend.model;
 
 import lombok.AllArgsConstructor;
@@ -16,11 +17,23 @@ public class Configuracao {
 
     @Id
     private String id;
+
     private String usuarioId;
+
     private Double metaConsumoKwh;
     private Double metaGastoReais;
+
     private Boolean notificacoesAtivas;
+
     private String distribuidora;
+
+    private String cep;
+    private String logradouro;
+    private String numero;
+    private String complemento;
+    private String bairro;
     private String cidade;
     private String uf;
+
+    private String fusoHorario;
 }

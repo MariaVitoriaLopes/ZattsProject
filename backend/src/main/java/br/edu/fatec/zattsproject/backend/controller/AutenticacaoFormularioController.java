@@ -1,3 +1,4 @@
+
 package br.edu.fatec.zattsproject.backend.controller;
 
 import br.edu.fatec.zattsproject.backend.model.Usuario;
@@ -118,15 +119,34 @@ public class AutenticacaoFormularioController {
                 return "redirect:/login";
 
             case SUCESSO:
-                // Guarda o utilizador na sessão para o homeController permitir o acesso
-                Usuario usuario = new Usuario();
-                usuario.setEmail(email);
+
+                Usuario usuario = autenticacaoService
+                        .buscarUsuarioPorEmail(email)
+                        .orElse(null);
+
+                if (usuario == null) {
+                    atributos.addFlashAttribute(
+                            "erro",
+                            "Não foi possível recuperar os dados do usuário."
+                    );
+                    return "redirect:/login";
+                }
+
+                // Guarda o usuário completo na sessão
+                usuario.setSenha(null);
                 session.setAttribute("usuarioLogado", usuario);
 
                 atributos.addFlashAttribute(
                         "sucesso",
                         "Login realizado com sucesso!"
                 );
+
+                // Verifica se o usuário já respondeu ao questionário
+                if (!usuario.isQuestionarioRespondido()) {
+                    return "redirect:/questionario";
+                }
+
+                // Se já respondeu, direciona para a Home
                 return "redirect:/home";
         }
 

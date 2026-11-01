@@ -96,4 +96,15 @@ public class AutenticacaoService {
         CAMPOS_OBRIGATORIOS,
         CREDENCIAIS_INVALIDAS
     }
+
+    public Optional<Usuario> buscarUsuarioPorEmail(String email) {
+
+        if (email == null || email.isBlank()) {
+            return Optional.empty();
+        }
+
+        email = email.trim().toLowerCase();
+
+        return repository.findByEmail(email);
+    }
 }
