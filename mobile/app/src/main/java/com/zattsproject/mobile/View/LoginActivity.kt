@@ -73,7 +73,11 @@ class LoginActivity : AppCompatActivity() {
         )
 
         val txvCadastrar = findViewById<TextView>(
-            R.id.txv_linkLogin
+            R.id.txv_linkRecSenha
+        )
+
+        val txvEsqueciSenha = findViewById<TextView>(
+            R.id.txv_esqueciSenha
         )
 
         // VOLTAR
@@ -86,6 +90,15 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(
                 this,
                 CadastroActivity::class.java
+            )
+
+            startActivity(intent)
+        }
+
+        txvEsqueciSenha.setOnClickListener {
+            val intent = Intent(
+                this,
+                RecuperarSenhaActivity::class.java
             )
 
             startActivity(intent)

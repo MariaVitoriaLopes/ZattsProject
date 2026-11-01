@@ -7,6 +7,8 @@ import com.zattsproject.mobile.Model.MensagemResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 
 interface ApiService {
 
@@ -19,4 +21,10 @@ interface ApiService {
     suspend fun login(
         @Body login: Login
     ): Response<MensagemResponse>
+
+    @FormUrlEncoded
+    @POST("api/recuperarSenha")
+    suspend fun recuperarSenha(
+        @Field("email") email: String
+    ): Response<Unit>
 }

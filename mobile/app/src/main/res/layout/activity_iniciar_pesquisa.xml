@@ -10,20 +10,21 @@
     tools:context=".IniciarPesquisaActivity">
 
     <!-- SETA PARA VOLTAR -->
-    <ImageButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_voltarLogin"
-        android:layout_width="56dp"
-        android:layout_height="57dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="22dp"
-        android:background="@android:color/transparent"
+        android:clickable="true"
         android:contentDescription="Voltar para login"
-        android:minWidth="48dp"
-        android:minHeight="48dp"
-        android:src="@android:drawable/ic_media_previous"
+        app:backgroundTint="?attr/corFundoTela"
+        app:tint="?attr/colorOnSurface"
+        app:elevation="0dp"
+        app:pressedTranslationZ="0dp"
+        app:srcCompat="?attr/homeAsUpIndicator"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?attr/colorOnSurface" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/txv_voltarLogin"

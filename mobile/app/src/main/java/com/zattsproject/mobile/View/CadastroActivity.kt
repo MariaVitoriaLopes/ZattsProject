@@ -65,7 +65,7 @@ class CadastroActivity : AppCompatActivity() {
         val txvMinuscula = findViewById<TextView>(R.id.txv_minuscula)
         val txvNumero = findViewById<TextView>(R.id.txv_numero)
         val txvCoincidem = findViewById<TextView>(R.id.txv_coincidem)
-        val txvLinkCadastro = findViewById<TextView>(R.id.txv_linkLogin)
+        val txvLinkCadastro = findViewById<TextView>(R.id.txv_linkRecSenha)
 
         btnVoltar.setOnClickListener {
             finish()

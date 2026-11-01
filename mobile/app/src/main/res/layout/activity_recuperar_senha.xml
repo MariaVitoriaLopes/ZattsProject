@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/corFundoTela"
+    android:paddingHorizontal="20dp"
     tools:context=".RecuperarSenhaActivity">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
         android:layout_marginTop="20dp"
         android:clickable="true"
         android:contentDescription="Voltar para login"
+        app:backgroundTint="?attr/corFundoTela"
+        app:tint="?attr/colorOnSurface"
+        app:elevation="0dp"
+        app:pressedTranslationZ="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="?attr/homeAsUpIndicator" />
@@ -26,6 +32,7 @@
         android:layout_marginStart="1dp"
         android:layout_marginTop="40dp"
         android:text="Voltar para Página de Login"
+        android:textColor="?attr/colorOnSurface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.072"
         app:layout_constraintStart_toEndOf="@+id/fab_login"
@@ -37,6 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
         android:text="Recuperar senha"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,6 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Informe seu email para receber instruções"
+        android:textColor="?attr/colorOnSurface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txv_Titulo" />
@@ -57,56 +66,74 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:text="E-Mail:"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.089"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textColor="?attr/colorOnSurface"
+        app:layout_constraintStart_toStartOf="@+id/layout_email"
         app:layout_constraintTop_toBottomOf="@+id/txv_subTitulo" />
 
-    <EditText
-        android:id="@+id/edt_emailLogin"
+    <!-- CAMPO EMAIL COM BORDA -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layout_email"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="350dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:ems="10"
-        android:hint="Digite seu e-mail"
-        android:inputType="textEmailAddress"
-        android:minHeight="48dp"
+        app:boxCornerRadiusBottomEnd="14dp"
+        app:boxCornerRadiusBottomStart="14dp"
+        app:boxCornerRadiusTopEnd="14dp"
+        app:boxCornerRadiusTopStart="14dp"
+        app:boxStrokeColor="?attr/colorOnSurface"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txv_labelEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/txv_labelEmail">
 
-    <!-- CAMPO SENHA COM OLHINHO -->
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edt_emailLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Digite seu e-mail"
+            android:inputType="textEmailAddress"
+            android:minHeight="48dp"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?android:attr/textColorHint" />
 
-    <!-- CONFIRMAR SENHA COM OLHINHO -->
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_recuperarSenha"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="107dp"
+        android:layout_height="56dp"
         android:layout_marginTop="50dp"
-        android:backgroundTint="#000000"
         android:text="Enviar"
+        android:textColor="?attr/corFundoTela"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:backgroundTint="?attr/colorOnSurface"
+        app:cornerRadius="14dp"
+        app:elevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edt_emailLogin" />
+        app:layout_constraintTop_toBottomOf="@+id/layout_email" />
 
     <TextView
         android:id="@+id/txv_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="250dp"
-        android:text="Já tem uma conta?"
+        android:layout_marginTop="230dp"
+        android:text="Ainda não tem uma conta?"
+        android:textColor="?attr/colorOnSurface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_recuperarSenha" />
 
     <TextView
-        android:id="@+id/txv_linkLogin"
+        android:id="@+id/txv_linkRecSenha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:text="Faça login."
+        android:layout_marginTop="10dp"
+        android:text="Cadastre-se"
+        android:textColor="?attr/colorOnSurface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txv_label" />
