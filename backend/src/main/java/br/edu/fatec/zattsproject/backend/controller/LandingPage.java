@@ -15,4 +15,7 @@ public class LandingPage {
     public String landingPage() {
         return "landingpage";
     }
+
+    @GetMapping("/instalacao-residencial")
+    public String instalacoesResidenciais(){ return "instalacao-residencial";}
 }
