@@ -1,4 +1,3 @@
-
 package br.edu.fatec.zattsproject.backend.controller;
 
 import br.edu.fatec.zattsproject.backend.model.Usuario;
@@ -66,6 +65,11 @@ public class QuestionarioController {
             @RequestParam String valorMes1,
             @RequestParam(required = false) String valorMes2,
             @RequestParam(required = false) String valorMes3,
+
+            @RequestParam String consumoMes1,
+            @RequestParam(required = false) String consumoMes2,
+            @RequestParam(required = false) String consumoMes3,
+
             @RequestParam String definirMeta,
             @RequestParam(required = false) String tipoMeta,
             @RequestParam(required = false) String valorMeta,
@@ -94,6 +98,9 @@ public class QuestionarioController {
                     valorMes1,
                     valorMes2,
                     valorMes3,
+                    consumoMes1,
+                    consumoMes2,
+                    consumoMes3,
                     definirMeta,
                     tipoMeta,
                     valorMeta

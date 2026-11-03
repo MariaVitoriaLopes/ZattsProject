@@ -1,4 +1,8 @@
 
+/* =====================================================
+   TOPO DA PÁGINA
+   ===================================================== */
+
 .topo-pagina {
     display: flex;
     align-items: flex-end;
@@ -24,6 +28,10 @@
 [hidden] {
     display: none !important;
 }
+
+/* =====================================================
+   CARD DE NOTIFICAÇÕES
+   ===================================================== */
 
 .card-notificacoes {
     display: flex;
@@ -60,6 +68,10 @@
     background-color: #EEEEEE;
 }
 
+/* =====================================================
+   ÍCONE DA NOTIFICAÇÃO
+   ===================================================== */
+
 .notificacao-icone {
     display: flex;
     align-items: center;
@@ -75,6 +87,10 @@
     font-size: 24px;
     color: var(--fundo-900);
 }
+
+/* =====================================================
+   TEXTO DA NOTIFICAÇÃO
+   ===================================================== */
 
 .notificacao-texto {
     max-width: 230px;
@@ -93,6 +109,10 @@
     font-size: 13px;
     color: #6B6B6B;
 }
+
+/* =====================================================
+   AÇÕES DA NOTIFICAÇÃO
+   ===================================================== */
 
 .notificacao-excluir,
 .notificacao-editar {
@@ -139,7 +159,9 @@
     color: #6B6B6B;
 }
 
-/* ALERTAS PERSONALIZADOS */
+/* =====================================================
+   ALERTAS PERSONALIZADOS
+   ===================================================== */
 
 .alertas-topo {
     display: flex;
@@ -161,6 +183,10 @@
     color: #6B6B6B;
 }
 
+/* =====================================================
+   BOTÕES
+   ===================================================== */
+
 .btn-criar-alerta,
 .btn-salvar {
     display: flex;
@@ -171,7 +197,7 @@
     border: none;
     border-radius: 10px;
     background-color: var(--cor-primaria-400);
-    color: #000;
+    color: var(--cor-primaria-950);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -186,6 +212,10 @@
 .btn-criar-alerta .material-symbols-outlined {
     font-size: 21px;
 }
+
+/* =====================================================
+   INFORMAÇÕES E AÇÕES DOS ALERTAS
+   ===================================================== */
 
 .alerta-informacoes {
     flex: 1;
@@ -222,6 +252,10 @@
     color: #666666;
 }
 
+/* =====================================================
+   LISTA VAZIA
+   ===================================================== */
+
 .alertas-vazio {
     display: flex;
     flex: 1;
@@ -249,6 +283,10 @@
     color: #6B6B6B;
 }
 
+/* =====================================================
+   MENSAGENS
+   ===================================================== */
+
 .mensagem-alerta {
     padding: 12px 16px;
     margin-bottom: 12px;
@@ -263,7 +301,9 @@
     color: #B3321B;
 }
 
-/* MODAL */
+/* =====================================================
+   MODAL
+   ===================================================== */
 
 .modal-alerta {
     position: fixed;
@@ -306,6 +346,10 @@
     color: var(--textos-pretos);
     cursor: pointer;
 }
+
+/* =====================================================
+   CAMPOS DO MODAL
+   ===================================================== */
 
 .campo-alerta {
     display: flex;
@@ -350,6 +394,10 @@
     accent-color: var(--cor-secundaria-700);
 }
 
+/* =====================================================
+   AÇÕES DO MODAL
+   ===================================================== */
+
 .modal-acoes {
     display: flex;
     justify-content: flex-end;
@@ -367,7 +415,12 @@
     cursor: pointer;
 }
 
+/* =====================================================
+   RESPONSIVIDADE
+   ===================================================== */
+
 @media (max-width: 900px) {
+
     .topo-pagina {
         flex-direction: column;
         align-items: flex-start;
@@ -388,6 +441,7 @@
 }
 
 @media (max-width: 480px) {
+
     .modal-conteudo {
         padding: 20px;
     }
@@ -399,4 +453,176 @@
     .btn-criar-alerta {
         width: 100%;
     }
+}
+
+/* =====================================================
+   TEMA ESCURO
+   ===================================================== */
+
+html[data-tema="escuro"] .contador-notificacoes {
+    color: #A3A3A3;
+}
+
+/* Card de notificações */
+
+html[data-tema="escuro"] .card-notificacoes {
+    background-color: #1A1A1A;
+    border-color: #333333;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.15);
+}
+
+/* Linhas das notificações */
+
+html[data-tema="escuro"] .lista-notificacoes .notificacao {
+    background-color: #1A1A1A;
+    border-bottom-color: #333333;
+}
+
+html[data-tema="escuro"] .lista-notificacoes .notificacao:nth-child(odd) {
+    background-color: #232323;
+}
+
+html[data-tema="escuro"] .lista-notificacoes .notificacao:hover {
+    background-color: #303030;
+}
+
+/* Ícones */
+
+html[data-tema="escuro"] .notificacao-icone {
+    background-color: #303030;
+}
+
+html[data-tema="escuro"] .notificacao-icone .material-symbols-outlined {
+    color: #F2F2F2;
+}
+
+/* Textos das notificações */
+
+html[data-tema="escuro"] .notificacao-titulo {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .notificacao-tempo,
+html[data-tema="escuro"] .sem-notificacoes {
+    color: #A3A3A3;
+}
+
+/* Ações */
+
+html[data-tema="escuro"] .notificacao-editar {
+    color: #D0D0D0;
+}
+
+html[data-tema="escuro"] .notificacao-editar:hover {
+    color: #A998FF;
+}
+
+html[data-tema="escuro"] .notificacao-excluir {
+    color: #FF6B6B;
+}
+
+html[data-tema="escuro"] .notificacao-excluir:hover {
+    color: #FF9999;
+}
+
+/* Alertas personalizados */
+
+html[data-tema="escuro"] .alertas-topo h2,
+html[data-tema="escuro"] .alertas-vazio h3 {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .alertas-subtitulo,
+html[data-tema="escuro"] .alertas-vazio p {
+    color: #A3A3A3;
+}
+
+html[data-tema="escuro"] .alertas-vazio .material-symbols-outlined {
+    color: #888888;
+}
+
+/* Status dos alertas */
+
+html[data-tema="escuro"] .status-ativo {
+    background-color: #283C2C;
+    color: #8CE09B;
+}
+
+html[data-tema="escuro"] .status-inativo {
+    background-color: #333333;
+    color: #BDBDBD;
+}
+
+/* Mensagens */
+
+html[data-tema="escuro"] .mensagem-alerta {
+    background-color: #283C2C;
+    color: #A9E6B2;
+}
+
+html[data-tema="escuro"] .mensagem-erro {
+    background-color: #402020;
+    color: #FFB4B4;
+}
+
+/* Modal */
+
+html[data-tema="escuro"] .modal-alerta {
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+html[data-tema="escuro"] .modal-conteudo {
+    background-color: #232323;
+    border: 1px solid #333333;
+    box-shadow: 0 8px 35px rgba(0, 0, 0, 0.4);
+}
+
+html[data-tema="escuro"] .modal-topo h2,
+html[data-tema="escuro"] .modal-fechar,
+html[data-tema="escuro"] .campo-alerta label {
+    color: #F2F2F2;
+}
+
+/* Inputs e selects */
+
+html[data-tema="escuro"] .campo-alerta input,
+html[data-tema="escuro"] .campo-alerta select {
+    background-color: #1A1A1A;
+    border-color: #444444;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .campo-alerta input::placeholder {
+    color: #888888;
+}
+
+html[data-tema="escuro"] .campo-alerta input:focus,
+html[data-tema="escuro"] .campo-alerta select:focus {
+    border-color: var(--cor-primaria-400);
+}
+
+html[data-tema="escuro"] .campo-alerta select option {
+    background-color: #232323;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .campo-ativo input[type="checkbox"] {
+    accent-color: var(--cor-primaria-400);
+}
+
+/* Botões */
+
+html[data-tema="escuro"] .btn-cancelar {
+    border-color: #444444;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .btn-cancelar:hover {
+    background-color: #333333;
+}
+
+html[data-tema="escuro"] .btn-criar-alerta,
+html[data-tema="escuro"] .btn-salvar {
+    background-color: var(--cor-primaria-400);
+    color: var(--cor-primaria-950);
 }

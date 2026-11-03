@@ -142,17 +142,20 @@ class LoginActivity : AppCompatActivity() {
 
                     if (resposta.isSuccessful) {
 
+                        val dados = resposta.body()
+
                         mostrarMensagem(
-                            resposta.body()?.mensagem
-                                ?: "Login realizado com sucesso!"
+                            dados?.mensagem ?: "Login realizado com sucesso!"
                         )
 
-                        // Por enquanto, o backend apenas
-                        // confirma as credenciais.
-                        // A navegação para a Home ficará
-                        // para quando implementarmos
-                        // a autenticação da sessão.
-                        val intent = Intent(this@LoginActivity, HomeActivity::class.java)
+                        val destino = if (dados?.questionarioRespondido == true) {
+                            HomeActivity::class.java
+                        } else {
+                            IniciarPesquisaActivity::class.java
+                        }
+
+                        val intent = Intent(this@LoginActivity, destino)
+
                         startActivity(intent)
                         finish()
 

@@ -3,6 +3,10 @@
     display: none !important;
 }
 
+/* =====================================================
+   PÁGINA
+   ===================================================== */
+
 .pagina-alertas {
     max-width: 1600px;
     margin: 0 auto;
@@ -10,7 +14,9 @@
     color: var(--fundo-900, #1a1a1a);
 }
 
-/* CABEÇALHO */
+/* =====================================================
+   CABEÇALHO
+   ===================================================== */
 
 .alertas-cabecalho {
     display: flex;
@@ -35,7 +41,9 @@
     white-space: nowrap;
 }
 
-/* BARRA DE AÇÕES */
+/* =====================================================
+   BARRA DE AÇÕES
+   ===================================================== */
 
 .alertas-barra {
     display: flex;
@@ -56,6 +64,9 @@
     font-size: 13px;
 }
 
+/* =====================================================
+   BOTÃO CRIAR
+   ===================================================== */
 
 .botao-criar {
     display: flex;
@@ -75,8 +86,9 @@
     filter: brightness(0.92);
 }
 
-
-/* TABELA */
+/* =====================================================
+   TABELA
+   ===================================================== */
 
 .alertas-tabela {
     border: 1px solid #ddd;
@@ -107,7 +119,9 @@
     border-right: 0;
 }
 
-/* DESCRIÇÃO */
+/* =====================================================
+   DESCRIÇÃO
+   ===================================================== */
 
 .alerta-descricao {
     display: flex;
@@ -137,7 +151,9 @@
     font-size: 11px;
 }
 
-/* CONDIÇÕES */
+/* =====================================================
+   CONDIÇÕES
+   ===================================================== */
 
 .chips {
     display: flex;
@@ -161,7 +177,9 @@
     font-size: 14px;
 }
 
-/* BOTÕES DE AÇÃO */
+/* =====================================================
+   BOTÕES DE AÇÃO
+   ===================================================== */
 
 .alerta-acoes {
     display: flex;
@@ -180,7 +198,9 @@
     color: #d22;
 }
 
-/* INTERRUPTOR */
+/* =====================================================
+   INTERRUPTOR
+   ===================================================== */
 
 .switch {
     position: relative;
@@ -225,7 +245,9 @@
     background: #525b00;
 }
 
-/* ESTADOS DA LISTA */
+/* =====================================================
+   ESTADOS DA LISTA
+   ===================================================== */
 
 .alertas-fim,
 .alertas-vazio {
@@ -246,7 +268,9 @@
     color: #a00;
 }
 
-/* MODAL */
+/* =====================================================
+   MODAL
+   ===================================================== */
 
 .fundo-modal {
     position: fixed;
@@ -286,7 +310,9 @@
     cursor: pointer;
 }
 
-/* CAMPOS DO FORMULÁRIO */
+/* =====================================================
+   CAMPOS DO FORMULÁRIO
+   ===================================================== */
 
 .campo {
     display: flex;
@@ -314,7 +340,9 @@
     align-items: center;
 }
 
-/* BOTÕES DO MODAL */
+/* =====================================================
+   BOTÕES DO MODAL
+   ===================================================== */
 
 .modal-botoes {
     display: flex;
@@ -333,7 +361,6 @@
     background: #fff;
 }
 
-
 .botao-salvar {
     border: 0;
     background: var(--cor-primaria-400);
@@ -346,8 +373,9 @@
     filter: brightness(0.92);
 }
 
-
-/* RESPONSIVIDADE */
+/* =====================================================
+   RESPONSIVIDADE
+   ===================================================== */
 
 @media (max-width: 1000px) {
 
@@ -363,7 +391,6 @@
     .alerta-linha > div {
         padding: 12px;
     }
-
 }
 
 @media (max-width: 650px) {
@@ -389,5 +416,187 @@
     .alertas-tabela {
         min-height: 400px;
     }
+}
 
+/* =====================================================
+   TEMA ESCURO
+   ===================================================== */
+
+html[data-tema="escuro"] .pagina-alertas {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .alertas-cabecalho h1,
+html[data-tema="escuro"] .alertas-barra h2 {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .alertas-cabecalho p,
+html[data-tema="escuro"] .alertas-barra p,
+html[data-tema="escuro"] .alertas-contagem {
+    color: #A3A3A3;
+}
+
+/* Tabela no tema escuro */
+
+html[data-tema="escuro"] .alertas-tabela {
+    background: #1A1A1A;
+    border-color: #333333;
+}
+
+html[data-tema="escuro"] .alerta-linha {
+    background: #1A1A1A;
+    border-bottom-color: #333333;
+}
+
+html[data-tema="escuro"] .alerta-linha:nth-child(odd) {
+    background: #232323;
+}
+
+html[data-tema="escuro"] .alerta-linha > div {
+    border-right-color: #333333;
+}
+
+html[data-tema="escuro"] .alerta-linha > div:last-child {
+    border-right: 0;
+}
+
+html[data-tema="escuro"] .alerta-descricao strong,
+html[data-tema="escuro"] .alerta-condicao strong,
+html[data-tema="escuro"] .alerta-canal strong,
+html[data-tema="escuro"] .alerta-ativacao strong {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .alerta-descricao small {
+    color: #A3A3A3;
+}
+
+/* Ícones e chips */
+
+html[data-tema="escuro"] .icone-alerta {
+    background: #303030;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .chip {
+    background: #303030;
+    border-color: #444444;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .chip .material-symbols-outlined {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .alerta-acoes button {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .excluir-alerta button {
+    color: #FF6B6B;
+}
+
+/* Interruptor */
+
+html[data-tema="escuro"] .switch span {
+    background: #555555;
+}
+
+html[data-tema="escuro"] .switch input:checked + span {
+    background: var(--cor-primaria-400);
+}
+
+html[data-tema="escuro"] .switch input:checked + span:before {
+    background: #3B3903;
+}
+
+/* Estados da lista */
+
+html[data-tema="escuro"] .alertas-fim,
+html[data-tema="escuro"] .alertas-vazio {
+    color: #A3A3A3;
+}
+
+html[data-tema="escuro"] .aviso {
+    background: #28351F;
+    color: #D9E8CC;
+}
+
+html[data-tema="escuro"] .aviso-erro {
+    background: #402020;
+    color: #FFB4B4;
+}
+
+/* Modal no tema escuro */
+
+html[data-tema="escuro"] .fundo-modal {
+    background: rgba(0, 0, 0, 0.75);
+}
+
+html[data-tema="escuro"] .modal-conteudo {
+    background: #232323;
+    color: #F2F2F2;
+    border: 1px solid #333333;
+}
+
+html[data-tema="escuro"] .modal-topo h2,
+html[data-tema="escuro"] .campo label {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .modal-topo button {
+    color: #F2F2F2;
+}
+
+/* Campos no tema escuro */
+
+html[data-tema="escuro"] .campo input:not([type=checkbox]),
+html[data-tema="escuro"] .campo select {
+    background: #1A1A1A;
+    border-color: #444444;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .campo input::placeholder {
+    color: #888888;
+}
+
+html[data-tema="escuro"] .campo input:focus,
+html[data-tema="escuro"] .campo select:focus {
+    border-color: var(--cor-primaria-400);
+    outline: none;
+}
+
+html[data-tema="escuro"] .campo select option {
+    background: #232323;
+    color: #F2F2F2;
+}
+
+/* Botões do modal */
+
+html[data-tema="escuro"] .botao-cancelar {
+    background: #333333;
+    border-color: #444444;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .botao-cancelar:hover {
+    background: #404040;
+}
+
+html[data-tema="escuro"] .botao-salvar,
+html[data-tema="escuro"] .botao-criar {
+    background: var(--cor-primaria-400);
+    color: var(--cor-primaria-950);
+}
+
+/* Responsividade no tema escuro */
+
+@media (max-width: 1000px) {
+
+    html[data-tema="escuro"] .alerta-ativacao,
+    html[data-tema="escuro"] .alerta-acoes {
+        border-top-color: #333333;
+    }
 }

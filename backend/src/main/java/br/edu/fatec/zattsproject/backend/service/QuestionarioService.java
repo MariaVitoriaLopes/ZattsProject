@@ -1,4 +1,3 @@
-
 package br.edu.fatec.zattsproject.backend.service;
 
 import br.edu.fatec.zattsproject.backend.model.Questionario;
@@ -40,6 +39,9 @@ public class QuestionarioService {
             String valorMes1,
             String valorMes2,
             String valorMes3,
+            String consumoMes1,
+            String consumoMes2,
+            String consumoMes3,
             String definirMeta,
             String tipoMeta,
             String valorMeta
@@ -75,7 +77,6 @@ public class QuestionarioService {
             );
         }
 
-        // Valida a escolha da meta
         if (!"sim".equals(definirMeta) &&
                 !"nao".equals(definirMeta)) {
             throw new IllegalArgumentException(
@@ -87,15 +88,28 @@ public class QuestionarioService {
 
         // Primeiro mês obrigatório
         BigDecimal mes1 = converterValor(valorMes1);
+        BigDecimal consumo1 = converterValor(consumoMes1);
 
-        // Segundo e terceiro meses opcionais
-        BigDecimal mes2 = valorMes2 == null || valorMes2.isBlank()
-                ? null
-                : converterValor(valorMes2);
+        // Segundo mês opcional
+        BigDecimal mes2 = converterOpcional(valorMes2);
+        BigDecimal consumo2 = converterOpcional(consumoMes2);
 
-        BigDecimal mes3 = valorMes3 == null || valorMes3.isBlank()
-                ? null
-                : converterValor(valorMes3);
+        // Terceiro mês opcional
+        BigDecimal mes3 = converterOpcional(valorMes3);
+        BigDecimal consumo3 = converterOpcional(consumoMes3);
+
+        // Valida se valor e consumo foram preenchidos juntos
+        if ((mes2 == null) != (consumo2 == null)) {
+            throw new IllegalArgumentException(
+                    "Informe o valor e o consumo do segundo mês."
+            );
+        }
+
+        if ((mes3 == null) != (consumo3 == null)) {
+            throw new IllegalArgumentException(
+                    "Informe o valor e o consumo do terceiro mês."
+            );
+        }
 
         // Valida o tipo de meta
         if (desejaMeta &&
@@ -108,7 +122,6 @@ public class QuestionarioService {
 
         String tipoMetaFinal = desejaMeta ? tipoMeta : null;
 
-        // Converte o valor da meta somente se necessário
         BigDecimal meta = desejaMeta
                 ? converterValor(valorMeta)
                 : null;
@@ -134,12 +147,22 @@ public class QuestionarioService {
                 .qtdPessoas(qtdPessoas)
                 .concessionaria(concessionaria)
                 .vencimentoUltimaConta(vencimentoUltimaConta)
+
+                // Valores das contas
                 .valorMes1(mes1)
                 .valorMes2(mes2)
                 .valorMes3(mes3)
+
+                // Consumo das contas
+                .consumoMes1(consumo1)
+                .consumoMes2(consumo2)
+                .consumoMes3(consumo3)
+
+                // Meta
                 .definirMeta(desejaMeta)
                 .tipoMeta(tipoMetaFinal)
                 .valorMeta(meta)
+
                 .criadoEm(agora)
                 .atualizadoEm(agora)
                 .concluidoEm(agora)
@@ -160,6 +183,15 @@ public class QuestionarioService {
         // Marca o questionário como respondido
         usuario.setQuestionarioRespondido(true);
         usuarioRepository.save(usuario);
+    }
+
+    private BigDecimal converterOpcional(String valor) {
+
+        if (valor == null || valor.isBlank()) {
+            return null;
+        }
+
+        return converterValor(valor);
     }
 
     private BigDecimal converterValor(String valor) {

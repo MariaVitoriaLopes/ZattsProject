@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding: 30px 0 70px;
+    padding: 10px 0 70px;
     background-color: var(--fundo-0);
 }
 
@@ -22,7 +22,6 @@
     color: var(--fundo-900);
     transition: 0.3s ease;
 }
-
 
 .quest-voltar .material-symbols-outlined {
     font-size: 28px;
@@ -166,6 +165,12 @@
     font-weight: 700;
     letter-spacing: -0.5px;
     color: var(--textos-pretos);
+}
+
+.ajusteImgExplicacao{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
 }
 
 .quest-opcoes {
@@ -340,7 +345,60 @@ p.quest-aviso {
     display: none !important;
 }
 
+/* =====================================================
+   Campos de valor e consumo
+   ===================================================== */
+
+.quest-rotulo-campo {
+    display: block;
+    margin: 18px 0 9px;
+}
+
+.quest-consumo .quest-unidade {
+    position: absolute;
+    right: 15px;
+    color: var(--fundo-700);
+    pointer-events: none;
+    font-size: 15px;
+}
+
+.quest-consumo input {
+    padding-right: 65px;
+}
+
+/* =====================================================
+   Imagem explicativa da conta de luz
+   ===================================================== */
+
+.quest-ajuda-conta {
+    width: 100%;
+    max-width: 420px;
+    text-align: left;
+    display: flex;
+    gap: 20px;
+}
+
+.quest-ajuda-conta img {
+    display: block;
+    width: 30%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid #E3E3E3;
+}
+
+.quest-ajuda-conta figcaption {
+    margin-top: 9px;
+    color: var(--fundo-700);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* =====================================================
+   Responsividade
+   ===================================================== */
+
 @media (max-width: 900px) {
+
     .quest-topo {
         padding: 0 24px;
     }
@@ -374,6 +432,10 @@ p.quest-aviso {
         padding: 0 22px;
     }
 }
+
+/* =====================================================
+   Tema escuro
+   ===================================================== */
 
 html[data-tema="escuro"] .quest-pagina {
     background-color: #121212;
@@ -440,12 +502,29 @@ html[data-tema="escuro"] .quest-btn-secundario:hover {
     background-color: #333333;
 }
 
+/* Novos componentes no tema escuro */
+
+html[data-tema="escuro"] .quest-consumo .quest-unidade,
+html[data-tema="escuro"] .quest-ajuda-conta figcaption {
+    color: #A3A3A3;
+}
+
+html[data-tema="escuro"] .quest-ajuda-conta img {
+    border-color: #444444;
+}
+
+/* =====================================================
+   Efeitos dos botões
+   ===================================================== */
+
 .quest-btn-primario {
-    box-shadow: 0 4px 18px color-mix(in srgb, var(--cor-primaria-400) 55%, transparent);
+    box-shadow: 0 4px 18px
+    color-mix(in srgb, var(--cor-primaria-400) 55%, transparent);
 }
 
 .quest-btn-primario:hover {
-    box-shadow: 0 6px 24px color-mix(in srgb, var(--cor-primaria-400) 85%, transparent);
+    box-shadow: 0 6px 24px
+    color-mix(in srgb, var(--cor-primaria-400) 85%, transparent);
 }
 
 .quest-navegacao .quest-btn-primario {

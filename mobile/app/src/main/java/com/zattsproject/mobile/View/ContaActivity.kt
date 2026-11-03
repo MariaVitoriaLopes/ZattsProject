@@ -1,5 +1,6 @@
 package com.zattsproject.mobile
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,11 +14,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.zattsproject.mobile.R
+import androidx.lifecycle.lifecycleScope
+import com.zattsproject.mobile.Network.RetrofitClient
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
+import android.util.Log
+import com.zattsproject.mobile.Model.Conta
 
 class ContaActivity : AppCompatActivity() {
 
@@ -53,6 +59,7 @@ class ContaActivity : AppCompatActivity() {
         configurarSeletores()
         configurarCep()
         configurarBotoes()
+        carregarConta()
     }
 
     private fun iniciarCampos() {
@@ -281,81 +288,361 @@ class ContaActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnSalvarConta)
             .setOnClickListener {
-
-                val senha = findViewById<EditText>(
-                    R.id.edtSenha
-                ).text.toString()
-
-                val confirmacao = findViewById<EditText>(
-                    R.id.edtConfirmarSenha
-                ).text.toString()
-
-                if (senha != confirmacao) {
-                    Toast.makeText(
-                        this,
-                        "As senhas não coincidem.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return@setOnClickListener
-                }
-
-                // TODO: COLOQUE O CAMINHO DA API AQUI.
-                // Enviar os dados da conta e do endereço
-                // para o Spring Boot utilizando Retrofit.
-                //
-                // Exemplo de dados disponíveis:
-                // edtCep.text.toString()
-                // edtLogradouro.text.toString()
-                // edtNumero.text.toString()
-                // edtComplemento.text.toString()
-                // edtBairro.text.toString()
-                // edtCidade.text.toString()
-                // estados[spinnerUf.selectedItemPosition]
-
-                Toast.makeText(
-                    this,
-                    "Coloque aqui o caminho da API para salvar.",
-                    Toast.LENGTH_LONG
-                ).show()
+                salvarConta()
             }
 
         findViewById<Button>(R.id.btnSairConta)
             .setOnClickListener {
 
-                // TODO: COLOQUE A LÓGICA DE LOGOUT AQUI.
-                // Encerrar a sessão e retornar ao login.
+                lifecycleScope.launch {
 
-                Toast.makeText(
-                    this,
-                    "Coloque aqui o caminho para sair da conta.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                    try {
+
+                        val resposta = RetrofitClient.apiService.logout()
+
+                        if (!resposta.isSuccessful) {
+                            Toast.makeText(
+                                this@ContaActivity,
+                                "Não foi possível encerrar a sessão no servidor.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                    } catch (e: CancellationException) {
+                        throw e
+
+                    } catch (e: Exception) {
+
+                        Toast.makeText(
+                            this@ContaActivity,
+                            "Erro ao encerrar sessão.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                    } finally {
+
+                        RetrofitClient.limparCookies()
+
+                        val intent = Intent(
+                            this@ContaActivity,
+                            LoginActivity::class.java
+                        )
+
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                        startActivity(intent)
+                        finish()
+                    }
+                }
             }
 
         findViewById<Button>(R.id.btnExcluirConta)
             .setOnClickListener {
 
                 AlertDialog.Builder(this)
-                    .setTitle("Excluir minha conta")
+                    .setTitle("Excluir conta")
                     .setMessage(
-                        "Esta ação pode excluir permanentemente " +
-                                "todos os seus dados. Deseja continuar?"
+                        "Tem certeza de que deseja excluir sua conta? " +
+                                "Essa ação não poderá ser desfeita."
                     )
                     .setNegativeButton("Cancelar", null)
-                    .setPositiveButton("Continuar") { _, _ ->
+                    .setPositiveButton("Excluir") { _, _ ->
 
-                        // TODO: COLOQUE O CAMINHO DA API AQUI.
-                        // Solicitar a exclusão da conta
-                        // ao back-end Spring Boot.
+                        lifecycleScope.launch {
 
-                        Toast.makeText(
-                            this,
-                            "Coloque aqui o caminho da API para excluir.",
-                            Toast.LENGTH_LONG
-                        ).show()
+                            try {
+
+                                val resposta =
+                                    RetrofitClient.apiService.excluirConta()
+
+                                Log.d(
+                                    "ZATTS_EXCLUIR",
+                                    "HTTP: ${resposta.code()}"
+                                )
+
+                                if (resposta.isSuccessful) {
+
+                                    RetrofitClient.limparCookies()
+
+                                    Toast.makeText(
+                                        this@ContaActivity,
+                                        "Conta excluída com sucesso!",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
+                                    val intent = Intent(
+                                        this@ContaActivity,
+                                        LoginActivity::class.java
+                                    )
+
+                                    intent.flags =
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or
+                                                Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                                    startActivity(intent)
+                                    finish()
+
+                                } else {
+
+                                    val erro = resposta.errorBody()?.string()
+
+                                    Log.e(
+                                        "ZATTS_EXCLUIR",
+                                        "Erro HTTP ${resposta.code()}: $erro"
+                                    )
+
+                                    Toast.makeText(
+                                        this@ContaActivity,
+                                        "Erro ${resposta.code()}: $erro",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+
+                            } catch (e: CancellationException) {
+
+                                throw e
+
+                            } catch (e: Exception) {
+
+                                Log.e(
+                                    "ZATTS_EXCLUIR",
+                                    "Falha ao excluir conta.",
+                                    e
+                                )
+
+                                Toast.makeText(
+                                    this@ContaActivity,
+                                    "Erro ao excluir conta: ${e.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
                     }
                     .show()
             }
+    }
+
+
+    private fun carregarConta() {
+
+        lifecycleScope.launch {
+
+            try {
+
+                val resposta = RetrofitClient.apiService.buscarConta()
+
+                if (!resposta.isSuccessful) {
+
+                    Toast.makeText(
+                        this@ContaActivity,
+                        "Não foi possível carregar os dados da conta.",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    return@launch
+                }
+
+                val conta = resposta.body() ?: return@launch
+
+                findViewById<EditText>(R.id.edtNome)
+                    .setText(conta.nome.orEmpty())
+
+                findViewById<EditText>(R.id.edtEmail)
+                    .setText(conta.email.orEmpty())
+
+                findViewById<EditText>(R.id.edtTelefone)
+                    .setText(conta.telefone.orEmpty())
+
+                // Evita que o CEP salvo dispare uma nova consulta.
+                cepConsultado = conta.cep.orEmpty()
+                    .filter { it.isDigit() }
+
+                edtCep.setText(conta.cep.orEmpty())
+                edtLogradouro.setText(conta.logradouro.orEmpty())
+                edtNumero.setText(conta.numero.orEmpty())
+                edtComplemento.setText(conta.complemento.orEmpty())
+                edtBairro.setText(conta.bairro.orEmpty())
+                edtCidade.setText(conta.cidade.orEmpty())
+
+                val indiceUf = estados.indexOf(conta.uf)
+
+                if (indiceUf >= 0) {
+                    spinnerUf.setSelection(indiceUf)
+                }
+
+                val spinnerFuso =
+                    findViewById<Spinner>(R.id.spinnerFuso)
+
+                val adapter = spinnerFuso.adapter
+
+                for (i in 0 until adapter.count) {
+
+                    if (adapter.getItem(i).toString() ==
+                        conta.fusoHorario) {
+
+                        spinnerFuso.setSelection(i)
+                        break
+                    }
+                }
+
+            } catch (e: CancellationException) {
+                throw e
+
+            } catch (e: Exception) {
+
+                Log.e("ZATTS_CONTA", "Erro ao carregar conta", e)
+
+                Toast.makeText(
+                    this@ContaActivity,
+                    "Erro ao carregar os dados.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+
+    private fun salvarConta() {
+
+        val novaSenha = findViewById<EditText>(
+            R.id.edtSenha
+        ).text.toString()
+
+        val confirmarSenha = findViewById<EditText>(
+            R.id.edtConfirmarSenha
+        ).text.toString()
+
+        val alterarSenha =
+            novaSenha.isNotEmpty() ||
+                    confirmarSenha.isNotEmpty()
+
+        if (alterarSenha) {
+
+            if (novaSenha != confirmarSenha) {
+                Toast.makeText(
+                    this,
+                    "As novas senhas não coincidem.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+
+            val senhaValida = Regex(
+                """^(?=\S+$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"""
+            ).matches(novaSenha)
+
+            if (!senhaValida) {
+                Toast.makeText(
+                    this,
+                    "A nova senha precisa ter 8 caracteres, " +
+                            "letras maiúsculas e minúsculas, " +
+                            "número e caractere especial.",
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            }
+        }
+
+        val conta = Conta(
+            nome = findViewById<EditText>(R.id.edtNome)
+                .text.toString().trim(),
+
+            email = findViewById<EditText>(R.id.edtEmail)
+                .text.toString().trim(),
+
+            telefone = findViewById<EditText>(R.id.edtTelefone)
+                .text.toString().trim(),
+
+            fusoHorario = findViewById<Spinner>(R.id.spinnerFuso)
+                .selectedItem.toString(),
+
+            cep = edtCep.text.toString().trim(),
+            logradouro = edtLogradouro.text.toString().trim(),
+            numero = edtNumero.text.toString().trim(),
+            complemento = edtComplemento.text.toString().trim(),
+            bairro = edtBairro.text.toString().trim(),
+            cidade = edtCidade.text.toString().trim(),
+            uf = spinnerUf.selectedItem.toString(),
+
+            novaSenha = novaSenha,
+            confirmarSenha = confirmarSenha
+        )
+
+        if (conta.email.isNullOrBlank()) {
+            Toast.makeText(
+                this,
+                "Preencha o e-mail.",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        val botaoSalvar = findViewById<Button>(R.id.btnSalvarConta)
+        botaoSalvar.isEnabled = false
+
+        lifecycleScope.launch {
+
+            try {
+
+                val resposta =
+                    RetrofitClient.apiService.atualizarConta(conta)
+
+                if (resposta.isSuccessful) {
+
+                    findViewById<EditText>(R.id.edtSenha)
+                        .text.clear()
+
+                    findViewById<EditText>(R.id.edtConfirmarSenha)
+                        .text.clear()
+
+                    Toast.makeText(
+                        this@ContaActivity,
+                        "Alterações salvas com sucesso!",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                } else {
+
+                    val erro = resposta.errorBody()?.string()
+
+                    Log.e(
+                        "ZATTS_CONTA",
+                        "Erro HTTP ${resposta.code()}: $erro"
+                    )
+
+                    val mensagem = try {
+                        JSONObject(erro.orEmpty())
+                            .optString("erro", "Não foi possível salvar.")
+                    } catch (e: Exception) {
+                        "Não foi possível salvar as alterações."
+                    }
+
+                    Toast.makeText(
+                        this@ContaActivity,
+                        mensagem,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+            } catch (e: CancellationException) {
+                throw e
+
+            } catch (e: Exception) {
+
+                Log.e("ZATTS_CONTA", "Erro ao salvar conta", e)
+
+                Toast.makeText(
+                    this@ContaActivity,
+                    "Erro de conexão ao salvar alterações.",
+                    Toast.LENGTH_LONG
+                ).show()
+
+            } finally {
+                botaoSalvar.isEnabled = true
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -367,4 +654,6 @@ class ContaActivity : AppCompatActivity() {
 
         super.onDestroy()
     }
+
+
 }

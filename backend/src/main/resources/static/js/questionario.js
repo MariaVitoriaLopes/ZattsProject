@@ -1,4 +1,3 @@
-
 const etapas = document.querySelectorAll('.quest-pergunta');
 const barra = document.querySelector('.quest-progresso-barra');
 const progresso = document.querySelector('.quest-progresso');
@@ -23,19 +22,28 @@ let enviando = false;
 
 form.noValidate = true;
 
+// =====================================================
 // Atualiza automaticamente os meses das contas
+// =====================================================
+
 const nomeDoMes = new Intl.DateTimeFormat('pt-BR', {
     month: 'long'
 });
 
 document.querySelectorAll('[data-meses-atras]').forEach(function (el) {
+
     const data = new Date();
+
     data.setDate(1);
     data.setMonth(data.getMonth() - Number(el.dataset.mesesAtras));
+
     el.textContent = nomeDoMes.format(data);
 });
 
+// =====================================================
 // Mostra a pergunta atual
+// =====================================================
+
 function mostrarEtapa() {
 
     etapas.forEach(function (etapa, i) {
@@ -57,7 +65,10 @@ function mostrarEtapa() {
     btnProxima.type = 'button';
 }
 
+// =====================================================
 // Atualiza os campos condicionais da meta
+// =====================================================
+
 function atualizarMeta() {
 
     const desejaMeta = metaSim.checked;
@@ -89,8 +100,77 @@ function atualizarMeta() {
     }
 }
 
+// =====================================================
+// Valida o valor e o consumo dos meses opcionais
+// =====================================================
+
+function validarParMes(numero) {
+
+    const valor = form.querySelector(`[name="valorMes${numero}"]`);
+    const consumo = form.querySelector(`[name="consumoMes${numero}"]`);
+
+    if (!valor || !consumo) {
+        return true;
+    }
+
+    const valorPreenchido = valor.value.trim() !== '';
+    const consumoPreenchido = consumo.value.trim() !== '';
+
+    // Limpa mensagens anteriores
+    valor.setCustomValidity('');
+    consumo.setCustomValidity('');
+
+    // Ambos vazios são permitidos nos meses opcionais
+    if (!valorPreenchido && !consumoPreenchido) {
+        return true;
+    }
+
+    if (!valorPreenchido) {
+        valor.setCustomValidity('Informe também o valor da conta.');
+        return false;
+    }
+
+    if (!consumoPreenchido) {
+        consumo.setCustomValidity('Informe também o consumo em kWh.');
+        return false;
+    }
+
+    return true;
+}
+
+// =====================================================
+// Atualiza a validação durante a digitação
+// =====================================================
+
+[2, 3].forEach(function (numero) {
+
+    const valor = form.querySelector(`[name="valorMes${numero}"]`);
+    const consumo = form.querySelector(`[name="consumoMes${numero}"]`);
+
+    valor.addEventListener('input', function () {
+        validarParMes(numero);
+    });
+
+    consumo.addEventListener('input', function () {
+        validarParMes(numero);
+    });
+});
+
+// =====================================================
 // Valida a pergunta atual
+// =====================================================
+
 function etapaValida() {
+
+    // Questão 05: segundo mês
+    if (atual === 4) {
+        validarParMes(2);
+    }
+
+    // Questão 06: terceiro mês
+    if (atual === 5) {
+        validarParMes(3);
+    }
 
     const campos = etapas[atual].querySelectorAll('input, select');
 
@@ -131,7 +211,10 @@ function etapaValida() {
     return true;
 }
 
+// =====================================================
 // Avança ou finaliza o questionário
+// =====================================================
+
 btnProxima.addEventListener('click', function () {
 
     if (enviando) {
@@ -144,6 +227,7 @@ btnProxima.addEventListener('click', function () {
 
     if (atual === etapas.length - 1) {
 
+        // Valida todas as perguntas antes de enviar
         for (let i = 0; i < etapas.length; i++) {
 
             atual = i;
@@ -169,7 +253,10 @@ btnProxima.addEventListener('click', function () {
     mostrarEtapa();
 });
 
+// =====================================================
 // Volta para a pergunta anterior
+// =====================================================
+
 btnAnterior.addEventListener('click', function () {
 
     if (atual > 0 && !enviando) {
@@ -178,13 +265,20 @@ btnAnterior.addEventListener('click', function () {
     }
 });
 
+// =====================================================
 // Atualiza a meta quando o usuário altera a escolha
+// =====================================================
+
 [metaSim, metaNao, tipoConsumo, tipoValor].forEach(function (radio) {
 
     radio.addEventListener('change', function () {
         atualizarMeta();
     });
 });
+
+// =====================================================
+// Inicialização
+// =====================================================
 
 atualizarMeta();
 mostrarEtapa();

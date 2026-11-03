@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/corFundoTela"
+    tools:context=".QuestionarioActivity">
+
+    <!-- BARRA DE PROGRESSO -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressoQuestionario"
+        android:layout_width="0dp"
+        android:layout_height="12dp"
+        android:layout_marginStart="21dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="21dp"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="14"
+        app:indicatorColor="@color/cor_primaria_400"
+        app:trackColor="@color/fundo_50"
+        app:trackCornerRadius="6dp"
+        app:trackThickness="12dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- SETA PARA VOLTAR -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_voltarLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="22dp"
+        android:clickable="true"
+        android:contentDescription="Voltar para login"
+        app:backgroundTint="?attr/corFundoTela"
+        app:tint="?attr/colorOnSurface"
+        app:elevation="0dp"
+        app:pressedTranslationZ="0dp"
+        app:srcCompat="?attr/homeAsUpIndicator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/progressoQuestionario" />
+
+    <!-- TEXTO PARA VOLTAR -->
+    <TextView
+        android:id="@+id/txv_voltarLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="Voltar para Página de Login"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/btn_voltarLogin"
+        app:layout_constraintStart_toEndOf="@id/btn_voltarLogin"
+        app:layout_constraintTop_toTopOf="@id/btn_voltarLogin" />
+
+    <!-- CONTEÚDO DA PERGUNTA -->
+    <ScrollView
+        android:id="@+id/scrollQuestionario"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingStart="33dp"
+        android:paddingEnd="33dp"
+        app:layout_constraintTop_toBottomOf="@id/txv_voltarLogin"
+        app:layout_constraintBottom_toTopOf="@id/layout_navegacao"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <!-- NÚMERO DA QUESTÃO -->
+            <TextView
+                android:id="@+id/txv_numeroQuestao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Questão 01"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- ENUNCIADO -->
+            <TextView
+                android:id="@+id/txv_pergunta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="37dp"
+                android:text="Quantas pessoas moram na sua casa?"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <!-- OPÇÕES DE RESPOSTA -->
+            <RadioGroup
+                android:id="@+id/grupoOpcoes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+
+                <RadioButton
+                    android:id="@+id/radioOpcao1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:buttonTint="?attr/colorOnSurface"
+                    android:text="1 pessoa"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="18sp" />
+
+                <RadioButton
+                    android:id="@+id/radioOpcao2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:buttonTint="?attr/colorOnSurface"
+                    android:text="2 pessoas"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="18sp" />
+
+                <RadioButton
+                    android:id="@+id/radioOpcao3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:buttonTint="?attr/colorOnSurface"
+                    android:text="3 pessoas"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="18sp" />
+
+                <RadioButton
+                    android:id="@+id/radioOpcao4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:buttonTint="?attr/colorOnSurface"
+                    android:text="4 pessoas"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="18sp" />
+
+                <RadioButton
+                    android:id="@+id/radioOpcao5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:buttonTint="?attr/colorOnSurface"
+                    android:text="5 pessoas"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="18sp" />
+
+            </RadioGroup>
+
+            <!-- CAMPO DE DATA -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutData"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:hint="Vencimento da última conta"
+                android:visibility="gone"
+                app:boxStrokeColor="?attr/colorOnSurface"
+                app:hintTextColor="?attr/colorOnSurface">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtData"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none"
+                    android:textColor="?attr/colorOnSurface"
+                    tools:text="01/11/2026" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- CAMPO DE VALOR -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutValor"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:hint="Valor da conta (R$)"
+                android:visibility="gone"
+                app:boxStrokeColor="?attr/colorOnSurface"
+                app:hintTextColor="?attr/colorOnSurface">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtValor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:textColor="?attr/colorOnSurface"
+                    tools:text="250,00" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- CAMPO DE CONSUMO -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutConsumo"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:hint="Consumo da conta (kWh)"
+                android:visibility="gone"
+                app:boxStrokeColor="?attr/colorOnSurface"
+                app:hintTextColor="?attr/colorOnSurface">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtConsumo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:textColor="?attr/colorOnSurface"
+                    tools:text="185" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- IMAGEM EXPLICATIVA DO CONSUMO -->
+            <LinearLayout
+                android:id="@+id/layoutAjudaConsumo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Onde encontro o consumo na conta de luz?"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/imvExemploConsumo"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:layout_marginTop="12dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="Exemplo de onde encontrar o consumo em kWh na conta de luz"
+                    android:src="@drawable/exemplo_consumo_conta" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Procure o campo Consumo, geralmente indicado em kWh."
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- BOTÕES ANTERIOR E PRÓXIMA -->
+    <LinearLayout
+        android:id="@+id/layout_navegacao"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="28dp"
+        android:gravity="end"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_anterior"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_marginEnd="12dp"
+            android:backgroundTint="@color/fundo_700"
+            android:text="←  Anterior"
+            android:textAllCaps="false"
+            android:textColor="@color/fundo_0"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_proxima"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:backgroundTint="@color/cor_primaria_400"
+            android:text="Próxima  →"
+            android:textAllCaps="false"
+            android:textColor="@color/cor_primaria_950"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="16dp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

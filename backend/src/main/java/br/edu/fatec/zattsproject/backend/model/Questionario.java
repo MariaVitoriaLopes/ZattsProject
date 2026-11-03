@@ -35,6 +35,11 @@ public class Questionario {
     private BigDecimal valorMes2;
     private BigDecimal valorMes3;
 
+    // Consumo das contas em kWh
+    private BigDecimal consumoMes1;
+    private BigDecimal consumoMes2;
+    private BigDecimal consumoMes3;
+
     // Meta
     private Boolean definirMeta;
     private String tipoMeta; // CONSUMO ou VALOR

@@ -1,9 +1,16 @@
+
 package br.edu.fatec.zattsproject.backend.controller.mobile;
 
+import br.edu.fatec.zattsproject.backend.model.Usuario;
+import br.edu.fatec.zattsproject.backend.repository.UsuarioRepository;
 import br.edu.fatec.zattsproject.backend.service.AutenticacaoService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +22,7 @@ import java.util.Map;
 public class AutenticacaoApiController {
 
     private final AutenticacaoService autenticacaoService;
+    private final UsuarioRepository usuarioRepository;
 
     public record CadastroRequest(
             String email,
@@ -77,13 +85,15 @@ public class AutenticacaoApiController {
     // LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @RequestBody LoginRequest dados
+            @RequestBody LoginRequest dados,
+            HttpServletRequest request
     ) {
 
-        AutenticacaoService.ResultadoLogin resultado = autenticacaoService.autenticar(
-                dados.email(),
-                dados.senha()
-        );
+        AutenticacaoService.ResultadoLogin resultado =
+                autenticacaoService.autenticar(
+                        dados.email(),
+                        dados.senha()
+                );
 
         return switch (resultado) {
 
@@ -97,10 +107,114 @@ public class AutenticacaoApiController {
                             Map.of("erro", "E-mail ou senha inválidos.")
                     );
 
-            case SUCESSO ->
-                    ResponseEntity.ok(
-                            Map.of("mensagem", "Login realizado com sucesso!")
-                    );
+            case SUCESSO -> {
+
+                Usuario usuario = autenticacaoService
+                        .buscarUsuarioPorEmail(dados.email())
+                        .orElseThrow();
+
+                // Cria ou recupera a sessão
+                HttpSession session = request.getSession(true);
+
+                // Proteção contra session fixation
+                request.changeSessionId();
+
+                // Utiliza a mesma chave da autenticação Web
+                session.setAttribute("usuarioLogado", usuario);
+
+                yield ResponseEntity.ok(
+                        Map.of(
+                                "mensagem", "Login realizado com sucesso!",
+                                "usuarioId", usuario.getId(),
+                                "email", usuario.getEmail(),
+                                "questionarioRespondido",
+                                usuario.isQuestionarioRespondido()
+                        )
+                );
+            }
         };
+    }
+
+
+    // VERIFICAR SESSÃO
+    @GetMapping("/sessao")
+    public ResponseEntity<?> verificarSessao(
+            HttpServletRequest request
+    ) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return ResponseEntity.status(401).body(
+                    Map.of("erro", "Sessão não encontrada ou expirada.")
+            );
+        }
+
+        Usuario usuario = (Usuario)
+                session.getAttribute("usuarioLogado");
+
+        if (usuario == null) {
+            return ResponseEntity.status(401).body(
+                    Map.of("erro", "Sessão não encontrada ou expirada.")
+            );
+        }
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "usuarioId", usuario.getId(),
+                        "email", usuario.getEmail(),
+                        "questionarioRespondido",
+                        usuario.isQuestionarioRespondido()
+                )
+        );
+    }
+
+    // LOGOUT
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(
+            HttpServletRequest request
+    ) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            session.invalidate();
+        }
+
+        return ResponseEntity.ok(
+                Map.of("mensagem", "Logout realizado com sucesso!")
+        );
+    }
+
+    // EXCLUIR CONTA
+    @DeleteMapping("/conta")
+    public ResponseEntity<?> excluirConta(
+            HttpServletRequest request
+    ) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("erro", "Sessão expirada."));
+        }
+
+        Usuario usuario = (Usuario)
+                session.getAttribute("usuarioLogado");
+
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("erro", "Usuário não autenticado."));
+        }
+
+        // Exclui o usuário
+        usuarioRepository.deleteById(usuario.getId());
+
+        // Encerra a sessão
+        session.invalidate();
+
+        return ResponseEntity.ok(
+                Map.of("mensagem", "Conta excluída com sucesso!")
+        );
     }
 }
