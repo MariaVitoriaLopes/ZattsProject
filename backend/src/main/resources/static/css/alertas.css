@@ -314,64 +314,294 @@
    CAMPOS DO FORMULÁRIO
    ===================================================== */
 
-.campo {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 16px;
-}
+.fundo-modal {
+    position: fixed;
+        inset: 0;
+        background: #0008;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 16px;
+    }
 
-.campo label {
-    font-size: 13px;
-    font-weight: 600;
-}
+    .modal-conteudo {
+        width: 100%;
+        max-width: 1000px;
+        max-height: 92vh;
+        overflow: auto;
+        padding: 40px 42px 42px;
+        background: #fff;
+        border-radius: 24px;
+    }
 
-.campo input:not([type=checkbox]),
-.campo select {
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    width: 100%;
-    box-sizing: border-box;
-}
+    .modal-topo {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 36px;
+    }
 
-.campo-ativo {
-    flex-direction: row;
-    align-items: center;
-}
+    .modal-topo h2 {
+        margin: 0;
+        font-family: "Cal Sans", sans-serif;
+        font-size: 30px;
+        font-weight: 600;
+        letter-spacing: -0.5px;
+    }
 
-/* =====================================================
-   BOTÕES DO MODAL
-   ===================================================== */
+    .modal-topo button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: 0;
+        color: var(--fundo-900);
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
 
-.modal-botoes {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
+    .modal-topo button:hover {
+        text-shadow: 0 0 8px var(--cor-primaria-400);
+    }
 
-.modal-botoes button {
-    padding: 11px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-}
+    .modal-topo button .material-symbols-outlined {
+        font-size: 30px;
+    }
 
-.botao-cancelar {
-    border: 1px solid #ddd;
-    background: #fff;
-}
+    .modal-grade {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 40px;
+    }
 
-.botao-salvar {
-    border: 0;
-    background: var(--cor-primaria-400);
-    color: var(--cor-primaria-950);
-    font-weight: 600;
-    transition: filter 0.2s ease;
-}
+    .modal-coluna {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+    }
 
-.botao-salvar:hover {
-    filter: brightness(0.92);
-}
+    .modal-duplo {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+    }
+
+    .campo {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 0;
+    }
+
+    .campo label,
+    .campo-rotulo {
+        font-size: 14px;
+        font-weight: 500;
+        color: #6B6B6B;
+    }
+
+    .campo input:not([type=checkbox]),
+    .campo select {
+        width: 100%;
+        height: 48px;
+        padding: 0 16px;
+        border: 1px solid #E6E6E6;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        box-sizing: border-box;
+        font-family: Inter, sans-serif;
+        font-size: 15px;
+        color: var(--fundo-900);
+        outline: none;
+        transition: 0.3s ease;
+    }
+
+    .campo input::placeholder {
+        color: #A0A0A0;
+    }
+
+    .campo input:focus,
+    .campo select:focus {
+        border-color: var(--cor-primaria-400);
+        box-shadow: 0 0 6px var(--cor-primaria-400);
+    }
+
+    .campo-select {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .campo-select select {
+        padding-right: 44px;
+        appearance: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+    }
+
+    .campo-select .material-symbols-outlined {
+        position: absolute;
+        right: 14px;
+        font-size: 22px;
+        color: var(--fundo-900);
+        pointer-events: none;
+    }
+
+    .grade-icones {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .opcao-icone {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 58px;
+        height: 58px;
+        border: 1px solid #E6E6E6;
+        border-radius: 12px;
+        background: #fff;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
+
+    .modal-conteudo .campo .opcao-icone input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        opacity: 0;
+        cursor: pointer;
+        box-shadow: none;
+    }
+
+    .opcao-icone .material-symbols-outlined {
+        font-size: 26px;
+        color: var(--fundo-900);
+    }
+
+    .opcao-icone:hover {
+        box-shadow: 0 0 8px var(--cor-primaria-400);
+    }
+
+    .opcao-icone:has(input:checked) {
+        border-color: var(--cor-primaria-400);
+        background: #F1F1F1;
+        box-shadow: 0 0 6px var(--cor-primaria-400);
+    }
+
+    .grupo-canais {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 28px;
+    }
+
+    .opcao-check,
+    .campo-ativo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .campo .opcao-check span,
+    .campo-ativo label {
+        font-size: 15px;
+        font-weight: 400;
+        color: var(--textos-pretos);
+    }
+
+    .opcao-check {
+        cursor: pointer;
+    }
+
+    .modal-conteudo input[type="checkbox"] {
+        position: relative;
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        border: 1px solid #CFCFCF;
+        border-radius: 4px;
+        background: #fff;
+        appearance: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
+
+    .modal-conteudo input[type="checkbox"]:checked {
+        border-color: var(--fundo-900);
+        background: var(--fundo-900);
+    }
+
+    .modal-conteudo input[type="checkbox"]:checked::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 5px;
+        width: 5px;
+        height: 9px;
+        border: solid var(--textos-brancos);
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .campo-ativo {
+        flex-direction: row;
+    }
+
+    .modal-botoes {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 6px;
+    }
+
+    .modal-botoes button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        height: 56px;
+        padding: 0 28px;
+        border-radius: 12px;
+        font-family: Inter, sans-serif;
+        font-size: 17px;
+        cursor: pointer;
+    }
+
+    .modal-botoes .material-symbols-outlined {
+        font-size: 24px;
+    }
+
+    .botao-cancelar {
+        border: 0;
+        background: #F1F1F1;
+        color: var(--fundo-900);
+        font-weight: 500;
+        transition: 0.3s ease;
+    }
+
+    .botao-cancelar:hover {
+        background: #E5E5E5;
+    }
+
+    .botao-salvar {
+        border: 0;
+        background: var(--cor-primaria-400);
+        color: var(--cor-primaria-950);
+        font-weight: 600;
+        transition: 0.3s ease;
+    }
+
+    .botao-salvar:hover {
+        box-shadow: 0 0 10px var(--cor-primaria-400);
+    }
 
 /* =====================================================
    RESPONSIVIDADE

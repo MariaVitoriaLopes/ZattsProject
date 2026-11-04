@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <title>Configurações</title>
+
+    <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/configuracoes.css}">
+    <link rel="stylesheet" th:href="@{/css/privacidade.css}">
+    <th:block th:replace="~{fragments/headTema :: tema}"></th:block>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/headerTelas :: header}"></div>
+
+<main class="configuracoes-container">
+
+    <h1 class="titulo-pagina">Configurações</h1>
+
+    <div class="abas-config">
+        <a th:href="@{/configuracoes}" class="aba">Conta</a>
+        <a th:href="@{/configuracoes/notificacoes}" class="aba">Notificações</a>
+        <a th:href="@{/configuracoes/preferencias}" class="aba">Preferências</a>
+        <a th:href="@{/configuracoes/dispositivos}" class="aba">Dispositivos</a>
+        <a th:href="@{/configuracoes/privacidade}" class="aba ativa">Privacidade e Dados</a>
+        <a th:href="@{/configuracoes/ajuda}" class="aba">Ajuda e Suporte</a>
+    </div>
+
+    <section class="card-privacidade">
+
+        <h2 class="secao-titulo">Privacidade e Dados</h2>
+
+        <div class="bloco-priv">
+
+            <div class="bloco-priv-info">
+                <h3>Privacidade</h3>
+                <p>Controle como o Zatts usa as informações da sua residência.</p>
+            </div>
+
+            <div class="bloco-priv-opcoes">
+
+                <label class="priv-linha">
+                    <div class="priv-linha-texto">
+                        <strong>Dados de uso anônimos</strong>
+                        <span>Ajuda a melhorar o sistema, sem identificar você.</span>
+                    </div>
+                    <input type="checkbox" class="priv-interruptor" id="privUsoAnonimo" checked>
+                </label>
+
+                <label class="priv-linha">
+                    <div class="priv-linha-texto">
+                        <strong>Recomendações personalizadas</strong>
+                        <span>Usa seu histórico de consumo para sugerir formas de economizar.</span>
+                    </div>
+                    <input type="checkbox" class="priv-interruptor" id="privRecomendacoes" checked>
+                </label>
+
+                <label class="priv-linha">
+                    <div class="priv-linha-texto">
+                        <strong>Comparar com residências semelhantes</strong>
+                        <span>Compara seu consumo com a média de casas parecidas, de forma anônima.</span>
+                    </div>
+                    <input type="checkbox" class="priv-interruptor" id="privComparativo">
+                </label>
+
+            </div>
+
+        </div>
+
+        <hr class="divisor-priv">
+
+        <div class="bloco-priv">
+
+            <div class="bloco-priv-info">
+                <h3>Meus dados</h3>
+                <p>Baixe uma cópia das suas informações ou apague o histórico de consumo.</p>
+            </div>
+
+            <div class="bloco-priv-opcoes">
+
+                <div class="priv-acao">
+                    <div class="priv-linha-texto">
+                        <strong>Exportar meus dados</strong>
+                        <span>Gera um arquivo com seus dados pessoais, endereço e leituras de consumo.</span>
+                    </div>
+
+                    <button type="button" class="priv-btn priv-btn-padrao" id="btnExportarDados">
+                        <span class="material-symbols-outlined">download</span>
+                        Exportar
+                    </button>
+                </div>
+
+                <div class="priv-acao">
+                    <div class="priv-linha-texto">
+                        <strong>Apagar histórico de consumo</strong>
+                        <span>Remove todas as leituras salvas. Esta ação não pode ser desfeita.</span>
+                    </div>
+
+                    <button type="button" class="priv-btn priv-btn-perigo" id="btnApagarHistorico">
+                        <span class="material-symbols-outlined">delete</span>
+                        Apagar histórico
+                    </button>
+                </div>
+
+                <p class="priv-retorno" id="privRetorno" hidden></p>
+
+            </div>
+
+        </div>
+
+        <hr class="divisor-priv">
+
+        <div class="bloco-priv">
+
+            <div class="bloco-priv-info">
+                <h3>Documentos</h3>
+                <p>Saiba como tratamos seus dados e quais são as regras de uso.</p>
+            </div>
+
+            <div class="bloco-priv-opcoes">
+
+                <a href="#" class="priv-link">
+                    <span class="material-symbols-outlined">shield</span>
+                    Política de privacidade
+                    <span class="material-symbols-outlined priv-link-seta">arrow_forward</span>
+                </a>
+
+                <a href="#" class="priv-link">
+                    <span class="material-symbols-outlined">description</span>
+                    Termos de uso
+                    <span class="material-symbols-outlined priv-link-seta">arrow_forward</span>
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script th:src="@{/js/privacidade.js}"></script>
+
+</body>
+
+</html>

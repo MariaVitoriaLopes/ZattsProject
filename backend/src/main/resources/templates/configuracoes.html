@@ -28,12 +28,12 @@
     <h1 class="titulo-pagina">Configurações</h1>
 
     <div class="abas-config">
-        <a th:href="@{/configuracoes}" class="aba ativa">Conta</a>
+        <a th:href="@{/configuracoes}" class="aba">Conta</a>
         <a th:href="@{/configuracoes/notificacoes}" class="aba">Notificações</a>
         <a th:href="@{/configuracoes/preferencias}" class="aba">Preferências</a>
-        <a href="#" class="aba">Dispositivos</a>
-        <a href="#" class="aba">Privacidade e Dados</a>
-        <a href="#" class="aba">Ajuda e Suporte</a>
+        <a th:href="@{/configuracoes/dispositivos}" class="aba">Dispositivos</a>
+        <a th:href="@{/configuracoes/privacidade}" class="aba">Privacidade e Dados</a>
+        <a th:href="@{/configuracoes/ajuda}" class="aba">Ajuda e Suporte</a>
     </div>
 
     <div th:if="${mensagem}" class="mensagem-sucesso" th:text="${mensagem}"></div>

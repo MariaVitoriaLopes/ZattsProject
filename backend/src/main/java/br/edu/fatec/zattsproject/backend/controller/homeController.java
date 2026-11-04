@@ -142,4 +142,31 @@ public class homeController {
 
         return "configuracoes-notificacoes";
     }
+
+    @GetMapping("/configuracoes/dispositivos")
+    public String configuracoesDispositivos(HttpSession session, Model model) {
+        if (session.getAttribute("usuarioLogado") == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("paginaAtual", "configuracoes");
+        return "configuracoes-dispositivos";
+    }
+
+    @GetMapping("/configuracoes/privacidade")
+    public String configuracoesPrivacidade(HttpSession session, Model model) {
+        if (session.getAttribute("usuarioLogado") == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("paginaAtual", "configuracoes");
+        return "configuracoes-privacidade";
+    }
+
+    @GetMapping("/configuracoes/ajuda")
+    public String configuracoesAjuda(HttpSession session, Model model) {
+        if (session.getAttribute("usuarioLogado") == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("paginaAtual", "configuracoes");
+        return "configuracoes-ajuda";
+    }
 }

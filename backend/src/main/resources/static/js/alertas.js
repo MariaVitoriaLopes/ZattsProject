@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const ativoFalso = document.getElementById("ativoFalso");
     const campoAtivo = document.getElementById("campoAtivo");
     const labelLimite = document.getElementById("labelLimite");
+    const textoSalvar = document.getElementById("textoSalvarAlerta");
 
     const urlCriar = form.action;
 
@@ -48,10 +49,8 @@ document.addEventListener("DOMContentLoaded", function () {
         form.reset();
         form.action = urlCriar;
 
-        titulo.textContent = "Criar alerta";
-
-        campoAtivo.hidden = true;
-        ativoFalso.disabled = true;
+        titulo.textContent = "Novo alerta";
+        textoSalvar.textContent = "Criar novo alerta";
 
         atualizarTipo();
         abrirModal();
@@ -74,6 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             titulo.textContent = "Editar alerta";
+            textoSalvar.textContent = "Salvar alerta";
 
             nome.value = dados.nome || "";
             tipo.value = dados.tipo || "CONSUMO";
@@ -81,8 +81,6 @@ document.addEventListener("DOMContentLoaded", function () {
             percentual.value = dados.percentual || "";
             ativo.checked = dados.ativo === "true";
 
-            campoAtivo.hidden = false;
-            ativoFalso.disabled = false;
 
             atualizarTipo();
             abrirModal();
@@ -110,6 +108,10 @@ document.addEventListener("DOMContentLoaded", function () {
             fecharModal();
         }
 
+    });
+
+    form.addEventListener("submit", function () {
+        ativoFalso.disabled = ativo.checked;
     });
 
     // EXCLUIR ALERTA

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <title>Configurações</title>
+
+    <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/configuracoes.css}">
+    <link rel="stylesheet" th:href="@{/css/ajuda.css}">
+    <th:block th:replace="~{fragments/headTema :: tema}"></th:block>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/headerTelas :: header}"></div>
+
+<main class="configuracoes-container">
+
+    <h1 class="titulo-pagina">Configurações</h1>
+
+    <div class="abas-config">
+        <a th:href="@{/configuracoes}" class="aba">Conta</a>
+        <a th:href="@{/configuracoes/notificacoes}" class="aba">Notificações</a>
+        <a th:href="@{/configuracoes/preferencias}" class="aba">Preferências</a>
+        <a th:href="@{/configuracoes/dispositivos}" class="aba">Dispositivos</a>
+        <a th:href="@{/configuracoes/privacidade}" class="aba">Privacidade e Dados</a>
+        <a th:href="@{/configuracoes/ajuda}" class="aba ativa">Ajuda e Suporte</a>
+    </div>
+
+    <section class="card-ajuda">
+
+        <h2 class="secao-titulo">Ajuda e Suporte</h2>
+
+        <div class="bloco-ajuda">
+
+            <div class="bloco-ajuda-info">
+                <h3>Perguntas frequentes</h3>
+                <p>Encontre respostas rápidas sobre o uso do Zatts.</p>
+            </div>
+
+            <div class="bloco-ajuda-conteudo">
+
+                <div class="campo-input ajuda-busca">
+                    <span class="material-symbols-outlined ajuda-busca-icone">search</span>
+                    <input type="search" id="ajudaBusca" placeholder="Buscar nas perguntas frequentes" aria-label="Buscar nas perguntas frequentes">
+                </div>
+
+                <div class="ajuda-faq" id="ajudaFaq">
+
+                    <details class="ajuda-pergunta">
+                        <summary>
+                            <span>Como conecto um novo dispositivo à minha conta?</span>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </summary>
+                        <p>Acesse Configurações, abra a aba Dispositivos e clique em "Adicionar dispositivo". Informe um nome e o código que acompanha o quadro de energia.</p>
+                    </details>
+
+                    <details class="ajuda-pergunta">
+                        <summary>
+                            <span>Por que meu dispositivo aparece como desconectado?</span>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </summary>
+                        <p>Isso acontece quando o Zatts deixa de receber leituras por algum tempo. Verifique se o quadro está ligado e se a rede Wi-Fi da residência está funcionando.</p>
+                    </details>
+
+                    <details class="ajuda-pergunta">
+                        <summary>
+                            <span>Como defino uma meta mensal de consumo?</span>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </summary>
+                        <p>Na tela Notificações, abra a aba Metas e crie uma nova meta com o valor em reais. Você também pode definir a meta ao responder o questionário inicial.</p>
+                    </details>
+
+                    <details class="ajuda-pergunta">
+                        <summary>
+                            <span>Como crio um alerta personalizado?</span>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </summary>
+                        <p>Na tela Notificações, abra a aba Alertas personalizados e crie um alerta com o limite de consumo que deseja acompanhar.</p>
+                    </details>
+
+                    <details class="ajuda-pergunta">
+                        <summary>
+                            <span>Como altero o tema ou a cor de destaque?</span>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </summary>
+                        <p>Em Configurações, abra a aba Preferências e escolha o modo (automático, claro ou escuro) e a cor de destaque que preferir.</p>
+                    </details>
+
+                    <details class="ajuda-pergunta">
+                        <summary>
+                            <span>Esqueci minha senha. O que faço?</span>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </summary>
+                        <p>Na tela de login, use a opção de recuperar senha e siga as instruções enviadas para o seu e-mail. Se estiver logado, você pode trocar a senha na aba Conta.</p>
+                    </details>
+
+                    <details class="ajuda-pergunta">
+                        <summary>
+                            <span>Como excluo minha conta e meus dados?</span>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </summary>
+                        <p>Na aba Conta, clique em "Deletar minha conta". Para apagar só o histórico de consumo, use a aba Privacidade e Dados.</p>
+                    </details>
+
+                </div>
+
+                <p class="ajuda-vazio" id="ajudaVazio" hidden>
+                    Nenhuma pergunta encontrada. Tente outras palavras ou fale com o suporte abaixo.
+                </p>
+
+            </div>
+
+        </div>
+
+        <hr class="divisor-ajuda">
+
+        <div class="bloco-ajuda">
+
+            <div class="bloco-ajuda-info">
+                <h3>Canais de contato</h3>
+                <p>Prefere falar com a gente? Escolha o canal mais conveniente.</p>
+            </div>
+
+            <div class="bloco-ajuda-conteudo">
+
+                <div class="ajuda-canais">
+
+                    <div class="ajuda-canal">
+                        <div class="ajuda-canal-icone">
+                            <span class="material-symbols-outlined">mail</span>
+                        </div>
+                        <div class="ajuda-canal-texto">
+                            <strong>E-mail</strong>
+                            <span>suporte@zatts.com.br</span>
+                        </div>
+                    </div>
+
+                    <div class="ajuda-canal">
+                        <div class="ajuda-canal-icone">
+                            <span class="material-symbols-outlined">schedule</span>
+                        </div>
+                        <div class="ajuda-canal-texto">
+                            <strong>Atendimento</strong>
+                            <span>Segunda a sexta, das 9h às 18h</span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr class="divisor-ajuda">
+
+        <div class="bloco-ajuda">
+
+            <div class="bloco-ajuda-info">
+                <h3>Falar com o suporte</h3>
+                <p>Descreva o que aconteceu e responderemos pelo seu e-mail.</p>
+            </div>
+
+            <div class="bloco-ajuda-conteudo">
+
+                <form class="ajuda-form" id="formSuporte" th:action="@{/configuracoes/ajuda/contato}" method="post">
+
+                    <div class="campo">
+                        <label for="ajudaAssunto">Assunto</label>
+                        <div class="campo-input">
+                            <select id="ajudaAssunto" name="assunto" required>
+                                <option value="" selected disabled>Selecione um assunto</option>
+                                <option value="conta">Conta e acesso</option>
+                                <option value="dispositivo">Dispositivos</option>
+                                <option value="consumo">Consumo e leituras</option>
+                                <option value="meta">Metas e alertas</option>
+                                <option value="sugestao">Sugestão</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                            <span class="material-symbols-outlined seta-select">expand_more</span>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="ajudaMensagem">Mensagem</label>
+                        <textarea id="ajudaMensagem"
+                                  name="mensagem"
+                                  rows="6"
+                                  maxlength="1000"
+                                  placeholder="Conte com detalhes como podemos ajudar"
+                                  required></textarea>
+                        <span class="ajuda-contador" id="ajudaContador">0 / 1000</span>
+                    </div>
+
+                    <div class="ajuda-form-acoes">
+                        <button type="submit" class="btn-salvar-tudo" id="btnEnviarSuporte">Enviar mensagem</button>
+                    </div>
+
+                    <p class="ajuda-retorno" id="ajudaRetorno" hidden></p>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script th:src="@{/js/ajuda.js}"></script>
+
+</body>
+
+</html>

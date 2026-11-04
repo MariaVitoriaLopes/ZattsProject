@@ -188,7 +188,7 @@
 
         <div class="modal-topo">
 
-            <h2 id="tituloModal">Criar alerta</h2>
+            <h2 id="tituloModal">Novo alerta</h2>
 
             <button type="button" id="btnFecharModal" aria-label="Fechar">
                 <span class="material-symbols-outlined">close</span>
@@ -205,82 +205,192 @@
                    th:name="${_csrf.parameterName}"
                    th:value="${_csrf.token}">
 
-            <div class="campo">
-                <label for="nomeAlerta">Nome do alerta</label>
+            <div class="modal-grade">
 
-                <input id="nomeAlerta"
-                       name="nome"
-                       type="text"
-                       maxlength="100"
-                       required
-                       placeholder="Ex.: Consumo elevado">
-            </div>
+                <div class="modal-coluna">
 
-            <div class="campo">
-                <label for="tipoAlerta">Tipo do alerta</label>
+                    <div class="campo">
+                        <span class="campo-rotulo">Ícone</span>
 
-                <select id="tipoAlerta" name="tipo" required>
-                    <option value="CONSUMO">Consumo de energia (kWh)</option>
-                    <option value="GASTO">Gastos de energia (R$)</option>
-                </select>
-            </div>
+                        <div class="grade-icones">
+                            <label class="opcao-icone">
+                                <input type="radio" name="icone" value="bolt" checked>
+                                <span class="material-symbols-outlined">bolt</span>
+                            </label>
+                            <label class="opcao-icone">
+                                <input type="radio" name="icone" value="flag">
+                                <span class="material-symbols-outlined">flag</span>
+                            </label>
+                            <label class="opcao-icone">
+                                <input type="radio" name="icone" value="shield">
+                                <span class="material-symbols-outlined">shield</span>
+                            </label>
+                            <label class="opcao-icone">
+                                <input type="radio" name="icone" value="wifi_off">
+                                <span class="material-symbols-outlined">wifi_off</span>
+                            </label>
+                            <label class="opcao-icone">
+                                <input type="radio" name="icone" value="power_settings_new">
+                                <span class="material-symbols-outlined">power_settings_new</span>
+                            </label>
+                            <label class="opcao-icone">
+                                <input type="radio" name="icone" value="alarm_on">
+                                <span class="material-symbols-outlined">alarm_on</span>
+                            </label>
+                            <label class="opcao-icone">
+                                <input type="radio" name="icone" value="crisis_alert">
+                                <span class="material-symbols-outlined">crisis_alert</span>
+                            </label>
+                        </div>
+                    </div>
 
-            <div class="campo">
-                <label id="labelLimite" for="valorLimite">
-                    Limite de consumo (kWh)
-                </label>
+                    <div class="campo">
+                        <label for="nomeAlerta">Nome</label>
 
-                <input id="valorLimite"
-                       name="valorLimite"
-                       type="number"
-                       min="0.01"
-                       step="0.01"
-                       required
-                       placeholder="Ex.: 200">
-            </div>
+                        <input id="nomeAlerta"
+                               name="nome"
+                               type="text"
+                               maxlength="100"
+                               required
+                               placeholder="Ex.: Queda de energia">
+                    </div>
 
-            <div class="campo">
-                <label for="percentualLimite">
-                    Percentual da meta (opcional)
-                </label>
+                    <div class="campo">
+                        <label for="categoriaAlerta">Categoria</label>
 
-                <input id="percentualLimite"
-                       name="percentualLimite"
-                       type="number"
-                       min="0.01"
-                       step="0.01"
-                       placeholder="Ex.: 80">
-            </div>
+                        <div class="campo-select">
+                            <select id="categoriaAlerta" name="categoria">
+                                <option value="ALERTA">Alerta</option>
+                                <option value="META">Meta</option>
+                                <option value="DISPOSITIVO">Dispositivo</option>
+                            </select>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </div>
+                    </div>
 
-            <div class="campo campo-ativo" id="campoAtivo" hidden>
+                    <div class="campo">
+                        <label for="tipoAlerta">Tipo de alerta</label>
 
-                <label for="ativoAlerta">Alerta ativo</label>
+                        <div class="campo-select">
+                            <select id="tipoAlerta" name="tipo" required>
+                                <option value="CONSUMO">Consumo de energia (kWh)</option>
+                                <option value="GASTO">Gastos de energia (R$)</option>
+                            </select>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </div>
+                    </div>
 
-                <input type="hidden"
-                       name="ativo"
-                       value="false"
-                       id="ativoFalso"
-                       disabled>
+                </div>
 
-                <input type="checkbox"
-                       name="ativo"
-                       value="true"
-                       id="ativoAlerta"
-                       checked>
+                <div class="modal-coluna">
 
-            </div>
+                    <div class="modal-duplo">
 
-            <div class="modal-botoes">
+                        <div class="campo">
+                            <label id="labelLimite" for="valorLimite">Limite de consumo (kWh)</label>
 
-                <button type="button"
-                        id="btnCancelar"
-                        class="botao-cancelar">
-                    Cancelar
-                </button>
+                            <input id="valorLimite"
+                                   name="valorLimite"
+                                   type="number"
+                                   min="0.01"
+                                   step="0.01"
+                                   required
+                                   placeholder="Ex.: 200">
+                        </div>
 
-                <button type="submit" class="botao-salvar">
-                    Salvar alerta
-                </button>
+                        <div class="campo">
+                            <label for="percentualLimite">Percentual atingido</label>
+
+                            <input id="percentualLimite"
+                                   name="percentualLimite"
+                                   type="number"
+                                   min="0.01"
+                                   step="0.01"
+                                   placeholder="Ex.: 80">
+                        </div>
+
+                    </div>
+
+                    <div class="campo">
+                        <span class="campo-rotulo">Notificações</span>
+
+                        <div class="grupo-canais">
+                            <label class="opcao-check">
+                                <input type="checkbox" name="canalPush" value="true" checked>
+                                <span>Push</span>
+                            </label>
+                            <label class="opcao-check">
+                                <input type="checkbox" name="canalEmail" value="true" checked>
+                                <span>E-mail</span>
+                            </label>
+                            <label class="opcao-check">
+                                <input type="checkbox" name="canalApp" value="true" checked>
+                                <span>Apenas no aplicativo</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="lembreteAlerta">Lembretes</label>
+
+                        <div class="campo-select">
+                            <select id="lembreteAlerta" name="lembrete">
+                                <option value="NA_HORA">Na hora</option>
+                                <option value="5_MIN">5 minutos antes</option>
+                                <option value="15_MIN">15 minutos antes</option>
+                                <option value="1_HORA">1 hora antes</option>
+                            </select>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="repetirAlerta">Repetir</label>
+
+                        <div class="campo-select">
+                            <select id="repetirAlerta" name="repetir">
+                                <option value="NUNCA">Não repetir</option>
+                                <option value="1_HORA" selected>A cada 1 hora</option>
+                                <option value="6_HORAS">A cada 6 horas</option>
+                                <option value="DIARIO">Diariamente</option>
+                            </select>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </div>
+                    </div>
+
+                    <div class="campo campo-ativo" id="campoAtivo">
+
+                        <input type="hidden"
+                               name="ativo"
+                               value="false"
+                               id="ativoFalso">
+
+                        <input type="checkbox"
+                               name="ativo"
+                               value="true"
+                               id="ativoAlerta"
+                               checked>
+
+                        <label for="ativoAlerta">Ativar alerta</label>
+
+                    </div>
+
+                    <div class="modal-botoes">
+
+                        <button type="button"
+                                id="btnCancelar"
+                                class="botao-cancelar">
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="botao-salvar" id="btnSalvarAlerta">
+                            <span class="material-symbols-outlined">add</span>
+                            <span id="textoSalvarAlerta">Criar novo alerta</span>
+                        </button>
+
+                    </div>
+
+                </div>
 
             </div>
 

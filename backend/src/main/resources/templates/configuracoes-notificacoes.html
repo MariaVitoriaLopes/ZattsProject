@@ -19,17 +19,19 @@
 
 <body>
 
+<div th:replace="~{fragments/headerTelas :: header}"></div>
+
 <main class="configuracoes-container">
 
     <h1 class="titulo-pagina">Configurações</h1>
 
     <div class="abas-config">
-        <a href="#" class="aba">Conta</a>
-        <a href="#" class="aba ativa">Notificações</a>
-        <a href="#" class="aba">Preferências</a>
-        <a href="#" class="aba">Dispositivos</a>
-        <a href="#" class="aba">Privacidade e Dados</a>
-        <a href="#" class="aba">Ajuda e Suporte</a>
+        <a th:href="@{/configuracoes}" class="aba">Conta</a>
+        <a th:href="@{/configuracoes/notificacoes}" class="aba ativa">Notificações</a>
+        <a th:href="@{/configuracoes/preferencias}" class="aba">Preferências</a>
+        <a th:href="@{/configuracoes/dispositivos}" class="aba">Dispositivos</a>
+        <a th:href="@{/configuracoes/privacidade}" class="aba">Privacidade e Dados</a>
+        <a th:href="@{/configuracoes/ajuda}" class="aba">Ajuda e Suporte</a>
     </div>
 
     <form class="cfg-notif-card">
@@ -171,11 +173,97 @@
                 </div>
             </section>
 
+            <section class="cfg-notif-secao" id="meta">
+                <label class="cfg-notif-todas">
+                    <span>Desativar todas</span>
+                    <input type="checkbox" class="interruptor" checked>
+                </label>
+
+                <div class="cfg-notif-grupo">
+                    <div class="cfg-notif-linha cfg-notif-cabecalho">
+                        <h3>Notificações de Meta</h3>
+                        <span>Push</span>
+                        <span>E-mail</span>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Meta mensal criada ou editada</span>
+                        <input type="checkbox" aria-label="Push: Meta mensal criada ou editada" checked>
+                        <input type="checkbox" aria-label="E-mail: Meta mensal criada ou editada">
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Consumo chegou a 80% da meta</span>
+                        <input type="checkbox" aria-label="Push: Consumo chegou a 80% da meta" checked>
+                        <input type="checkbox" aria-label="E-mail: Consumo chegou a 80% da meta" checked>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Meta mensal ultrapassada</span>
+                        <input type="checkbox" aria-label="Push: Meta mensal ultrapassada" checked>
+                        <input type="checkbox" aria-label="E-mail: Meta mensal ultrapassada" checked>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Meta mensal atingida com sucesso</span>
+                        <input type="checkbox" aria-label="Push: Meta mensal atingida com sucesso" checked>
+                        <input type="checkbox" aria-label="E-mail: Meta mensal atingida com sucesso">
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Resumo semanal da meta</span>
+                        <input type="checkbox" aria-label="Push: Resumo semanal da meta">
+                        <input type="checkbox" aria-label="E-mail: Resumo semanal da meta" checked>
+                    </div>
+                </div>
+            </section>
+
+            <section class="cfg-notif-secao" id="alerta">
+                <label class="cfg-notif-todas">
+                    <span>Desativar todas</span>
+                    <input type="checkbox" class="interruptor" checked>
+                </label>
+
+                <div class="cfg-notif-grupo">
+                    <div class="cfg-notif-linha cfg-notif-cabecalho">
+                        <h3>Notificações de Alerta</h3>
+                        <span>Push</span>
+                        <span>E-mail</span>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Alerta personalizado criado ou editado</span>
+                        <input type="checkbox" aria-label="Push: Alerta personalizado criado ou editado" checked>
+                        <input type="checkbox" aria-label="E-mail: Alerta personalizado criado ou editado">
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Alerta personalizado disparado</span>
+                        <input type="checkbox" aria-label="Push: Alerta personalizado disparado" checked>
+                        <input type="checkbox" aria-label="E-mail: Alerta personalizado disparado" checked>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Limite de consumo do alerta ultrapassado</span>
+                        <input type="checkbox" aria-label="Push: Limite de consumo do alerta ultrapassado" checked>
+                        <input type="checkbox" aria-label="E-mail: Limite de consumo do alerta ultrapassado" checked>
+                    </div>
+
+                    <div class="cfg-notif-linha">
+                        <span>Alerta personalizado excluído</span>
+                        <input type="checkbox" aria-label="Push: Alerta personalizado excluído">
+                        <input type="checkbox" aria-label="E-mail: Alerta personalizado excluído">
+                    </div>
+                </div>
+            </section>
+
         </div>
 
     </form>
 
 </main>
+
+<script th:src="@{/js/configuracoes-notificacoes.js}"></script>
 
 </body>
 

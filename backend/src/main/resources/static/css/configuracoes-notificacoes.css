@@ -148,7 +148,7 @@
 }
 
 .cfg-notif-linha input[type="checkbox"]:checked {
-    border-color: var(--fundo-900);
+    border-color: var(--fundo-700);
     background-color: var(--fundo-900);
 }
 
@@ -162,6 +162,11 @@
     border: solid var(--textos-brancos);
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
+}
+
+.cfg-notif-linha input[type="checkbox"]:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 @media (max-width: 1100px) {

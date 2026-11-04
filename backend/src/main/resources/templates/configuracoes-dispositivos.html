@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <title>Configurações</title>
+
+    <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/configuracoes.css}">
+    <link rel="stylesheet" th:href="@{/css/dispositivos.css}">
+    <th:block th:replace="~{fragments/headTema :: tema}"></th:block>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/headerTelas :: header}"></div>
+
+<main class="configuracoes-container">
+
+    <h1 class="titulo-pagina">Configurações</h1>
+
+    <div class="abas-config">
+        <a th:href="@{/configuracoes}" class="aba">Conta</a>
+        <a th:href="@{/configuracoes/notificacoes}" class="aba">Notificações</a>
+        <a th:href="@{/configuracoes/preferencias}" class="aba">Preferências</a>
+        <a th:href="@{/configuracoes/dispositivos}" class="aba ativa">Dispositivos</a>
+        <a th:href="@{/configuracoes/privacidade}" class="aba">Privacidade e Dados</a>
+        <a th:href="@{/configuracoes/ajuda}" class="aba">Ajuda e Suporte</a>
+    </div>
+
+    <section class="card-dispositivos">
+
+        <div class="disp-cabecalho">
+            <div>
+                <h2 class="secao-titulo">Dispositivos</h2>
+                <p class="disp-descricao">Gerencie os quadros de energia e sensores conectados à sua conta.</p>
+            </div>
+
+            <button type="button" class="disp-btn-adicionar" id="btnAdicionarDispositivo">
+                <span class="material-symbols-outlined">add</span>
+                Adicionar dispositivo
+            </button>
+        </div>
+
+        <form class="disp-novo" id="formNovoDispositivo" hidden>
+            <div class="campo">
+                <label for="dispNome">Nome do dispositivo</label>
+                <div class="campo-input">
+                    <input type="text" id="dispNome" name="nome" placeholder="Ex.: Quadro da sala" required>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="dispCodigo">Código do dispositivo</label>
+                <div class="campo-input">
+                    <input type="text" id="dispCodigo" name="codigo" placeholder="Ex.: ZT-4F2A91" required>
+                </div>
+            </div>
+
+            <div class="disp-novo-acoes">
+                <button type="submit" class="btn-salvar-tudo">Conectar</button>
+                <button type="button" class="btn-cancelar-tudo" id="btnCancelarNovo">Cancelar</button>
+            </div>
+        </form>
+
+        <ul class="disp-lista" id="listaDispositivos">
+
+            <li class="disp-item">
+                <div class="disp-icone">
+                    <span class="material-symbols-outlined">electric_meter</span>
+                </div>
+
+                <div class="disp-info">
+                    <strong class="disp-nome">Quadro de energia principal</strong>
+                    <span class="disp-detalhe">Código ZT-4F2A91 · Última leitura há 2 minutos</span>
+                </div>
+
+                <span class="disp-status disp-conectado">
+                    <span class="disp-ponto"></span>
+                    Conectado
+                </span>
+
+                <div class="disp-acoes">
+                    <button type="button" class="disp-btn-icone" data-acao="renomear" aria-label="Renomear dispositivo">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                    <button type="button" class="disp-btn-icone disp-btn-remover" data-acao="remover" aria-label="Remover dispositivo">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+            </li>
+
+            <li class="disp-item">
+                <div class="disp-icone">
+                    <span class="material-symbols-outlined">sensors</span>
+                </div>
+
+                <div class="disp-info">
+                    <strong class="disp-nome">Sensor da cozinha</strong>
+                    <span class="disp-detalhe">Código ZT-8C10B7 · Última leitura há 14 minutos</span>
+                </div>
+
+                <span class="disp-status disp-conectado">
+                    <span class="disp-ponto"></span>
+                    Conectado
+                </span>
+
+                <div class="disp-acoes">
+                    <button type="button" class="disp-btn-icone" data-acao="renomear" aria-label="Renomear dispositivo">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                    <button type="button" class="disp-btn-icone disp-btn-remover" data-acao="remover" aria-label="Remover dispositivo">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+            </li>
+
+            <li class="disp-item">
+                <div class="disp-icone">
+                    <span class="material-symbols-outlined">sensors</span>
+                </div>
+
+                <div class="disp-info">
+                    <strong class="disp-nome">Sensor da garagem</strong>
+                    <span class="disp-detalhe">Código ZT-1D77E3 · Última leitura há 3 dias</span>
+                </div>
+
+                <span class="disp-status disp-desconectado">
+                    <span class="disp-ponto"></span>
+                    Desconectado
+                </span>
+
+                <div class="disp-acoes">
+                    <button type="button" class="disp-btn-icone" data-acao="renomear" aria-label="Renomear dispositivo">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                    <button type="button" class="disp-btn-icone disp-btn-remover" data-acao="remover" aria-label="Remover dispositivo">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+            </li>
+
+        </ul>
+
+        <p class="disp-vazio" id="dispVazio" hidden>
+            Nenhum dispositivo conectado ainda. Clique em "Adicionar dispositivo" para começar.
+        </p>
+
+    </section>
+
+</main>
+
+<script th:src="@{/js/dispositivos.js}"></script>
+
+</body>
+
+</html>
