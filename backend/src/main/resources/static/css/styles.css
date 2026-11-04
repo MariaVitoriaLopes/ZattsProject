@@ -12,6 +12,7 @@
     --fundo-950: #161611;
     --textos-pretos: #000;
     --textos-brancos: #fff;
+    --cor-padrao: #E6FB1A;
 }
 
 *{
@@ -664,7 +665,7 @@ span.material-symbols-outlined.visibility, span.material-symbols-outlined.visibi
 
 
 .btnEntrar:hover{
-    background-color: var(--cor-primaria-400);
+    background-color: var(--cor-padrao);
     color: black;
 }
 

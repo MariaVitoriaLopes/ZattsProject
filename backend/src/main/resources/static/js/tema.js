@@ -55,8 +55,21 @@
             }
 
             aplicarCor(cor, valor);
+        },
+
+        alternar: function () {
+            const proximo = raiz.getAttribute('data-tema') === 'escuro' ? 'claro' : 'escuro';
+            gravar('zatts-tema', proximo);
+            aplicarTema(proximo);
         }
     };
+
+    document.addEventListener('click', function (evento) {
+        if (evento.target.closest('[data-alternar-tema]')) {
+            window.zattsTema.alternar();
+        }
+    });
+
 
     aplicarTema(ler('zatts-tema', 'automatico'));
     aplicarCor(ler('zatts-cor', 'padrao'), ler('zatts-cor-personalizada', '#E6FB1A'));

@@ -269,3 +269,112 @@ html[data-tema="escuro"] .btn-cancelar {
     background: #2A2A2A;
     color: #F2F2F2;
 }
+.alternar-tema {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid #E3E3E3;
+    border-radius: 10px;
+    background-color: var(--fundo-0);
+    color: var(--fundo-900);
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.alternar-tema:hover {
+    box-shadow: 0 0 8px var(--cor-primaria-400);
+}
+
+.alternar-tema .material-symbols-outlined {
+    font-size: 22px;
+    color: inherit;
+}
+
+.alternar-tema .alternar-tema-sol {
+    display: none;
+}
+
+html[data-tema="escuro"] .alternar-tema .alternar-tema-lua {
+    display: none;
+}
+
+html[data-tema="escuro"] .alternar-tema .alternar-tema-sol {
+    display: inline-block;
+}
+
+html[data-tema="escuro"] .alternar-tema {
+    background-color: #232323;
+    border-color: #333333;
+    color: #F2F2F2;
+}
+
+.alternar-tema-fixo {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    z-index: 1100;
+}
+
+html[data-tema="escuro"] .formulario .voltar,
+html[data-tema="escuro"] .boasvindas,
+html[data-tema="escuro"] .formulario .campo label,
+html[data-tema="escuro"] .cadastro a {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .cadastro,
+html[data-tema="escuro"] .esqueci,
+html[data-tema="escuro"] .requisitos span {
+    color: #A3A3A3;
+}
+
+html[data-tema="escuro"] .formulario .campo input,
+html[data-tema="escuro"] .formulario .inputSenhaPassword {
+    background-color: #232323;
+    border-color: #444444;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .formulario .inputSenhaPassword input {
+    background-color: transparent;
+}
+
+html[data-tema="escuro"] .formulario .campo input::placeholder {
+    color: #777777;
+}
+
+html[data-tema="escuro"] .formulario .campo input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #232323 inset;
+    -webkit-text-fill-color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .formulario .campo input:focus,
+html[data-tema="escuro"] .formulario .inputSenhaPassword:focus-within {
+    border-color: var(--cor-primaria-400);
+}
+
+html[data-tema="escuro"] .btnEntrar {
+    background-color: #2A2A2A;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .btnEntrar:hover {
+    background-color: var(--cor-primaria-400);
+    color: var(--cor-primaria-950);
+}
+
+html[data-tema="escuro"] .alert-danger {
+    background-color: rgba(179, 50, 27, 0.25);
+    border-color: rgba(179, 50, 27, 0.5);
+    color: #FF6B4A;
+}
+
+html[data-tema="escuro"] .alert-success {
+    background-color: rgba(47, 191, 138, 0.15);
+    border-color: rgba(47, 191, 138, 0.4);
+    color: #2FBF8A;
+}
