@@ -20,13 +20,14 @@ public class Consumo {
     private String id;
 
     private String dispositivoId;
-    private String usuarioId; // ID do utilizador dono do dispositivo/leitura
+    private String usuarioId;
 
     private Double correnteAmperes;
     private Double voltagem;
     private Double potenciaWatts;
     private Double consumoKwh;
     private Double valorEstimadoReais;
+    private String macAddress;
 
     @Builder.Default
     private LocalDateTime dataHora = LocalDateTime.now();

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 
@@ -93,6 +92,67 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
 <script th:src="@{/js/script.js}"></script>
+
+<!-- INTEGRAÇÃO COM BACKEND ZATTS (REST + SSE) -->
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const dash = /*[[${dash}]]*/ null;
+
+        if (!dash) return;
+
+        // 1. Gráfico Consumo Atual (Horas do Dia)
+        const canvasRealtime = document.getElementById("chartConsumoRealtime");
+        if (canvasRealtime && dash.consumoTempoReal) {
+            new Chart(canvasRealtime, {
+                type: 'bar',
+                data: {
+                    labels: dash.consumoTempoReal.map(p => p.hora),
+                    datasets: [{
+                        label: 'Consumo (kWh)',
+                        data: dash.consumoTempoReal.map(p => p.consumoKwh),
+                        backgroundColor: '#C2F012'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        // 2. Gráfico Consumo Diário/Mensal
+        const canvasComparativo = document.getElementById("chartResumoComparativo");
+        if (canvasComparativo && dash.resumoComparativoKwh) {
+            new Chart(canvasComparativo, {
+                type: 'line',
+                data: {
+                    labels: dash.resumoComparativoKwh.map(p => p.mes),
+                    datasets: [{
+                        label: 'Consumo (kWh)',
+                        data: dash.resumoComparativoKwh.map(p => p.valor),
+                        borderColor: '#00D26A',
+                        fill: false
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        // 3. Gráfico Estimativa de Valor da Conta
+        const canvasValorConta = document.getElementById("chartValorConta");
+        if (canvasValorConta && dash.valorContaEstimadoReais) {
+            new Chart(canvasValorConta, {
+                type: 'bar',
+                data: {
+                    labels: dash.valorContaEstimadoReais.map(p => p.mes),
+                    datasets: [{
+                        label: 'Valor Estimado (R$)',
+                        data: dash.valorContaEstimadoReais.map(p => p.valor),
+                        backgroundColor: '#0052FF'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+    });
+</script>
 
 </body>
 </html>

@@ -1,9 +1,10 @@
-
 package br.edu.fatec.zattsproject.backend.controller;
 
+import br.edu.fatec.zattsproject.backend.dto.DashboardDTO;
 import br.edu.fatec.zattsproject.backend.model.Usuario;
 import br.edu.fatec.zattsproject.backend.service.AlertaService;
 import br.edu.fatec.zattsproject.backend.service.ConfiguracaoService;
+import br.edu.fatec.zattsproject.backend.service.DashboardService; // 1. Import do DashboardService
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -15,14 +16,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class homeController {
 
     private final ConfiguracaoService configuracaoService;
-
     private final AlertaService alertaService;
+    private final DashboardService dashboardService; // 2. Injeção do serviço
 
     private boolean usuarioLogado(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
         return usuario != null;
     }
-
 
     @GetMapping("/home")
     public String home(Model model, HttpSession session) {
@@ -40,9 +40,13 @@ public class homeController {
                 configuracaoService.buscarPorUsuario(usuario.getId())
         );
 
+        // 3. Buscar os dados dinâmicos da Dashboard para o usuário logado
+        DashboardDTO dashboardData = dashboardService.obterDadosDashboard(usuario.getId());
+        model.addAttribute("dash", dashboardData);
+        model.addAttribute("usuarioId", usuario.getId());
+
         return "home";
     }
-
 
     @GetMapping("/historico")
     public String historico(Model model, HttpSession session) {
@@ -90,11 +94,6 @@ public class homeController {
                 "configuracao",
                 configuracaoService.buscarPorUsuario(usuario.getId())
         );
-
-        // Futuramente, carregar aqui as notificações
-        // geradas pelos alertas personalizados.
-        // Não utilizar alertaService.listar() para isso,
-        // pois ele retorna as regras, não os disparos.
 
         return "notificacoes";
     }

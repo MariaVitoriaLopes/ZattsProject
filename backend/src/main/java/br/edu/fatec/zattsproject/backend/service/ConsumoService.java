@@ -5,6 +5,7 @@ import br.edu.fatec.zattsproject.backend.repository.ConsumoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -19,5 +20,9 @@ public class ConsumoService {
 
     public List<Consumo> listarPorUsuario(String usuarioId) {
         return repository.findByUsuarioIdOrderByDataHoraDesc(usuarioId);
+    }
+
+    public List<Consumo> buscarPorUsuarioEIntervalo(String usuarioId, LocalDateTime inicio, LocalDateTime fim) {
+        return repository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicio, fim);
     }
 }

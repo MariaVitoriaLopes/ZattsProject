@@ -1,6 +1,6 @@
-
 package br.edu.fatec.zattsproject.backend.model;
 
+import br.edu.fatec.zattsproject.backend.service.CalculadoraTarifaService.BandeiraTarifaria;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,16 +17,11 @@ public class Configuracao {
 
     @Id
     private String id;
-
     private String usuarioId;
-
     private Double metaConsumoKwh;
     private Double metaGastoReais;
-
     private Boolean notificacoesAtivas;
-
     private String distribuidora;
-
     private String cep;
     private String logradouro;
     private String numero;
@@ -34,6 +29,6 @@ public class Configuracao {
     private String bairro;
     private String cidade;
     private String uf;
-
+    private BandeiraTarifaria bandeiraAtual;
     private String fusoHorario;
 }

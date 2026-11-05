@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 
@@ -18,16 +17,16 @@
 
         <div class="progresso-meta"
              id="progressoMeta"
-             style="width: 0%">
+             th:style="'width: ' + (${dash != null ? (dash.percentualMetaAtingida > 100 ? 100 : dash.percentualMetaAtingida) : 0}) + '%'">
         </div>
 
     </div>
 
     <div class="meta-info">
 
-        <span>0 kWh</span>
+        <span id="consumoAtualTexto" th:text="${dash != null ? dash.consumoTotalDiarioKwh + ' kWh' : '0 kWh'}">0 kWh</span>
 
-        <span id="limiteMeta">Meta não definida</span>
+        <span id="limiteMeta" th:text="${dash != null ? 'Meta: ' + dash.metaGastoKwh + ' kWh' : 'Meta não definida'}">Meta não definida</span>
 
     </div>
 
@@ -38,7 +37,7 @@
 
             Consumo atual:
 
-            <strong id="consumoMensal">
+            <strong id="consumoMensal" th:text="${dash != null ? dash.metaConsumoMensalAtualKwh + ' kWh' : '-- kWh'}">
                 -- kWh
             </strong>
         </div>
@@ -48,7 +47,7 @@
 
             Meta:
 
-            <strong id="valorMeta">
+            <strong id="valorMeta" th:text="${dash != null ? dash.metaGastoKwh + ' kWh' : '-- kWh'}">
                 -- kWh
             </strong>
         </div>
