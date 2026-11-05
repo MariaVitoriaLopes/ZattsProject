@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.ResponseEntity;
 
 @Controller
 @RequiredArgsConstructor
@@ -81,6 +82,36 @@ public class AlertaWebController {
         }
 
         return "redirect:/alertas";
+    }
+
+    @PostMapping("/{id}/ativo")
+    @ResponseBody
+    public ResponseEntity<?> alterarAtivo(
+            @PathVariable String id,
+            @RequestParam boolean ativo,
+            HttpSession session) {
+
+        Usuario usuario =
+                (Usuario) session.getAttribute("usuarioLogado");
+
+        if (usuario == null) {
+            return ResponseEntity.status(401)
+                    .body("Usuário não autenticado.");
+        }
+
+        ResultadoAlerta resultado =
+                alertaService.alterarAtivo(
+                        id,
+                        usuario.getId(),
+                        ativo
+                );
+
+        if (resultado == ResultadoAlerta.NAO_ENCONTRADO) {
+            return ResponseEntity.status(404)
+                    .body("Alerta não encontrado.");
+        }
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/excluir")

@@ -21,6 +21,22 @@ public class Alerta {
     private String usuarioId;
     private String nome;
     private String tipo;
+
+    private String icone;
+    private String categoria;
+
+    @Builder.Default
+    private Boolean canalPush = true;
+
+    @Builder.Default
+    private Boolean canalEmail = true;
+
+    @Builder.Default
+    private Boolean canalApp = true;
+
+    private String lembrete;
+    private String repetir;
+
     private Double percentualLimite;
     private Double valorLimite;
     private Boolean ativo;

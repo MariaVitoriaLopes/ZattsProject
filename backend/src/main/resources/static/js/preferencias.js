@@ -55,5 +55,57 @@ seletorCor.addEventListener('input', function () {
 selectIdioma.value = idiomaSalvo;
 
 selectIdioma.addEventListener('change', function () {
-    zattsTema.gravar('zatts-idioma', selectIdioma.value);
+    zattsTema.definirIdioma(selectIdioma.value);
 });
+
+document.addEventListener(
+    'zatts:aparencia-carregada',
+    function () {
+
+        const temaSalvo =
+            zattsTema.ler(
+                'zatts-tema',
+                'automatico'
+            );
+
+        const corSalva =
+            zattsTema.ler(
+                'zatts-cor',
+                'padrao'
+            );
+
+        const corPersonalizadaSalva =
+            zattsTema.ler(
+                'zatts-cor-personalizada',
+                '#E6FB1A'
+            );
+
+        const idiomaSalvo =
+            zattsTema.ler(
+                'zatts-idioma',
+                'pt-BR'
+            );
+
+        radiosTema.forEach(function (radio) {
+            radio.checked =
+                radio.value === temaSalvo;
+        });
+
+        radiosCor.forEach(function (radio) {
+            radio.checked =
+                radio.value === corSalva;
+        });
+
+        seletorCor.value =
+            corPersonalizadaSalva;
+
+        if (corSalva === 'outra') {
+            pintarBolinha(
+                corPersonalizadaSalva
+            );
+        }
+
+        selectIdioma.value =
+            idiomaSalvo;
+    }
+);

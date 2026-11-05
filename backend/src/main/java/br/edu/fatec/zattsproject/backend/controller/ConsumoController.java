@@ -8,6 +8,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import br.edu.fatec.zattsproject.backend.model.Usuario;
+import jakarta.servlet.http.HttpSession;
+
+import br.edu.fatec.zattsproject.backend.model.Usuario;
+import jakarta.servlet.http.HttpSession;
+
+import java.util.Map;
 
 import java.util.List;
 
@@ -37,7 +44,41 @@ public class ConsumoController {
     }
 
     @GetMapping("/historico")
-    public ResponseEntity<List<Consumo>> getHistorico() {
-        return ResponseEntity.ok(service.listarPorUsuario(null));
+    public ResponseEntity<?> getHistorico(
+            @RequestParam(defaultValue = "todos")
+            String periodo,
+            HttpSession session) {
+
+        Usuario usuario =
+                (Usuario) session.getAttribute(
+                        "usuarioLogado"
+                );
+
+        if (usuario == null) {
+            return ResponseEntity.status(401)
+                    .body(Map.of(
+                            "erro",
+                            "Usuário não autenticado."
+                    ));
+        }
+
+        try {
+
+            List<Consumo> historico =
+                    service.listarHistorico(
+                            usuario.getId(),
+                            periodo
+                    );
+
+            return ResponseEntity.ok(historico);
+
+        } catch (IllegalArgumentException e) {
+
+            return ResponseEntity.badRequest()
+                    .body(Map.of(
+                            "erro",
+                            e.getMessage()
+                    ));
+        }
     }
 }

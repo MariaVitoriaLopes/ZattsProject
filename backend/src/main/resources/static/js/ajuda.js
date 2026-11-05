@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
     busca.addEventListener('input', filtrar);
     mensagem.addEventListener('input', atualizarContador);
 
-    form.addEventListener('submit', function (evento) {
+    form.addEventListener('submit', async function (evento) {
         evento.preventDefault();
 
         if (!form.checkValidity()) {
@@ -67,12 +67,57 @@ document.addEventListener('DOMContentLoaded', function () {
 
         botao.disabled = true;
 
-        setTimeout(function () {
+        try {
+
+            const dados = new FormData(form);
+
+            const resposta = await fetch(form.action, {
+                method: 'POST',
+                body: dados
+            });
+
+            const retornoBackend = await resposta.json();
+
+            if (resposta.ok) {
+
+                form.reset();
+                atualizarContador();
+
+                mostrarRetorno(
+                    retornoBackend.mensagem ||
+                    'Mensagem enviada. Responderemos pelo seu e-mail.',
+                    false
+                );
+
+                return;
+            }
+
+            if (resposta.status === 401) {
+                window.location.href = '/login';
+                return;
+            }
+
+            mostrarRetorno(
+                retornoBackend.erro ||
+                'Não foi possível enviar sua mensagem.',
+                true
+            );
+
+        } catch (erro) {
+
+            console.error(
+                'Erro ao enviar solicitação de suporte:',
+                erro
+            );
+
+            mostrarRetorno(
+                'Não foi possível conectar ao servidor. Tente novamente.',
+                true
+            );
+
+        } finally {
             botao.disabled = false;
-            form.reset();
-            atualizarContador();
-            mostrarRetorno('Mensagem enviada. Responderemos pelo seu e-mail.', false);
-        }, 800);
+        }
     });
 
     atualizarContador();

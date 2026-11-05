@@ -9,6 +9,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const titulo = document.getElementById("tituloModal");
     const nome = document.getElementById("nomeAlerta");
     const tipo = document.getElementById("tipoAlerta");
+
+    const categoria = document.getElementById("categoriaAlerta");
+    const lembrete = document.getElementById("lembreteAlerta");
+    const repetir = document.getElementById("repetirAlerta");
+
+    const canalPush = form.querySelector('input[type="checkbox"][name="canalPush"]');
+    const canalEmail = form.querySelector('input[type="checkbox"][name="canalEmail"]');
+    const canalApp = form.querySelector('input[type="checkbox"][name="canalApp"]');
+
+    const canalPushFalso = document.getElementById("canalPushFalso");
+    const canalEmailFalso = document.getElementById("canalEmailFalso");
+    const canalAppFalso = document.getElementById("canalAppFalso");
+
+    const icones = form.querySelectorAll('input[name="icone"]');
+
     const valor = document.getElementById("valorLimite");
     const percentual = document.getElementById("percentualLimite");
     const ativo = document.getElementById("ativoAlerta");
@@ -80,6 +95,28 @@ document.addEventListener("DOMContentLoaded", function () {
             valor.value = dados.valor || "";
             percentual.value = dados.percentual || "";
             ativo.checked = dados.ativo === "true";
+            categoria.value = dados.categoria || "ALERTA";
+
+            lembrete.value = dados.lembrete || "NA_HORA";
+
+            repetir.value = dados.repetir || "1_HORA";
+
+            canalPush.checked =
+                dados.canalPush !== "false";
+
+            canalEmail.checked =
+                dados.canalEmail !== "false";
+
+            canalApp.checked =
+                dados.canalApp !== "false";
+
+            const iconeSelecionado =
+                dados.icone || "bolt";
+
+            icones.forEach(function (icone) {
+                icone.checked =
+                    icone.value === iconeSelecionado;
+            });
 
 
             atualizarTipo();
@@ -112,6 +149,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     form.addEventListener("submit", function () {
         ativoFalso.disabled = ativo.checked;
+
+        canalPushFalso.disabled = canalPush.checked;
+        canalEmailFalso.disabled = canalEmail.checked;
+        canalAppFalso.disabled = canalApp.checked;
     });
 
     // EXCLUIR ALERTA
@@ -129,18 +170,63 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // ATIVAR / DESATIVAR ALERTA
-    // O endpoint para o interruptor ainda precisa ser conectado.
 
     document.querySelectorAll(".toggle-alerta").forEach(checkbox => {
 
-        checkbox.addEventListener("change", function () {
+        checkbox.addEventListener("change", async function () {
 
-            checkbox.checked = !checkbox.checked;
+            const id = checkbox.dataset.id;
+            const novoEstado = checkbox.checked;
+            const estadoAnterior = !novoEstado;
 
-            alert(
-                "Para ativar ou desativar diretamente, é necessário " +
-                "conectar o endpoint no backend. Por enquanto, use Editar alerta."
-            );
+            checkbox.disabled = true;
+
+            try {
+
+                const dados = new URLSearchParams();
+                dados.set("ativo", String(novoEstado));
+
+                const csrf =
+                    form.querySelector('input[type="hidden"][name="_csrf"]');
+
+                if (csrf) {
+                    dados.set(csrf.name, csrf.value);
+                }
+
+                const resposta = await fetch(
+                    "/notificacoes/alertas/"
+                    + encodeURIComponent(id)
+                    + "/ativo",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded;charset=UTF-8"
+                        },
+                        body: dados.toString()
+                    }
+                );
+
+                if (resposta.status === 401) {
+                    window.location.href = "/login";
+                    return;
+                }
+
+                if (!resposta.ok) {
+                    throw new Error("Não foi possível alterar o alerta.");
+                }
+
+            } catch (erro) {
+
+                checkbox.checked = estadoAnterior;
+
+                alert(
+                    "Não foi possível alterar o alerta. Tente novamente."
+                );
+
+            } finally {
+                checkbox.disabled = false;
+            }
 
         });
 

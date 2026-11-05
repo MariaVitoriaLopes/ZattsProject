@@ -136,8 +136,15 @@
                         th:attr="data-id=${alerta.id},
                                  data-nome=${alerta.nome},
                                  data-tipo=${alerta.tipo},
+                                 data-icone=${alerta.icone},
+                                 data-categoria=${alerta.categoria},
                                  data-valor=${alerta.valorLimite},
                                  data-percentual=${alerta.percentualLimite},
+                                 data-canal-push=${alerta.canalPush},
+                                 data-canal-email=${alerta.canalEmail},
+                                 data-canal-app=${alerta.canalApp},
+                                 data-lembrete=${alerta.lembrete},
+                                 data-repetir=${alerta.repetir},
                                  data-ativo=${alerta.ativo}">
 
                     <span class="material-symbols-outlined">edit</span>
@@ -315,16 +322,42 @@
                         <span class="campo-rotulo">Notificações</span>
 
                         <div class="grupo-canais">
+                            <input type="hidden"
+                                   name="canalPush"
+                                   value="false"
+                                   id="canalPushFalso">
+
                             <label class="opcao-check">
-                                <input type="checkbox" name="canalPush" value="true" checked>
+                                <input type="checkbox"
+                                       name="canalPush"
+                                       value="true"
+                                       checked>
                                 <span>Push</span>
                             </label>
+
+                            <input type="hidden"
+                                   name="canalEmail"
+                                   value="false"
+                                   id="canalEmailFalso">
+
                             <label class="opcao-check">
-                                <input type="checkbox" name="canalEmail" value="true" checked>
+                                <input type="checkbox"
+                                       name="canalEmail"
+                                       value="true"
+                                       checked>
                                 <span>E-mail</span>
                             </label>
+
+                            <input type="hidden"
+                                   name="canalApp"
+                                   value="false"
+                                   id="canalAppFalso">
+
                             <label class="opcao-check">
-                                <input type="checkbox" name="canalApp" value="true" checked>
+                                <input type="checkbox"
+                                       name="canalApp"
+                                       value="true"
+                                       checked>
                                 <span>Apenas no aplicativo</span>
                             </label>
                         </div>

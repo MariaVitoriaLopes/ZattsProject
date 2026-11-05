@@ -53,7 +53,10 @@
             <section class="cfg-notif-secao" id="gerais">
                 <label class="cfg-notif-todas">
                     <span>Desativar todas</span>
-                    <input type="checkbox" class="interruptor" checked>
+                    <input type="checkbox"
+                           class="interruptor"
+                           data-chave="secao-gerais-desativada"
+                           checked>
                 </label>
 
                 <div class="cfg-notif-grupo">
@@ -65,20 +68,36 @@
 
                     <div class="cfg-notif-linha">
                         <span>Atualização de sistema</span>
-                        <input type="checkbox" aria-label="Push: Atualização de sistema" checked>
-                        <input type="checkbox" aria-label="E-mail: Atualização de sistema" checked>
+                        <input type="checkbox"
+                               data-chave="gerais-atualizacaoSistema-push"
+                               aria-label="Push: Atualização de sistema"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="gerais-atualizacaoSistema-email"
+                               aria-label="E-mail: Atualização de sistema"
+                               checked>
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Atualização dos termos</span>
-                        <input type="checkbox" aria-label="Push: Atualização dos termos">
-                        <input type="checkbox" aria-label="E-mail: Atualização dos termos" checked>
+                        <input type="checkbox"
+                               data-chave="gerais-atualizacaoTermos-push"
+                               aria-label="Push: Atualização dos termos">
+                        <input type="checkbox"
+                               data-chave="gerais-atualizacaoTermos-email"
+                               aria-label="E-mail: Atualização dos termos"
+                               checked>
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Contato com o suporte</span>
-                        <input type="checkbox" aria-label="Push: Contato com o suporte">
-                        <input type="checkbox" aria-label="E-mail: Contato com o suporte" checked>
+                        <input type="checkbox"
+                               data-chave="gerais-contatoSuporte-push"
+                               aria-label="Push: Contato com o suporte">
+                        <input type="checkbox"
+                               data-chave="gerais-contatoSuporte-email"
+                               aria-label="E-mail: Contato com o suporte"
+                               checked>
                     </div>
                 </div>
             </section>
@@ -86,7 +105,10 @@
             <section class="cfg-notif-secao" id="conta">
                 <label class="cfg-notif-todas">
                     <span>Desativar todas</span>
-                    <input type="checkbox" class="interruptor" checked>
+                    <input type="checkbox"
+                           class="interruptor"
+                           data-chave="secao-conta-desativada"
+                           checked>
                 </label>
 
                 <div class="cfg-notif-grupo">
@@ -98,32 +120,59 @@
 
                     <div class="cfg-notif-linha">
                         <span>Atualização das informações pessoais</span>
-                        <input type="checkbox" aria-label="Push: Atualização das informações pessoais">
-                        <input type="checkbox" aria-label="E-mail: Atualização das informações pessoais" checked>
+                        <input type="checkbox"
+                               data-chave="conta-informacoesPessoais-push"
+                               aria-label="Push: Atualização das informações pessoais">
+                        <input type="checkbox"
+                               data-chave="conta-informacoesPessoais-email"
+                               aria-label="E-mail: Atualização das informações pessoais"
+                               checked>
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Endereço atualizado</span>
-                        <input type="checkbox" aria-label="Push: Endereço atualizado">
-                        <input type="checkbox" aria-label="E-mail: Endereço atualizado" checked>
+                        <input type="checkbox"
+                               data-chave="conta-enderecoAtualizado-push"
+                               aria-label="Push: Endereço atualizado">
+                        <input type="checkbox"
+                               data-chave="conta-enderecoAtualizado-email"
+                               aria-label="E-mail: Endereço atualizado"
+                               checked>
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Senha atualizada</span>
-                        <input type="checkbox" aria-label="Push: Senha atualizada" checked>
-                        <input type="checkbox" aria-label="E-mail: Senha atualizada" checked>
+                        <input type="checkbox"
+                               data-chave="conta-senhaAtualizada-push"
+                               aria-label="Push: Senha atualizada"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="conta-senhaAtualizada-email"
+                               aria-label="E-mail: Senha atualizada"
+                               checked>
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Conta deletada</span>
-                        <input type="checkbox" aria-label="Push: Conta deletada">
-                        <input type="checkbox" aria-label="E-mail: Conta deletada" checked>
+                        <input type="checkbox"
+                               data-chave="conta-contaDeletada-push"
+                               aria-label="Push: Conta deletada">
+                        <input type="checkbox"
+                               data-chave="conta-contaDeletada-email"
+                               aria-label="E-mail: Conta deletada"
+                               checked>
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Dispositivo conectado à sua conta</span>
-                        <input type="checkbox" aria-label="Push: Dispositivo conectado à sua conta" checked>
-                        <input type="checkbox" aria-label="E-mail: Dispositivo conectado à sua conta" checked>
+                        <input type="checkbox"
+                               data-chave="conta-dispositivoConectado-push"
+                               aria-label="Push: Dispositivo conectado à sua conta"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="conta-dispositivoConectado-email"
+                               aria-label="E-mail: Dispositivo conectado à sua conta"
+                               checked>
                     </div>
                 </div>
             </section>
@@ -131,7 +180,10 @@
             <section class="cfg-notif-secao" id="consumo">
                 <label class="cfg-notif-todas">
                     <span>Desativar todas</span>
-                    <input type="checkbox" class="interruptor" checked>
+                    <input type="checkbox"
+                           class="interruptor"
+                           data-chave="secao-consumo-desativada"
+                           checked>
                 </label>
 
                 <div class="cfg-notif-grupo">
@@ -143,32 +195,57 @@
 
                     <div class="cfg-notif-linha">
                         <span>Pico alto de energia detectado</span>
-                        <input type="checkbox" aria-label="Push: Pico alto de energia detectado" checked>
-                        <input type="checkbox" aria-label="E-mail: Pico alto de energia detectado">
+                        <input type="checkbox"
+                               data-chave="consumo-picoAlto-push"
+                               aria-label="Push: Pico alto de energia detectado"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="consumo-picoAlto-email"
+                               aria-label="E-mail: Pico alto de energia detectado">
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Pico de queda de energia detectado</span>
-                        <input type="checkbox" aria-label="Push: Pico de queda de energia detectado" checked>
-                        <input type="checkbox" aria-label="E-mail: Pico de queda de energia detectado">
+                        <input type="checkbox"
+                               data-chave="consumo-quedaEnergia-push"
+                               aria-label="Push: Pico de queda de energia detectado"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="consumo-quedaEnergia-email"
+                               aria-label="E-mail: Pico de queda de energia detectado">
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Consumo contínuo elevado</span>
-                        <input type="checkbox" aria-label="Push: Consumo contínuo elevado" checked>
-                        <input type="checkbox" aria-label="E-mail: Consumo contínuo elevado">
+                        <input type="checkbox"
+                               data-chave="consumo-continuoElevado-push"
+                               aria-label="Push: Consumo contínuo elevado"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="consumo-continuoElevado-email"
+                               aria-label="E-mail: Consumo contínuo elevado">
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Consumo noturno anormal</span>
-                        <input type="checkbox" aria-label="Push: Consumo noturno anormal" checked>
-                        <input type="checkbox" aria-label="E-mail: Consumo noturno anormal">
+                        <input type="checkbox"
+                               data-chave="consumo-noturnoAnormal-push"
+                               aria-label="Push: Consumo noturno anormal"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="consumo-noturnoAnormal-email"
+                               aria-label="E-mail: Consumo noturno anormal">
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Quadro de energia desconectado</span>
-                        <input type="checkbox" aria-label="Push: Quadro de energia desconectado" checked>
-                        <input type="checkbox" aria-label="E-mail: Quadro de energia desconectado">
+                        <input type="checkbox"
+                               data-chave="consumo-quadroDesconectado-push"
+                               aria-label="Push: Quadro de energia desconectado"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="consumo-quadroDesconectado-email"
+                               aria-label="E-mail: Quadro de energia desconectado">
                     </div>
                 </div>
             </section>
@@ -176,7 +253,10 @@
             <section class="cfg-notif-secao" id="meta">
                 <label class="cfg-notif-todas">
                     <span>Desativar todas</span>
-                    <input type="checkbox" class="interruptor" checked>
+                    <input type="checkbox"
+                           class="interruptor"
+                           data-chave="secao-meta-desativada"
+                           checked>
                 </label>
 
                 <div class="cfg-notif-grupo">
@@ -188,32 +268,59 @@
 
                     <div class="cfg-notif-linha">
                         <span>Meta mensal criada ou editada</span>
-                        <input type="checkbox" aria-label="Push: Meta mensal criada ou editada" checked>
-                        <input type="checkbox" aria-label="E-mail: Meta mensal criada ou editada">
+                        <input type="checkbox"
+                               data-chave="meta-criadaEditada-push"
+                               aria-label="Push: Meta mensal criada ou editada"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="meta-criadaEditada-email"
+                               aria-label="E-mail: Meta mensal criada ou editada">
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Consumo chegou a 80% da meta</span>
-                        <input type="checkbox" aria-label="Push: Consumo chegou a 80% da meta" checked>
-                        <input type="checkbox" aria-label="E-mail: Consumo chegou a 80% da meta" checked>
+                        <input type="checkbox"
+                               data-chave="meta-oitentaPorCento-push"
+                               aria-label="Push: Consumo chegou a 80% da meta"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="meta-oitentaPorCento-email"
+                               aria-label="E-mail: Consumo chegou a 80% da meta"
+                               checked>
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Meta mensal ultrapassada</span>
-                        <input type="checkbox" aria-label="Push: Meta mensal ultrapassada" checked>
-                        <input type="checkbox" aria-label="E-mail: Meta mensal ultrapassada" checked>
+                        <input type="checkbox"
+                               data-chave="meta-ultrapassada-push"
+                               aria-label="Push: Meta mensal ultrapassada"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="meta-ultrapassada-email"
+                               aria-label="E-mail: Meta mensal ultrapassada"
+                               checked>
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Meta mensal atingida com sucesso</span>
-                        <input type="checkbox" aria-label="Push: Meta mensal atingida com sucesso" checked>
-                        <input type="checkbox" aria-label="E-mail: Meta mensal atingida com sucesso">
+                        <input type="checkbox"
+                               data-chave="meta-atingida-push"
+                               aria-label="Push: Meta mensal atingida com sucesso"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="meta-atingida-email"
+                               aria-label="E-mail: Meta mensal atingida com sucesso">
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Resumo semanal da meta</span>
-                        <input type="checkbox" aria-label="Push: Resumo semanal da meta">
-                        <input type="checkbox" aria-label="E-mail: Resumo semanal da meta" checked>
+                        <input type="checkbox"
+                               data-chave="meta-resumoSemanal-push"
+                               aria-label="Push: Resumo semanal da meta">
+                        <input type="checkbox"
+                               data-chave="meta-resumoSemanal-email"
+                               aria-label="E-mail: Resumo semanal da meta"
+                               checked>
                     </div>
                 </div>
             </section>
@@ -221,7 +328,10 @@
             <section class="cfg-notif-secao" id="alerta">
                 <label class="cfg-notif-todas">
                     <span>Desativar todas</span>
-                    <input type="checkbox" class="interruptor" checked>
+                    <input type="checkbox"
+                           class="interruptor"
+                           data-chave="secao-alerta-desativada"
+                           checked>
                 </label>
 
                 <div class="cfg-notif-grupo">
@@ -233,26 +343,47 @@
 
                     <div class="cfg-notif-linha">
                         <span>Alerta personalizado criado ou editado</span>
-                        <input type="checkbox" aria-label="Push: Alerta personalizado criado ou editado" checked>
-                        <input type="checkbox" aria-label="E-mail: Alerta personalizado criado ou editado">
+                        <input type="checkbox"
+                               data-chave="alerta-criadoEditado-push"
+                               aria-label="Push: Alerta personalizado criado ou editado"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="alerta-criadoEditado-email"
+                               aria-label="E-mail: Alerta personalizado criado ou editado">
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Alerta personalizado disparado</span>
-                        <input type="checkbox" aria-label="Push: Alerta personalizado disparado" checked>
-                        <input type="checkbox" aria-label="E-mail: Alerta personalizado disparado" checked>
+                        <input type="checkbox"
+                               data-chave="alerta-disparado-push"
+                               aria-label="Push: Alerta personalizado disparado"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="alerta-disparado-email"
+                               aria-label="E-mail: Alerta personalizado disparado"
+                               checked>
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Limite de consumo do alerta ultrapassado</span>
-                        <input type="checkbox" aria-label="Push: Limite de consumo do alerta ultrapassado" checked>
-                        <input type="checkbox" aria-label="E-mail: Limite de consumo do alerta ultrapassado" checked>
+                        <input type="checkbox"
+                               data-chave="alerta-limiteUltrapassado-push"
+                               aria-label="Push: Limite de consumo do alerta ultrapassado"
+                               checked>
+                        <input type="checkbox"
+                               data-chave="alerta-limiteUltrapassado-email"
+                               aria-label="E-mail: Limite de consumo do alerta ultrapassado"
+                               checked>
                     </div>
 
                     <div class="cfg-notif-linha">
                         <span>Alerta personalizado excluído</span>
-                        <input type="checkbox" aria-label="Push: Alerta personalizado excluído">
-                        <input type="checkbox" aria-label="E-mail: Alerta personalizado excluído">
+                        <input type="checkbox"
+                               data-chave="alerta-excluido-push"
+                               aria-label="Push: Alerta personalizado excluído">
+                        <input type="checkbox"
+                               data-chave="alerta-excluido-email"
+                               aria-label="E-mail: Alerta personalizado excluído">
                     </div>
                 </div>
             </section>
