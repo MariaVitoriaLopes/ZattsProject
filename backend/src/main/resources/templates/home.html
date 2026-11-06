@@ -96,22 +96,27 @@
                 textoStatusMeta.innerText = dash.mensagemStatusMeta;
             }
 
-            // Barra de Progresso e Meta de Consumo Mensal
+            // Componentes do Quadro "Meta de Consumo Mensal"
             const progressoMeta = document.getElementById("progressoMeta");
-            const consumoAtualTexto = document.getElementById("consumoAtualTexto");
+            const consumoAtualTexto = document.getElementById("consumoAtualTexto"); // Rótulo na esquerda da barra
+            const consumoMensal = document.getElementById("consumoMensal");         // Texto na legenda da bolinha
             const limiteMeta = document.getElementById("limiteMeta");
-            const consumoMensal = document.getElementById("consumoMensal");
             const valorMeta = document.getElementById("valorMeta");
 
+            // Consumo ACUMULADO DO MÊS (ex: 3.1 kWh)
+            const acumuladoMes = dash.metaConsumoMensalAtualKwh !== undefined ? dash.metaConsumoMensalAtualKwh : (dash.consumoTotalDiarioKwh || 0);
+            const limite = dash.metaGastoKwh || dash.metaConsumoMensalLimiteKwh || 250;
+
             if (progressoMeta) {
-                const perc = dash.percentualMetaAtingida > 100 ? 100 : (dash.percentualMetaAtingida || 0);
-                progressoMeta.style.width = perc + "%";
+                const perc = limite > 0 ? (acumuladoMes / limite) * 100 : 0;
+                progressoMeta.style.width = (perc > 100 ? 100 : perc) + "%";
             }
 
-            if (consumoAtualTexto) consumoAtualTexto.innerText = (dash.consumoTotalDiarioKwh || 0) + " kWh";
-            if (limiteMeta) limiteMeta.innerText = "Meta: " + (dash.metaGastoKwh || dash.metaConsumoMensalLimiteKwh || 0) + " kWh";
-            if (consumoMensal) consumoMensal.innerText = (dash.metaConsumoMensalAtualKwh || dash.consumoTotalDiarioKwh || 0) + " kWh";
-            if (valorMeta) valorMeta.innerText = (dash.metaGastoKwh || dash.metaConsumoMensalLimiteKwh || 0) + " kWh";
+            // Exibe estritamente o ACUMULADO DO MÊS nos dois textos da barra de meta
+            if (consumoAtualTexto) consumoAtualTexto.innerText = acumuladoMes + " kWh";
+            if (consumoMensal) consumoMensal.innerText = acumuladoMes + " kWh";
+            if (limiteMeta) limiteMeta.innerText = "Meta: " + limite + " kWh";
+            if (valorMeta) valorMeta.innerText = limite + " kWh";
 
             // Cards de Resumo Superiores (cards.html)
             const elConsumo = document.getElementById("cardConsumoTotalDiario");
@@ -178,7 +183,7 @@
             });
         }
 
-        // 3. GRÁFICO 2 (MEIO): CONSUMO DIÁRIO (HORA A HORA - BARRAS FILTRADAS COMO NO FIGMA)
+        // 3. GRÁFICO 2 (MEIO): CONSUMO DIÁRIO - EIXO Y EXATO DO FIGMA (0 A 50 DE 10 EM 10)
         function initChartComparativo(dash) {
             const canvas = document.getElementById("chartResumoComparativo");
             if (!canvas) return;
@@ -188,7 +193,7 @@
 
             const listaHoras = (dash && dash.consumoDiarioHoras) ? dash.consumoDiarioHoras : [];
 
-            // Filtra barras vazias para manter barras de tamanho normal
+            // Filtra barras vazias mantendo apenas horas ativas
             const horasFiltradas = listaHoras.filter(p => (p.consumoKwh && p.consumoKwh > 0) || (p.valor && p.valor > 0));
             const dadosExibicao = horasFiltradas.length > 0 ? horasFiltradas : listaHoras;
 
@@ -218,14 +223,22 @@
                         }
                     },
                     scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' } },
+                        y: {
+                            min: 0,
+                            max: 50,
+                            grid: { color: 'rgba(255,255,255,0.08)' },
+                            ticks: {
+                                stepSize: 10,
+                                precision: 0
+                            }
+                        },
                         x: { grid: { display: false } }
                     }
                 }
             });
         }
 
-        // 4. GRÁFICO 3 (DIREITA): ESTIMATIVA DA CONTA DE LUZ (HISTÓRICO MENSAL - BARRAS)
+        // 4. GRÁFICO 3 (DIREITA): ESTIMATIVA DA CONTA - EIXO Y EXATO DO FIGMA (0 A 300 DE 50 EM 50)
         function initChartValorConta(dash) {
             const canvas = document.getElementById("chartValorConta");
             if (!canvas) return;
@@ -253,9 +266,13 @@
                     plugins: { legend: { display: false } },
                     scales: {
                         y: {
-                            beginAtZero: true,
+                            min: 0,
+                            max: 300,
                             grid: { color: 'rgba(255,255,255,0.08)' },
-                            ticks: { callback: v => 'R$ ' + v }
+                            ticks: {
+                                stepSize: 50,
+                                callback: v => v === 0 ? '0' : 'R$ ' + v
+                            }
                         },
                         x: { grid: { display: false } }
                     }

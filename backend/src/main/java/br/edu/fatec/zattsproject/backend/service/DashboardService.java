@@ -42,15 +42,29 @@ public class DashboardService {
         BandeiraTarifaria bandeira = config.getBandeiraAtual() != null ?
                 config.getBandeiraAtual() : BandeiraTarifaria.VERDE;
 
-        // 2. Consumo do dia atual
+        // 2. CONSUMO ACUMULADO DO MÊS ATUAL (Do dia 1º até o segundo atual)
+        LocalDateTime inicioMesAtual = YearMonth.now().atDay(1).atStartOfDay();
+        List<Consumo> consumosMesAtual = consumoRepository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioMesAtual, agora);
+
+        double consumoAcumuladoMesKwh = consumosMesAtual.stream()
+                .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
+                .sum();
+
+        // CONSUMO DO DIA ATUAL (Das 00:00 de hoje até agora)
         List<Consumo> consumosHoje = consumoRepository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioHoje, fimHoje);
         double consumoTotalHojeKwh = consumosHoje.stream()
                 .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
                 .sum();
 
+        // Custo financeiro direto somente de hoje
         double custoDiarioDiretoReais = calculadoraTarifaService.calcularCustoDiretoAFerroEFogo(consumoTotalHojeKwh);
-        double consumoProjetadoMesKwh = consumoTotalHojeKwh > 0 ? (consumoTotalHojeKwh * 30) : 0.0;
-        double valorContaEstimadoMes = calculadoraTarifaService.calcularEstimativaOficialContaMensal(consumoProjetadoMesKwh, bandeira);
+
+        // CONTA DE LUZ ACUMULATIVA (ESTILO FATURA DE CARTÃO DE CRÉDITO)
+        // Calcula o valor acumulado em R$ com base no consumo total do mês até o exato momento
+        double valorContaAcumuladoMesReais = calculadoraTarifaService.calcularEstimativaOficialContaMensal(
+                consumoAcumuladoMesKwh,
+                bandeira
+        );
 
         // 3. GRÁFICO 1: Consumo Minuto a Minuto (Últimos 15 minutos em tempo real)
         List<DashboardDTO.PontoGraficoMinuto> pontosMinuto = new ArrayList<>();
@@ -68,18 +82,19 @@ public class DashboardService {
             pontosMinuto.add(new DashboardDTO.PontoGraficoMinuto(minInicio.format(fmtMinuto), Math.round(kwhMinuto * 1000.0) / 1000.0));
         }
 
-        // 4. GRÁFICO 2: Consumo Diário Hora a Hora (Do início do dia até a hora atual)
+        // 4. GRÁFICO 2: Consumo Hora a Hora (Janela móvel das últimas 12 horas corridas)
         List<DashboardDTO.PontoGraficoHora> pontosHora = new ArrayList<>();
-        for (int hora = 0; hora <= agora.getHour(); hora++) {
-            LocalDateTime inicioHora = LocalDate.now().atTime(hora, 0, 0);
-            LocalDateTime fimHora = LocalDate.now().atTime(hora, 59, 59);
+        for (int i = 11; i >= 0; i--) {
+            LocalDateTime horaAlvo = agora.minusHours(i);
+            LocalDateTime inicioHora = horaAlvo.withMinute(0).withSecond(0);
+            LocalDateTime fimHora = horaAlvo.withMinute(59).withSecond(59);
 
             List<Consumo> consumosDaHora = consumoRepository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioHora, fimHora);
             double consumoHoraKwh = consumosDaHora.stream()
                     .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
                     .sum();
 
-            pontosHora.add(new DashboardDTO.PontoGraficoHora(hora + "h", Math.round(consumoHoraKwh * 100.0) / 100.0));
+            pontosHora.add(new DashboardDTO.PontoGraficoHora(inicioHora.getHour() + "h", Math.round(consumoHoraKwh * 100.0) / 100.0));
         }
 
         // 5. GRÁFICO 3: Histórico dos Últimos 6 Meses em R$
@@ -103,9 +118,9 @@ public class DashboardService {
                     .sum();
 
             double valorContaMes;
-            if (i == 0 && consumoKwhMes == 0.0) {
-                consumoKwhMes = consumoProjetadoMesKwh;
-                valorContaMes = valorContaEstimadoMes;
+            if (i == 0) {
+                // Mês corrente exibe a fatura parcial acumulada em tempo real
+                valorContaMes = valorContaAcumuladoMesReais;
             } else {
                 valorContaMes = calculadoraTarifaService.calcularEstimativaOficialContaMensal(consumoKwhMes, bandeira);
             }
@@ -115,7 +130,9 @@ public class DashboardService {
         }
 
         double metaLimiteKwh = config.getMetaConsumoKwh() != null ? config.getMetaConsumoKwh() : 250.0;
-        double percentualMeta = metaLimiteKwh > 0 ? (consumoTotalHojeKwh / metaLimiteKwh) * 100 : 0.0;
+
+        // Percentual calculado sobre o consumo acumulado do mês
+        double percentualMeta = metaLimiteKwh > 0 ? (consumoAcumuladoMesKwh / metaLimiteKwh) * 100 : 0.0;
 
         return DashboardDTO.builder()
                 .consumoTotalDiarioKwh(Math.round(consumoTotalHojeKwh * 10.0) / 10.0)
@@ -124,15 +141,20 @@ public class DashboardService {
                 .statusCustoDiario("Custo direto proporcional em R$")
                 .metaGastoKwh(metaLimiteKwh)
                 .percentualMetaAtingida(Math.round(percentualMeta * 10.0) / 10.0)
-                .valorContaEstimadoMesReais(Math.round(valorContaEstimadoMes * 100.0) / 100.0)
+
+                // FATURA ACUMULATIVA EM TEMPO REAL: atualiza os centavos a cada publicação MQTT
+                .valorContaEstimadoMesReais(Math.round(valorContaAcumuladoMesReais * 100.0) / 100.0)
                 .statusEstimativaConta("Estimativa oficial CPFL (com impostos e CIP)")
-                .estaDentroDaMeta(consumoTotalHojeKwh <= metaLimiteKwh)
-                .mensagemStatusMeta(consumoTotalHojeKwh <= metaLimiteKwh ? "Você está dentro da sua meta estipulada!" : "Atenção: Meta estipulada ultrapassada!")
-                .consumoTempoReal(pontosMinuto)          // Gráfico 1: Minutos
-                .consumoDiarioHoras(pontosHora)           // Gráfico 2: Horas
+
+                .estaDentroDaMeta(consumoAcumuladoMesKwh <= metaLimiteKwh)
+                .mensagemStatusMeta(consumoAcumuladoMesKwh <= metaLimiteKwh ? "Você está dentro da sua meta estipulada!" : "Atenção: Meta estipulada ultrapassada!")
+                .consumoTempoReal(pontosMinuto)
+                .consumoDiarioHoras(pontosHora)
                 .resumoComparativoKwh(resumoComparativoKwh)
-                .valorContaEstimadoReais(historicoContasReais) // Gráfico 3: Meses R$
-                .metaConsumoMensalAtualKwh(Math.round(consumoTotalHojeKwh * 10.0) / 10.0)
+                .valorContaEstimadoReais(historicoContasReais)
+
+                // CONSUMO MENSAL ACUMULATIVO: exibe o somatório total acumulado no mês
+                .metaConsumoMensalAtualKwh(Math.round(consumoAcumuladoMesKwh * 10.0) / 10.0)
                 .metaConsumoMensalLimiteKwh(metaLimiteKwh)
                 .build();
     }
