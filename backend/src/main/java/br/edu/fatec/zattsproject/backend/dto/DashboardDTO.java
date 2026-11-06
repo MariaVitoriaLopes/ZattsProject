@@ -13,44 +13,39 @@ import java.util.List;
 @AllArgsConstructor
 public class DashboardDTO {
 
-    //  Consumo Total Diário
     private Double consumoTotalDiarioKwh;
     private Double variacaoDiariaPorcentagem;
-
-    //sem taxas/impostos
     private Double custoDiarioReais;
-    private String statusCustoDiario;            // Ex: "Custo direto de consumo"
-
-    // --- Card 3: Meta de Gasto (kWh) ---
+    private String statusCustoDiario;
     private Double metaGastoKwh;
     private Double percentualMetaAtingida;
+    private Double valorContaEstimadoMesReais;
+    private String statusEstimativaConta;
+    private Boolean estaDentroDaMeta;
+    private String mensagemStatusMeta;
 
-    // ) ---
-    private Double valorContaEstimadoMesReais;   // Ex: R$ 290.50 (Calculado com CPFL + ICMS + PIS/COFINS + Bandeira + CIP)
-    private String statusEstimativaConta;        // Ex: "Projeção mensal com impostos e CIP (PG)"
+    // Listas dos 3 Gráficos do Figma
+    private List<PontoGraficoMinuto> consumoTempoReal;    // Gráfico 1: Minuto a Minuto (Linha)
+    private List<PontoGraficoHora> consumoDiarioHoras;     // Gráfico 2: Hora a Hora (Barras)
+    private List<PontoGraficoMes> resumoComparativoKwh;   // Histórico Mensal em kWh
+    private List<PontoGraficoMes> valorContaEstimadoReais; // Gráfico 3: Histórico Mensal em R$ (Barras)
 
-    // --- Banner Status Topo ---
-    private Boolean estaDentroDaMeta;            // Ex: true ("Você está dentro da sua meta!")
-    private String mensagemStatusMeta;           // Ex: "Baseado na meta mensal definida"
+    private Double metaConsumoMensalAtualKwh;
+    private Double metaConsumoMensalLimiteKwh;
 
-    // --- Gráfico 1: Consumo de Energia em Tempo Real (kWh por hora) ---
-    private List<PontoGraficoHora> consumoTempoReal;
-
-    // --- Meta de Consumo Mensal (Barra de Progresso) ---
-    private Double metaConsumoMensalAtualKwh;    // Ex: 90 kWh
-    private Double metaConsumoMensalLimiteKwh;   // Ex: 250 kWh
-
-    // --- Gráfico 2: Resumo Comparativo (kWh dos últimos 6 meses) ---
-    private List<PontoGraficoMes> resumoComparativoKwh;
-
-    // --- Gráfico 3: Histórico e Estimativa de Contas (R$ dos últimos meses) ---
-    private List<PontoGraficoMes> valorContaEstimadoReais;
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PontoGraficoMinuto {
+        private String hora; // Ex: "15:00", "15:01"
+        private Double consumoKwh;
+    }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     public static class PontoGraficoHora {
-        private String hora;      // Ex: "5h", "6h", "15h"
+        private String hora; // Ex: "5h", "6h", "7h"
         private Double consumoKwh;
     }
 
@@ -58,7 +53,7 @@ public class DashboardDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class PontoGraficoMes {
-        private String mes;    // Ex: "Abril", "Maio", "Setembro"
-        private Double valor;  // Valor em kWh ou R$
+        private String mes; // Ex: "Jul", "Ago", "Set"
+        private Double valor;
     }
 }

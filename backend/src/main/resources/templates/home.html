@@ -26,9 +26,7 @@
 <main class="container-dashboard">
 
     <!-- CABEÇALHO -->
-
     <section class="titulo-dashboard">
-
         <div>
             <h1>Dashboard</h1>
             <p>
@@ -38,14 +36,11 @@
         </div>
 
         <div class="cardMeta status-sem-meta" id="cardStatusMeta">
-
-            <span class="material-symbols-outlined bandeiraMeta"
-                  id="iconeStatusMeta">
+            <span class="material-symbols-outlined bandeiraMeta" id="iconeStatusMeta">
                 flag
             </span>
 
             <div class="textoMeta">
-
                 <h2 id="textoStatusMeta">
                     Carregando a sua meta...
                 </h2>
@@ -53,37 +48,26 @@
                 <p id="descricaoStatusMeta">
                     Acompanhamento do consumo mensal
                 </p>
-
             </div>
-
         </div>
-
     </section>
 
     <!-- CARDS DE RESUMO EXISTENTES -->
-
     <div th:replace="~{fragments/cards :: cardsResumo}"></div>
 
     <!-- GRÁFICOS -->
-
     <section class="dashboard-grid">
 
-        <!-- CONSUMO EM TEMPO REAL -->
-
+        <!-- CONSUMO EM TEMPO REAL (MINUTO A MINUTO) -->
         <div th:replace="~{fragments/dashboards/consumo :: consumo}"></div>
 
         <!-- CONSUMO DIÁRIO E META -->
-
         <div class="coluna-central">
-
             <div th:replace="~{fragments/dashboards/comparativo :: comparativo}"></div>
-
             <div th:replace="~{fragments/dashboards/metaConsumo :: meta}"></div>
-
         </div>
 
-        <!-- VALOR DA CONTA -->
-
+        <!-- VALOR DA CONTA (ESTIMATIVA) -->
         <div th:replace="~{fragments/dashboards/valorConta :: valor}"></div>
 
     </section>
@@ -93,62 +77,235 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
 <script th:src="@{/js/script.js}"></script>
 
-<!-- INTEGRAÇÃO COM BACKEND ZATTS (REST + SSE) -->
+<!-- INTEGRAÇÃO COM BACKEND ZATTS (FIGMA COMPLIED + SSE) -->
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function () {
-        const dash = /*[[${dash}]]*/ null;
+        const initialDash = /*[[${dash}]]*/ null;
 
-        if (!dash) return;
+        let chartRealtime = null;
+        let chartComparativo = null;
+        let chartValorConta = null;
 
-        // 1. Gráfico Consumo Atual (Horas do Dia)
-        const canvasRealtime = document.getElementById("chartConsumoRealtime");
-        if (canvasRealtime && dash.consumoTempoReal) {
-            new Chart(canvasRealtime, {
-                type: 'bar',
-                data: {
-                    labels: dash.consumoTempoReal.map(p => p.hora),
-                    datasets: [{
-                        label: 'Consumo (kWh)',
-                        data: dash.consumoTempoReal.map(p => p.consumoKwh),
-                        backgroundColor: '#C2F012'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+        // 1. ATUALIZA TEXTOS, CARDS DA UI E COMPONENTES DE META
+        function atualizarInterface(dash) {
+            if (!dash) return;
+
+            // Status da Meta no Topo
+            const textoStatusMeta = document.getElementById("textoStatusMeta");
+            if (textoStatusMeta && dash.mensagemStatusMeta) {
+                textoStatusMeta.innerText = dash.mensagemStatusMeta;
+            }
+
+            // Barra de Progresso e Meta de Consumo Mensal
+            const progressoMeta = document.getElementById("progressoMeta");
+            const consumoAtualTexto = document.getElementById("consumoAtualTexto");
+            const limiteMeta = document.getElementById("limiteMeta");
+            const consumoMensal = document.getElementById("consumoMensal");
+            const valorMeta = document.getElementById("valorMeta");
+
+            if (progressoMeta) {
+                const perc = dash.percentualMetaAtingida > 100 ? 100 : (dash.percentualMetaAtingida || 0);
+                progressoMeta.style.width = perc + "%";
+            }
+
+            if (consumoAtualTexto) consumoAtualTexto.innerText = (dash.consumoTotalDiarioKwh || 0) + " kWh";
+            if (limiteMeta) limiteMeta.innerText = "Meta: " + (dash.metaGastoKwh || dash.metaConsumoMensalLimiteKwh || 0) + " kWh";
+            if (consumoMensal) consumoMensal.innerText = (dash.metaConsumoMensalAtualKwh || dash.consumoTotalDiarioKwh || 0) + " kWh";
+            if (valorMeta) valorMeta.innerText = (dash.metaGastoKwh || dash.metaConsumoMensalLimiteKwh || 0) + " kWh";
+
+            // Cards de Resumo Superiores (cards.html)
+            const elConsumo = document.getElementById("cardConsumoTotalDiario");
+            const elCusto = document.getElementById("cardCustoDiario");
+            const elMeta = document.getElementById("cardMetaGasto");
+            const elPercentual = document.getElementById("cardPercentualMeta");
+            const elConta = document.getElementById("cardValorContaEstimado");
+
+            if (elConsumo && dash.consumoTotalDiarioKwh !== undefined) {
+                elConsumo.innerText = dash.consumoTotalDiarioKwh.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+            }
+
+            if (elCusto && dash.custoDiarioReais !== undefined) {
+                elCusto.innerText = dash.custoDiarioReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            if (elMeta && dash.metaGastoKwh !== undefined) {
+                elMeta.innerText = Math.round(dash.metaGastoKwh);
+            }
+
+            if (elPercentual && dash.percentualMetaAtingida !== undefined) {
+                elPercentual.innerText = "↗ " + Math.round(dash.percentualMetaAtingida) + "% da meta atingida";
+            }
+
+            if (elConta && dash.valorContaEstimadoMesReais !== undefined) {
+                elConta.innerText = dash.valorContaEstimadoMesReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
         }
 
-        // 2. Gráfico Consumo Diário/Mensal
-        const canvasComparativo = document.getElementById("chartResumoComparativo");
-        if (canvasComparativo && dash.resumoComparativoKwh) {
-            new Chart(canvasComparativo, {
+        // 2. GRÁFICO 1 (ESQUERDA): CONSUMO ATUAL (MINUTO A MINUTO - LINHA)
+        function initChartRealtime(dash) {
+            const canvas = document.getElementById("chartConsumoRealtime");
+            if (!canvas) return;
+
+            const existing = Chart.getChart(canvas);
+            if (existing) existing.destroy();
+
+            const listaMinutos = (dash && dash.consumoTempoReal) ? dash.consumoTempoReal : [];
+
+            chartRealtime = new Chart(canvas, {
                 type: 'line',
                 data: {
-                    labels: dash.resumoComparativoKwh.map(p => p.mes),
+                    labels: listaMinutos.map(p => p.hora || p.horario || p.instante),
                     datasets: [{
                         label: 'Consumo (kWh)',
-                        data: dash.resumoComparativoKwh.map(p => p.valor),
-                        borderColor: '#00D26A',
-                        fill: false
+                        data: listaMinutos.map(p => p.consumoKwh),
+                        borderColor: '#C2F012',
+                        backgroundColor: 'rgba(194, 240, 18, 0.25)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#C2F012'
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
             });
         }
 
-        // 3. Gráfico Estimativa de Valor da Conta
-        const canvasValorConta = document.getElementById("chartValorConta");
-        if (canvasValorConta && dash.valorContaEstimadoReais) {
-            new Chart(canvasValorConta, {
+        // 3. GRÁFICO 2 (MEIO): CONSUMO DIÁRIO (HORA A HORA - BARRAS FILTRADAS COMO NO FIGMA)
+        function initChartComparativo(dash) {
+            const canvas = document.getElementById("chartResumoComparativo");
+            if (!canvas) return;
+
+            const existing = Chart.getChart(canvas);
+            if (existing) existing.destroy();
+
+            const listaHoras = (dash && dash.consumoDiarioHoras) ? dash.consumoDiarioHoras : [];
+
+            // Filtra barras vazias para manter barras de tamanho normal
+            const horasFiltradas = listaHoras.filter(p => (p.consumoKwh && p.consumoKwh > 0) || (p.valor && p.valor > 0));
+            const dadosExibicao = horasFiltradas.length > 0 ? horasFiltradas : listaHoras;
+
+            chartComparativo = new Chart(canvas, {
                 type: 'bar',
                 data: {
-                    labels: dash.valorContaEstimadoReais.map(p => p.mes),
+                    labels: dadosExibicao.length > 0
+                        ? dadosExibicao.map(p => p.hora || (p.horaInt !== undefined ? p.horaInt + 'h' : ''))
+                        : ['5h','6h','7h','8h','9h','10h','11h','12h','13h','14h','15h'],
                     datasets: [{
-                        label: 'Valor Estimado (R$)',
-                        data: dash.valorContaEstimadoReais.map(p => p.valor),
-                        backgroundColor: '#0052FF'
+                        label: 'Consumo (kWh)',
+                        data: dadosExibicao.map(p => p.consumoKwh || p.valor || 0),
+                        backgroundColor: '#C2F012',
+                        borderRadius: 4,
+                        maxBarThickness: 36
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { return context.raw + ' kWh'; }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // 4. GRÁFICO 3 (DIREITA): ESTIMATIVA DA CONTA DE LUZ (HISTÓRICO MENSAL - BARRAS)
+        function initChartValorConta(dash) {
+            const canvas = document.getElementById("chartValorConta");
+            if (!canvas) return;
+
+            const existing = Chart.getChart(canvas);
+            if (existing) existing.destroy();
+
+            const listaMeses = (dash && dash.valorContaEstimadoReais) ? dash.valorContaEstimadoReais : [];
+
+            chartValorConta = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: listaMeses.map(p => p.mes),
+                    datasets: [{
+                        label: 'Valor Estimado (R$)',
+                        data: listaMeses.map(p => p.valor),
+                        backgroundColor: '#C2F012',
+                        borderRadius: 4,
+                        maxBarThickness: 36
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.08)' },
+                            ticks: { callback: v => 'R$ ' + v }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Carga Inicial
+        if (initialDash) {
+            atualizarInterface(initialDash);
+            initChartRealtime(initialDash);
+            initChartComparativo(initialDash);
+            initChartValorConta(initialDash);
+        }
+
+        // 5. OUVINTE DE TEMPO REAL SSE VIA ESP32 / MQTT
+        if (window.EventSource) {
+            const eventSource = new EventSource('/api/v1/web/dashboard/sse');
+
+            eventSource.addEventListener('nova-leitura', function (event) {
+                fetch('/api/v1/web/dashboard/dados')
+                    .then(res => res.json())
+                    .then(dash => {
+                        atualizarInterface(dash);
+
+                        // Atualiza Gráfico 1 (Minuto a Minuto)
+                        if (chartRealtime && dash.consumoTempoReal) {
+                            chartRealtime.data.labels = dash.consumoTempoReal.map(p => p.hora || p.horario || p.instante);
+                            chartRealtime.data.datasets[0].data = dash.consumoTempoReal.map(p => p.consumoKwh);
+                            chartRealtime.update();
+                        }
+
+                        // Atualiza Gráfico 2 (Hora a Hora)
+                        if (chartComparativo && dash.consumoDiarioHoras) {
+                            const horasFiltradas = dash.consumoDiarioHoras.filter(p => (p.consumoKwh && p.consumoKwh > 0) || (p.valor && p.valor > 0));
+                            const dadosExibicao = horasFiltradas.length > 0 ? horasFiltradas : dash.consumoDiarioHoras;
+
+                            chartComparativo.data.labels = dadosExibicao.map(p => p.hora || (p.horaInt !== undefined ? p.horaInt + 'h' : ''));
+                            chartComparativo.data.datasets[0].data = dadosExibicao.map(p => p.consumoKwh || p.valor || 0);
+                            chartComparativo.update();
+                        }
+
+                        // Atualiza Gráfico 3 (Meses R$)
+                        if (chartValorConta && dash.valorContaEstimadoReais) {
+                            chartValorConta.data.labels = dash.valorContaEstimadoReais.map(p => p.mes);
+                            chartValorConta.data.datasets[0].data = dash.valorContaEstimadoReais.map(p => p.valor);
+                            chartValorConta.update();
+                        }
+                    })
+                    .catch(err => console.error("Erro ao atualizar métricas SSE:", err));
             });
         }
     });

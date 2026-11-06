@@ -1,4 +1,3 @@
-
 package br.edu.fatec.zattsproject.backend.controller.mobile;
 
 import br.edu.fatec.zattsproject.backend.model.Usuario;
@@ -40,7 +39,6 @@ public class AutenticacaoApiController {
     public ResponseEntity<?> cadastrar(
             @RequestBody CadastroRequest dados
     ) {
-
         AutenticacaoService.ResultadoCadastro resultado =
                 autenticacaoService.cadastrar(
                         dados.email(),
@@ -49,7 +47,6 @@ public class AutenticacaoApiController {
                 );
 
         return switch (resultado) {
-
             case CAMPOS_OBRIGATORIOS ->
                     ResponseEntity.badRequest().body(
                             Map.of("erro", "Todos os campos são obrigatórios.")
@@ -88,7 +85,6 @@ public class AutenticacaoApiController {
             @RequestBody LoginRequest dados,
             HttpServletRequest request
     ) {
-
         AutenticacaoService.ResultadoLogin resultado =
                 autenticacaoService.autenticar(
                         dados.email(),
@@ -96,30 +92,25 @@ public class AutenticacaoApiController {
                 );
 
         return switch (resultado) {
-
             case CAMPOS_OBRIGATORIOS ->
                     ResponseEntity.badRequest().body(
                             Map.of("erro", "E-mail e senha são obrigatórios.")
                     );
 
             case CREDENCIAIS_INVALIDAS ->
-                    ResponseEntity.status(401).body(
+                    ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                             Map.of("erro", "E-mail ou senha inválidos.")
                     );
 
             case SUCESSO -> {
-
                 Usuario usuario = autenticacaoService
                         .buscarUsuarioPorEmail(dados.email())
                         .orElseThrow();
 
-                // Cria ou recupera a sessão
                 HttpSession session = request.getSession(true);
 
-                // Proteção contra session fixation
                 request.changeSessionId();
 
-                // Utiliza a mesma chave da autenticação Web
                 session.setAttribute("usuarioLogado", usuario);
 
                 yield ResponseEntity.ok(
@@ -127,34 +118,29 @@ public class AutenticacaoApiController {
                                 "mensagem", "Login realizado com sucesso!",
                                 "usuarioId", usuario.getId(),
                                 "email", usuario.getEmail(),
-                                "questionarioRespondido",
-                                usuario.isQuestionarioRespondido()
+                                "questionarioRespondido", usuario.isQuestionarioRespondido()
                         )
                 );
             }
         };
     }
 
-
-    // VERIFICAR SESSÃO
     @GetMapping("/sessao")
     public ResponseEntity<?> verificarSessao(
             HttpServletRequest request
     ) {
-
         HttpSession session = request.getSession(false);
 
         if (session == null) {
-            return ResponseEntity.status(401).body(
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     Map.of("erro", "Sessão não encontrada ou expirada.")
             );
         }
 
-        Usuario usuario = (Usuario)
-                session.getAttribute("usuarioLogado");
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
 
         if (usuario == null) {
-            return ResponseEntity.status(401).body(
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     Map.of("erro", "Sessão não encontrada ou expirada.")
             );
         }
@@ -163,8 +149,7 @@ public class AutenticacaoApiController {
                 Map.of(
                         "usuarioId", usuario.getId(),
                         "email", usuario.getEmail(),
-                        "questionarioRespondido",
-                        usuario.isQuestionarioRespondido()
+                        "questionarioRespondido", usuario.isQuestionarioRespondido()
                 )
         );
     }
@@ -174,7 +159,6 @@ public class AutenticacaoApiController {
     public ResponseEntity<?> logout(
             HttpServletRequest request
     ) {
-
         HttpSession session = request.getSession(false);
 
         if (session != null) {
@@ -186,12 +170,10 @@ public class AutenticacaoApiController {
         );
     }
 
-    // EXCLUIR CONTA
     @DeleteMapping("/conta")
     public ResponseEntity<?> excluirConta(
             HttpServletRequest request
     ) {
-
         HttpSession session = request.getSession(false);
 
         if (session == null) {
@@ -199,18 +181,15 @@ public class AutenticacaoApiController {
                     .body(Map.of("erro", "Sessão expirada."));
         }
 
-        Usuario usuario = (Usuario)
-                session.getAttribute("usuarioLogado");
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
 
         if (usuario == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("erro", "Usuário não autenticado."));
         }
 
-        // Exclui o usuário
         usuarioRepository.deleteById(usuario.getId());
 
-        // Encerra a sessão
         session.invalidate();
 
         return ResponseEntity.ok(

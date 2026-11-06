@@ -14,7 +14,7 @@ public class SseService {
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 
     public SseEmitter addEmitter() {
-        SseEmitter emitter = new SseEmitter(0L); // 0L = Sem timeout
+        SseEmitter emitter = new SseEmitter(0L); // 0L = Sem timeout automático
         emitters.add(emitter);
 
         emitter.onCompletion(() -> emitters.remove(emitter));

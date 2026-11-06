@@ -1,8 +1,11 @@
 package br.edu.fatec.zattsproject.backend.config;
 
+import br.edu.fatec.zattsproject.backend.service.MqttLeituraService;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessageProducer;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
@@ -10,16 +13,17 @@ import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHandler;
 
 import java.util.UUID;
 
 @Configuration
+@EnableIntegration
 public class MqttConfig {
 
     private static final String MQTT_BROKER_URL = "ssl://z600fcff.ala.us-east-1.emqxsl.com:8883";
-    // Gera um ID único a cada inicialização para evitar o "Lost connection" por conflito de Client ID
     private static final String CLIENT_ID = "zatts-backend-sub-" + UUID.randomUUID().toString().substring(0, 8);
-    private static final String TOPIC = "sensores/corrente/#";
+    private static final String TOPIC = "zatts/dispositivos/leitura";
 
     private static final String MQTT_USER = "useresp32";
     private static final String MQTT_PASSWORD = "Esp1234@";
@@ -34,7 +38,7 @@ public class MqttConfig {
         options.setPassword(MQTT_PASSWORD.toCharArray());
         options.setCleanSession(true);
         options.setAutomaticReconnect(true);
-        options.setKeepAliveInterval(30); // Mantém o ping ativo com o EMQX
+        options.setKeepAliveInterval(30);
 
         factory.setConnectionOptions(options);
         return factory;
@@ -55,5 +59,15 @@ public class MqttConfig {
         adapter.setQos(1);
         adapter.setOutputChannel(mqttInputChannel());
         return adapter;
+    }
+
+    @Bean
+    @ServiceActivator(inputChannel = "mqttInputChannel")
+    public MessageHandler mqttHandler(MqttLeituraService mqttLeituraService) {
+        return message -> {
+            String payload = message.getPayload().toString();
+            System.out.println(">>> MQTT CHEGOU COM SUCESSO: " + payload);
+            mqttLeituraService.processarEMensurarLeitura(payload);
+        };
     }
 }

@@ -2,32 +2,38 @@ package br.edu.fatec.zattsproject.backend.controller.mobile;
 
 import br.edu.fatec.zattsproject.backend.service.RecuperacaoSenhaService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
+@Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/mobile/recuperacao")
 @RequiredArgsConstructor
 public class RecuperacaoSenhaApiController {
 
     private final RecuperacaoSenhaService service;
 
-    @PostMapping("/recuperarSenha")
-    public ResponseEntity<String> solicitar(
-            @RequestParam String email) {
+    public record RecuperacaoSenhaRequest(String email) {}
 
-        try {
-            service.solicitar(email);
-        } catch (RuntimeException e) {
-            System.err.println("ERRO AO ENVIAR EMAIL DE RECUPERACAO:");
-            e.printStackTrace();
+    @PostMapping("/solicitar")
+    public ResponseEntity<?> solicitar(@RequestBody RecuperacaoSenhaRequest request) {
+
+        if (request.email() == null || request.email().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("erro", "O e-mail deve ser informado."));
         }
 
-        return ResponseEntity.ok(
-                "Se o e-mail estiver cadastrado, você receberá um link de recuperação."
-        );
+        try {
+            service.solicitar(request.email().trim());
+        } catch (RuntimeException e) {
+            log.error("Erro ao processar envio de e-mail de recuperação para {}: ", request.email(), e);
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "mensagem", "Se o e-mail estiver cadastrado, você receberá um link de recuperação."
+        ));
     }
 }

@@ -8,7 +8,7 @@ public class LandingPage {
 
     @GetMapping("/")
     public String index() {
-        return "landingpage"; // Procura o ficheiro templates/landingpage.html
+        return "landingpage";
     }
 
     @GetMapping("/landingpage")
@@ -17,5 +17,7 @@ public class LandingPage {
     }
 
     @GetMapping("/instalacao-residencial")
-    public String instalacoesResidenciais(){ return "instalacao-residencial";}
+    public String instalacoesResidenciais() {
+        return "instalacao-residencial";
+    }
 }

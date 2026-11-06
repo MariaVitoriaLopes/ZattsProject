@@ -1,11 +1,9 @@
-
 package br.edu.fatec.zattsproject.backend.controller.mobile;
 
 import br.edu.fatec.zattsproject.backend.model.Usuario;
 import br.edu.fatec.zattsproject.backend.service.QuestionarioService;
 
 import jakarta.servlet.http.HttpSession;
-
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -44,28 +42,20 @@ public class QuestionarioMobileController {
             @RequestBody QuestionarioRequest dados,
             HttpSession session
     ) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
 
-        Usuario usuario = (Usuario)
-                session.getAttribute("usuarioLogado");
-
-        // Verificar autenticação
+        // 1. Validar autenticação
         if (usuario == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of(
-                            "erro", "Sessão não encontrada ou expirada."
-                    ));
+                    .body(Map.of("erro", "Sessão não encontrada ou expirada. Certifique-se de que o App está a enviar os cookies de sessão."));
         }
 
-        // Verificar se já respondeu
         if (questionarioService.concluido(usuario.getId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of(
-                            "erro", "O questionário já foi concluído."
-                    ));
+                    .body(Map.of("erro", "O questionário já foi concluído."));
         }
 
         try {
-
             questionarioService.salvar(
                     usuario.getId(),
                     dados.qtdPessoas(),
@@ -82,9 +72,7 @@ public class QuestionarioMobileController {
                     dados.valorMeta()
             );
 
-            // Atualizar usuário na sessão
             usuario.setQuestionarioRespondido(true);
-
             session.setAttribute("usuarioLogado", usuario);
 
             return ResponseEntity.ok(
@@ -95,16 +83,14 @@ public class QuestionarioMobileController {
             );
 
         } catch (IllegalArgumentException e) {
-
-            return ResponseEntity.badRequest().body(
-                    Map.of("erro", e.getMessage())
-            );
+            return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
 
         } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("erro", e.getMessage()));
 
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                    Map.of("erro", e.getMessage())
-            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("erro", "Erro ao processar questionário: " + e.getMessage()));
         }
     }
 }
