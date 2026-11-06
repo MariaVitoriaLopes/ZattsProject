@@ -755,7 +755,7 @@ p.cadastro {
 
     border-radius: 20px;
 
-    padding: 20px;
+    padding: 16px;
 
     border: 1px solid #EAECEF;
 
@@ -899,7 +899,6 @@ section.titulo-dashboard {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 50px;
 }
 
 /* ============================= */

@@ -2,6 +2,28 @@
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 
 <div th:fragment="cardsResumo" class="cards-resumo">
+    <!-- CARD 4: ESTIMATIVA DA CONTA DE LUZ / ECONOMIA -->
+    <div class="card-dashboard">
+
+        <div class="icone-card">
+            <span class="material-symbols-outlined">savings</span>
+        </div>
+
+        <div>
+            <span>Estimativa de conta de luz</span>
+            <div class="info-dados">
+                <h2 id="cardValorContaEstimado" th:text="${dash != null ? #numbers.formatDecimal(dash.valorContaEstimadoMesReais, 1, 'POINT', 2, 'COMMA') : '0,00'}">3,45</span></h2>
+                <small>Reais</small>
+            </div>
+
+            <!--            <p class="verde" id="cardStatusEstimativa"-->
+            <!--               th:text="${dash != null && dash.statusEstimativaConta != null ? '↘ ' + dash.statusEstimativaConta : '↘ 10% em relação ao mês anterior'}">-->
+            <!--                ↘ 10% em relação ao mês anterior-->
+            <!--            </p>-->
+            <p>Estimativa baseada na tarifa configurada</p>
+        </div>
+
+    </div>
 
     <!-- CARD 1: CONSUMO TOTAL DIÁRIO -->
     <div class="card-dashboard">
@@ -11,19 +33,17 @@
         </div>
 
         <div>
-            <span>Consumo Total Diário</span>
-
-            <h2>
-                <span id="cardConsumoTotalDiario"
-                      th:text="${dash != null ? #numbers.formatDecimal(dash.consumoTotalDiarioKwh, 1, 'POINT', 1, 'COMMA') : '0.0'}">32.8</span>
+            <span>Consumo de energia atual</span>
+            <div class="info-dados">
+                <h2 id="cardConsumoTotalDiario" th:text="${dash != null ? #numbers.formatDecimal(dash.consumoTotalDiarioKwh, 1, 'POINT', 1, 'COMMA') : '0.0'}"></h2>
                 <small>kWh</small>
-            </h2>
+            </div>
 
-            <p class="vermelho" id="cardVariacaoDiaria"
-               th:text="${dash != null && dash.variacaoDiariaPorcentagem != null ? '↗ ' + dash.variacaoDiariaPorcentagem + '% a mais que ontem' : '↗ 8% a mais que ontem'}">
-                ↗ 8% a mais que ontem
-            </p>
-
+<!--            <p class="vermelho" id="cardVariacaoDiaria"-->
+<!--               th:text="${dash != null && dash.variacaoDiariaPorcentagem != null ? '↗ ' + dash.variacaoDiariaPorcentagem + '% a mais que ontem' : '↗ 8% a mais que ontem'}">-->
+<!--                ↗ 8% a mais que ontem-->
+<!--            </p>-->
+            <p>Consumo de energia em tempo real</p>
         </div>
 
     </div>
@@ -37,19 +57,17 @@
 
         <div>
 
-            <span>Custo Diário</span>
-
-            <h2>
-                <span id="cardCustoDiario"
-                      th:text="${dash != null ? #numbers.formatDecimal(dash.custoDiarioReais, 1, 'POINT', 2, 'COMMA') : '0,00'}">3,57</span>
+            <span>Estimativa de custo atual</span>
+            <div class="info-dados">
+                <h2 id="cardCustoDiario" th:text="${dash != null ? #numbers.formatDecimal(dash.custoDiarioReais, 1, 'POINT', 2, 'COMMA') : '0,00'}">3,57</span></h2>
                 <small>Reais</small>
-            </h2>
+            </div>
 
-            <p id="cardStatusCusto"
-               th:text="${dash != null && dash.statusCustoDiario != null ? '→ ' + dash.statusCustoDiario : '→ Valor estimado normal'}">
-                → Valor estimado normal
-            </p>
-
+<!--            <p id="cardStatusCusto"-->
+<!--               th:text="${dash != null && dash.statusCustoDiario != null ? '→ ' + dash.statusCustoDiario : '→ Valor estimado normal'}">-->
+<!--                → Valor estimado normal-->
+<!--            </p>-->
+            <p>Estimativa de custo baseada no consumo</p>
         </div>
 
     </div>
@@ -63,48 +81,21 @@
 
         <div>
 
-            <span>Meta de Gasto</span>
-
-            <h2>
-                <span id="cardMetaGasto"
-                      th:text="${dash != null ? #numbers.formatDecimal(dash.metaGastoKwh, 1, 'POINT', 0, 'COMMA') : '250'}">260</span>
+            <span>Meta de gasto</span>
+            <div class="info-dados">
+                <h2 id="cardMetaGasto" th:text="${dash != null ? #numbers.formatDecimal(dash.metaGastoKwh, 1, 'POINT', 0, 'COMMA') : '250'}">260</span></h2>
                 <small>kWh</small>
-            </h2>
+            </div>
 
-            <p class="amarelo" id="cardPercentualMeta"
-               th:text="${dash != null ? '↗ ' + #numbers.formatDecimal(dash.percentualMetaAtingida, 1, 'POINT', 0, 'COMMA') + '% da meta atingida' : '↗ 64% da meta atingida'}">
-                ↗ 64% da meta atingida
-            </p>
-
+<!--            <p class="amarelo" id="cardPercentualMeta"-->
+<!--               th:text="${dash != null ? '↗ ' + #numbers.formatDecimal(dash.percentualMetaAtingida, 1, 'POINT', 0, 'COMMA') + '% da meta atingida' : '↗ 64% da meta atingida'}">-->
+<!--                ↗ 64% da meta atingida-->
+<!--            </p>-->
+            <p>Meta definida com o limite de 250 kWh</p>
         </div>
 
     </div>
 
-    <!-- CARD 4: ESTIMATIVA DA CONTA DE LUZ / ECONOMIA -->
-    <div class="card-dashboard">
-
-        <div class="icone-card">
-            <span class="material-symbols-outlined">savings</span>
-        </div>
-
-        <div>
-
-            <span>Estimativa de Conta</span>
-
-            <h2>
-                <span id="cardValorContaEstimado"
-                      th:text="${dash != null ? #numbers.formatDecimal(dash.valorContaEstimadoMesReais, 1, 'POINT', 2, 'COMMA') : '0,00'}">3,45</span>
-                <small>Reais</small>
-            </h2>
-
-            <p class="verde" id="cardStatusEstimativa"
-               th:text="${dash != null && dash.statusEstimativaConta != null ? '↘ ' + dash.statusEstimativaConta : '↘ 10% em relação ao mês anterior'}">
-                ↘ 10% em relação ao mês anterior
-            </p>
-
-        </div>
-
-    </div>
 
 </div>
 

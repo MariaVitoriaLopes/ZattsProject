@@ -172,7 +172,7 @@
                     plugins: { legend: { display: false } },
                     scales: {
                         y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' } },
-                        x: { grid: { display: false } }
+                        x: { grid: { display: false }, ticks: {maxTicksLimit: 10} }
                     }
                 }
             });
@@ -219,7 +219,7 @@
                     },
                     scales: {
                         y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' } },
-                        x: { grid: { display: false } }
+                        x: { grid: { display: false }, ticks: {autoSkip: true, maxTicksLimit: 6} }
                     }
                 }
             });
@@ -257,7 +257,7 @@
                             grid: { color: 'rgba(255,255,255,0.08)' },
                             ticks: { callback: v => 'R$ ' + v }
                         },
-                        x: { grid: { display: false } }
+                        x: { grid: { display: false }, ticks: {autoSkip: true, maxTicksLimit: 3} }
                     }
                 }
             });
