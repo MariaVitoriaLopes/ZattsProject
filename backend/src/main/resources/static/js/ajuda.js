@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
     busca.addEventListener('input', filtrar);
     mensagem.addEventListener('input', atualizarContador);
 
-    form.addEventListener('submit', function (evento) {
+    form.addEventListener('submit', async function (evento) {
         evento.preventDefault();
 
         if (!form.checkValidity()) {
@@ -67,12 +67,39 @@ document.addEventListener('DOMContentLoaded', function () {
 
         botao.disabled = true;
 
-        setTimeout(function () {
-            botao.disabled = false;
+        try {
+            const dados = new FormData(form);
+
+            const resposta = await fetch(form.action, {
+                method: 'POST',
+                body: dados
+            });
+
+            const retorno = await resposta.json();
+
+            if (!resposta.ok) {
+                throw new Error(
+                    retorno.erro || 'Não foi possível enviar a mensagem.'
+                );
+            }
+
             form.reset();
             atualizarContador();
-            mostrarRetorno('Mensagem enviada. Responderemos pelo seu e-mail.', false);
-        }, 800);
+
+            mostrarRetorno(
+                retorno.mensagem || 'Mensagem enviada. Responderemos pelo seu e-mail.',
+                false
+            );
+
+        } catch (erro) {
+            mostrarRetorno(
+                erro.message || 'Não foi possível enviar a mensagem. Tente novamente.',
+                true
+            );
+
+        } finally {
+            botao.disabled = false;
+        }
     });
 
     atualizarContador();

@@ -24,6 +24,9 @@ public class EmailService {
     @Value("${app.url}")
     private String appUrl;
 
+    @Value("${app.support.email:${spring.mail.username}}")
+    private String emailSuporte;
+
     public void enviarRecuperacao(String email, String token) {
 
         String link = appUrl + "/redefinirSenha?token=" + token;
@@ -69,6 +72,69 @@ public class EmailService {
         } catch (MessagingException | UnsupportedEncodingException e) {
             throw new IllegalStateException(
                     "Erro ao preparar e-mail de recuperação de senha.",
+                    e
+            );
+        }
+    }
+    public void enviarSuporte(
+            String nomeUsuario,
+            String emailUsuario,
+            String assunto,
+            String textoMensagem) {
+
+        try {
+            MimeMessage mensagem = mailSender.createMimeMessage();
+
+            MimeMessageHelper helper = new MimeMessageHelper(
+                    mensagem,
+                    false,
+                    "UTF-8"
+            );
+
+            helper.setFrom(
+                    new InternetAddress(
+                            remetente,
+                            "Zatts | Suporte",
+                            "UTF-8"
+                    )
+            );
+
+            helper.setTo(emailSuporte);
+
+            if (emailUsuario != null && !emailUsuario.isBlank()) {
+                helper.setReplyTo(emailUsuario);
+            }
+
+            helper.setSubject(
+                    "Zatts | Suporte - " + assunto
+            );
+
+            String corpo = """
+                Nova solicitação de suporte recebida pelo Zatts.
+
+                Usuário: %s
+                E-mail: %s
+                Assunto: %s
+
+                Mensagem:
+                %s
+
+                ------------------------------
+                Enviado pelo formulário de suporte do Zatts.
+                """.formatted(
+                    nomeUsuario,
+                    emailUsuario,
+                    assunto,
+                    textoMensagem
+            );
+
+            helper.setText(corpo, false);
+
+            mailSender.send(mensagem);
+
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            throw new IllegalStateException(
+                    "Erro ao enviar solicitação de suporte.",
                     e
             );
         }
