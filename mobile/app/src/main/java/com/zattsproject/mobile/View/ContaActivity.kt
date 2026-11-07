@@ -55,12 +55,17 @@ class ContaActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_conta)
 
+        // Seleciona Configurações na navbar
+        findViewById<AppNavBar>(R.id.navBar)
+            .setSelected(NavTab.SETTINGS)
+
         iniciarCampos()
         configurarSeletores()
         configurarCep()
         configurarBotoes()
         carregarConta()
     }
+
 
     private fun iniciarCampos() {
         edtCep = findViewById(R.id.edtCep)

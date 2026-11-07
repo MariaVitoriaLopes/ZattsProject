@@ -1,3 +1,4 @@
+
 package com.zattsproject.mobile
 
 import android.os.Bundle
@@ -10,7 +11,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
-import com.zattsproject.mobile.R
 
 class PreferenciasActivity : AppCompatActivity() {
 
@@ -20,11 +20,15 @@ class PreferenciasActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_preferencias)
 
-        findViewById<TextView>(
-            R.id.btnVoltarPreferencias
-        ).setOnClickListener {
-            finish()
-        }
+        // Seleciona Configurações na navbar
+        findViewById<AppNavBar>(R.id.navBar)
+            .setSelected(NavTab.SETTINGS)
+
+        // Voltar para Configurações
+        findViewById<TextView>(R.id.btnVoltarPreferencias)
+            .setOnClickListener {
+                finish()
+            }
 
         configurarTema()
         configurarCores()
@@ -122,6 +126,7 @@ class PreferenciasActivity : AppCompatActivity() {
         spinner.adapter = criarAdapter(idiomas)
 
         val idiomaAtual = AparenciaManager.obterIdioma(this)
+
         spinner.setSelection(if (idiomaAtual == "en") 1 else 0)
 
         spinner.onItemSelectedListener =

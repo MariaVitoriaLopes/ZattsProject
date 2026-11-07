@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,49 +9,13 @@
     android:background="?attr/corFundoTela"
     tools:context=".ContaActivity">
 
-    <LinearLayout
-        android:id="@+id/headerConta"
-        android:layout_width="0dp"
-        android:layout_height="64dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="18dp"
-        android:paddingEnd="18dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView
-            android:id="@+id/btnVoltar"
-            android:layout_width="40dp"
-            android:layout_height="48dp"
-            android:gravity="center_vertical"
-            android:text="‹"
-            android:textSize="36sp"
-            android:textColor="?attr/colorOnSurface"
-            android:contentDescription="Voltar"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Conta"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
+    <!-- CONTEÚDO -->
     <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:fillViewport="true"
         android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/headerConta"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:paddingBottom="88dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -59,11 +23,44 @@
             android:orientation="vertical"
             android:paddingStart="18dp"
             android:paddingEnd="18dp"
-            android:paddingTop="24dp"
+            android:paddingTop="20dp"
             android:paddingBottom="32dp">
 
+            <!-- CABEÇALHO -->
+            <LinearLayout
+                android:id="@+id/headerConta"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnVoltar"
+                    android:layout_width="40dp"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:text="‹"
+                    android:textSize="36sp"
+                    android:textColor="?attr/colorOnSurface"
+                    android:contentDescription="Voltar"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Conta"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- INFORMAÇÕES PESSOAIS -->
             <TextView
                 style="@style/ContaSecao"
+                android:layout_marginTop="24dp"
                 android:text="Informações pessoais" />
 
             <TextView
@@ -73,9 +70,10 @@
             <EditText
                 android:id="@+id/edtNome"
                 style="@style/ContaCampo"
+                android:drawableEnd="@drawable/ic_conta_editar"
                 android:hint="Nome completo"
                 android:inputType="textPersonName"
-                android:drawableEnd="@drawable/ic_conta_editar" />
+                android:minHeight="48dp" />
 
             <TextView
                 style="@style/ContaRotulo"
@@ -84,9 +82,10 @@
             <EditText
                 android:id="@+id/edtEmail"
                 style="@style/ContaCampo"
+                android:drawableEnd="@drawable/ic_conta_editar"
                 android:hint="emailusuario@gmail.com"
                 android:inputType="textEmailAddress"
-                android:drawableEnd="@drawable/ic_conta_editar" />
+                android:minHeight="48dp" />
 
             <TextView
                 style="@style/ContaRotulo"
@@ -95,9 +94,10 @@
             <EditText
                 android:id="@+id/edtTelefone"
                 style="@style/ContaCampo"
+                android:drawableEnd="@drawable/ic_conta_editar"
                 android:hint="(00) 00000-0000"
                 android:inputType="phone"
-                android:drawableEnd="@drawable/ic_conta_editar" />
+                android:minHeight="48dp" />
 
             <TextView
                 style="@style/ContaRotulo"
@@ -105,8 +105,10 @@
 
             <Spinner
                 android:id="@+id/spinnerFuso"
-                style="@style/ContaSpinner" />
+                style="@style/ContaSpinner"
+                android:minHeight="48dp" />
 
+            <!-- ENDEREÇO -->
             <TextView
                 style="@style/ContaSecao"
                 android:layout_marginTop="28dp"
@@ -131,10 +133,12 @@
             <EditText
                 android:id="@+id/edtLogradouro"
                 style="@style/ContaCampo"
+                android:drawableEnd="@drawable/ic_conta_editar"
                 android:hint="Rua X"
                 android:inputType="textCapWords"
-                android:drawableEnd="@drawable/ic_conta_editar" />
+                android:minHeight="48dp" />
 
+            <!-- NÚMERO E COMPLEMENTO -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -158,6 +162,7 @@
                         android:hint="01"
                         android:inputType="text"
                         android:drawableEnd="@drawable/ic_conta_editar" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -176,7 +181,9 @@
                         android:hint="Apartamento, bloco..."
                         android:inputType="textCapWords"
                         android:drawableEnd="@drawable/ic_conta_editar" />
+
                 </LinearLayout>
+
             </LinearLayout>
 
             <TextView
@@ -190,6 +197,7 @@
                 android:inputType="textCapWords"
                 android:drawableEnd="@drawable/ic_conta_editar" />
 
+            <!-- CIDADE E UF -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -213,6 +221,7 @@
                         android:hint="Praia Grande"
                         android:inputType="textCapWords"
                         android:drawableEnd="@drawable/ic_conta_editar" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -228,9 +237,12 @@
                     <Spinner
                         android:id="@+id/spinnerUf"
                         style="@style/ContaSpinner" />
+
                 </LinearLayout>
+
             </LinearLayout>
 
+            <!-- GERENCIAR CONTA -->
             <TextView
                 style="@style/ContaSecao"
                 android:layout_marginTop="28dp"
@@ -258,6 +270,7 @@
                 android:inputType="textPassword"
                 android:drawableEnd="@drawable/ic_conta_editar" />
 
+            <!-- SALVAR ALTERAÇÕES -->
             <Button
                 android:id="@+id/btnSalvarConta"
                 android:layout_width="match_parent"
@@ -268,6 +281,7 @@
                 android:textColor="?attr/colorOnPrimary"
                 android:backgroundTint="?attr/colorPrimary" />
 
+            <!-- SAIR DA CONTA -->
             <Button
                 android:id="@+id/btnSairConta"
                 android:layout_width="wrap_content"
@@ -278,6 +292,7 @@
                 android:textColor="@color/textos_brancos"
                 android:backgroundTint="@color/fundo_900" />
 
+            <!-- EXCLUIR CONTA -->
             <Button
                 android:id="@+id/btnExcluirConta"
                 android:layout_width="wrap_content"
@@ -297,15 +312,15 @@
                 android:textColor="?android:attr/textColorSecondary" />
 
         </LinearLayout>
+
     </ScrollView>
 
-    <!-- NAVBAR EXISTENTE DO PROJETO -->
+    <!-- NAVBAR -->
     <com.zattsproject.mobile.AppNavBar
         android:id="@+id/navBar"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="64dp"
-        android:background="?attr/corFundoTela"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:layout_gravity="bottom"
+        android:background="?attr/corFundoTela" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

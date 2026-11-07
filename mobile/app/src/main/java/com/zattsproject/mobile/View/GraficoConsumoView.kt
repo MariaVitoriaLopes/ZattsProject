@@ -292,11 +292,22 @@ class GraficoConsumoView @JvmOverloads constructor(
     ) {
         eixo.apply {
             valueFormatter = IndexAxisValueFormatter(rotulos)
-            axisMinimum = -0.1f
-            axisMaximum = (rotulos.size - 1).toFloat() + 0.1f
+
+            axisMinimum = 0f
+            axisMaximum = (rotulos.size - 1).toFloat()
+
             granularity = 1f
+            isGranularityEnabled = true
+
             setLabelCount(rotulos.size, true)
+
+            setAvoidFirstLastClipping(true)
+
+            position = XAxis.XAxisPosition.BOTTOM
+            labelRotationAngle = 0f
+
             textColor = corTexto
+            textSize = 9f
         }
     }
 

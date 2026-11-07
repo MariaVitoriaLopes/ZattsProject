@@ -1,9 +1,11 @@
 
 package com.zattsproject.mobile
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -11,21 +13,24 @@ import com.zattsproject.mobile.View.GraficoConsumoView
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.Calendar
-import java.text.DateFormatSymbols
-import android.content.res.ColorStateList
 
 class HomeActivity : AppCompatActivity() {
 
     private var corAplicada = ""
+
     private lateinit var txvHorario: TextView
     private lateinit var txvData: TextView
+
+    private lateinit var btnTempoReal: TextView
     private lateinit var btnConsumo: TextView
-    private lateinit var btnResumo: TextView
     private lateinit var btnValorConta: TextView
+
     private lateinit var txvTituloGrafico: TextView
     private lateinit var txvSubtituloGrafico: TextView
+
+    private lateinit var cardMetaMensal: View
     private lateinit var grafico: GraficoConsumoView
+
     private val handler = Handler(Looper.getMainLooper())
 
     private val atualizarRelogio = object : Runnable {
@@ -43,20 +48,21 @@ class HomeActivity : AppCompatActivity() {
         txvHorario = findViewById(R.id.txv_horario)
         txvData = findViewById(R.id.txv_data)
 
+        btnTempoReal = findViewById(R.id.btn_tempoReal)
         btnConsumo = findViewById(R.id.btn_consumo)
-        btnResumo = findViewById(R.id.btn_resumo)
         btnValorConta = findViewById(R.id.btn_valorConta)
 
         txvTituloGrafico = findViewById(R.id.txv_tituloGrafico)
         txvSubtituloGrafico = findViewById(R.id.txv_subtituloGrafico)
+
+        cardMetaMensal = findViewById(R.id.card_metaMensal)
         grafico = findViewById(R.id.graficoConsumo)
 
         configurarIndicadores()
         configurarBotoes()
 
-        mostrarConsumo()
+        mostrarTempoReal()
     }
-
 
     override fun onResume() {
         super.onResume()
@@ -93,13 +99,13 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun configurarIndicadores() {
+
         // Dados temporários para desenvolvimento
         val consumoMensal = 90.0
         val metaMensal = 250.0
 
         val porcentagem = if (metaMensal > 0) {
-            ((consumoMensal / metaMensal) * 100)
-                .toInt()
+            ((consumoMensal / metaMensal) * 100).toInt()
         } else {
             0
         }
@@ -132,26 +138,45 @@ class HomeActivity : AppCompatActivity() {
             R.id.txv_metaMensal
         ).text = "250 kWh"
 
-        val progressoMeta = findViewById<ProgressBar>(R.id.progressoMeta)
+        // Status da meta
+        val txvStatusMeta = findViewById<TextView>(
+            R.id.txv_statusMeta
+        )
 
-        // Pega a cor escolhida pelo usuário nas Preferências
+        val txvStatusDescricao = findViewById<TextView>(
+            R.id.txv_statusDescricao
+        )
+
+        if (consumoMensal <= metaMensal) {
+            txvStatusMeta.text = "Você está dentro da sua meta!"
+            txvStatusDescricao.text =
+                "O consumo está em $porcentagem% da sua meta."
+        } else {
+            txvStatusMeta.text = "Você ultrapassou sua meta!"
+            txvStatusDescricao.text =
+                "O consumo está em $porcentagem% da sua meta."
+        }
+
+        val progressoMeta = findViewById<ProgressBar>(
+            R.id.progressoMeta
+        )
+
         val corSelecionada = AparenciaManager.corHex(this)
 
-        // Aplica a cor na barra de progresso
         progressoMeta.progressTintList =
             ColorStateList.valueOf(corSelecionada)
 
-        // Atualiza o progresso normalmente
         progressoMeta.progress = porcentagem.coerceIn(0, 100)
     }
 
     private fun configurarBotoes() {
-        btnConsumo.setOnClickListener {
-            mostrarConsumo()
+
+        btnTempoReal.setOnClickListener {
+            mostrarTempoReal()
         }
 
-        btnResumo.setOnClickListener {
-            mostrarResumo()
+        btnConsumo.setOnClickListener {
+            mostrarConsumo()
         }
 
         btnValorConta.setOnClickListener {
@@ -160,9 +185,10 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun selecionarBotao(selecionado: TextView) {
+
         val botoes = listOf(
+            btnTempoReal,
             btnConsumo,
-            btnResumo,
             btnValorConta
         )
 
@@ -175,13 +201,44 @@ class HomeActivity : AppCompatActivity() {
         )
     }
 
+    private fun mostrarTempoReal() {
+
+        selecionarBotao(btnTempoReal)
+
+        cardMetaMensal.visibility = View.GONE
+
+        txvTituloGrafico.text = "Consumo de energia atual"
+
+        txvSubtituloGrafico.text =
+            "Veja o consumo de energia em tempo real"
+
+        // Dados temporários
+        // TODO: Substituir pelas medições da API
+
+        grafico.atualizarGraficoLinha(
+            listOf(
+                14f, 8f, 16f, 31f, 22f, 15f
+            ),
+            listOf(
+                "15:00", "15:01", "15:02",
+                "15:03", "15:04", "15:05"
+            )
+        )
+    }
+
     private fun mostrarConsumo() {
+
         selecionarBotao(btnConsumo)
+
+        cardMetaMensal.visibility = View.VISIBLE
 
         txvTituloGrafico.text = "Consumo de energia"
 
         txvSubtituloGrafico.text =
-            "Veja o consumo de energia (kWh) por horário"
+            "Veja o consumo de energia (kWh) em tempo real"
+
+        // Dados temporários
+        // TODO: Substituir pelos consumos da API
 
         grafico.atualizarGrafico(
             listOf(
@@ -195,74 +252,28 @@ class HomeActivity : AppCompatActivity() {
         )
     }
 
-    private fun mostrarResumo() {
-        selecionarBotao(btnResumo)
-
-        txvTituloGrafico.text = "Resumo comparativo"
-
-        txvSubtituloGrafico.text =
-            "Veja o gasto em kWh durante os últimos 6 meses"
-
-        val calendario = Calendar.getInstance()
-        val idioma = Locale("pt", "BR")
-
-        // Começa cinco meses antes do mês atual.
-        calendario.add(Calendar.MONTH, -5)
-
-        val nomesMeses = DateFormatSymbols(idioma).months
-
-        val rotulos = mutableListOf<String>()
-
-        repeat(6) {
-            val indiceMes = calendario.get(Calendar.MONTH)
-
-            val nomeMes = nomesMeses[indiceMes]
-                .replaceFirstChar { it.titlecase(idioma) }
-
-            rotulos.add(nomeMes)
-
-            calendario.add(Calendar.MONTH, 1)
-        }
-
-        // DADOS TEMPORÁRIOS
-        // TODO: COLOQUE AQUI O CAMINHO DA API.
-        // Buscar no Spring Boot os consumos mensais
-        // dos últimos seis meses, incluindo o atual.
-        //
-        // A API deve devolver os valores na mesma
-        // ordem dos meses exibidos no gráfico.
-
-        val consumosMensais = listOf(
-            150f,
-            35f,
-            185f,
-            485f,
-            305f,
-            170f
-        )
-
-        grafico.atualizarGraficoLinha(
-            consumosMensais,
-            rotulos
-        )
-    }
-
     private fun mostrarValorConta() {
+
         selecionarBotao(btnValorConta)
 
-        txvTituloGrafico.text = "Valor aproximado da conta"
+        cardMetaMensal.visibility = View.GONE
+
+        txvTituloGrafico.text = "Valor da conta (estimado)"
 
         txvSubtituloGrafico.text =
-            "Evolução do custo estimado em reais (R$)"
+            "Comparativo dos últimos meses"
+
+        // Dados temporários
+        // TODO: Substituir pelos valores estimados da API
 
         grafico.atualizarGrafico(
             listOf(
-                18f, 35f, 51f, 68f,
-                84f, 101f
+                160f, 190f, 140f,
+                160f, 110f, 120f
             ),
             listOf(
-                "1", "5", "10", "15",
-                "20", "25"
+                "Abr", "Mai", "Jun",
+                "Jul", "Ago", "Set"
             )
         )
     }

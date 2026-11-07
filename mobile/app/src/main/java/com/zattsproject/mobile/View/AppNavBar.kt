@@ -104,13 +104,6 @@ class AppNavBar @JvmOverloads constructor(
                 if (selected) R.drawable.bg_nav_selected else 0
             )
 
-            if (selected) {
-                item.icon.imageTintList =
-                    ColorStateList.valueOf(corSelecionada)
-            } else {
-                item.icon.imageTintList = null
-            }
-
             item.label.visibility =
                 if (selected) View.VISIBLE else View.GONE
 
