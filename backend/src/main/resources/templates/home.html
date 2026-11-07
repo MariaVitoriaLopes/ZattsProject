@@ -157,6 +157,7 @@
 
         // 2. GRÁFICO 1 (ESQUERDA): CONSUMO ATUAL (MINUTO A MINUTO - PADRÃO FIGMA)
         function initChartRealtime(dash) {
+            const cores = coresGrafico();
             const canvas = document.getElementById("chartConsumoRealtime");
             if (!canvas) return;
 
@@ -172,12 +173,12 @@
                     datasets: [{
                         label: 'Consumo (kWh)',
                         data: listaMinutos.map(p => p.consumoKwh),
-                        borderColor: '#C2F012',
-                        backgroundColor: 'rgba(194, 240, 18, 0.25)',
+                        borderColor: cores.linha,
+                        backgroundColor: cores.preenchimento,
                         fill: true,
                         tension: 0.3,
                         pointRadius: 4,
-                        pointBackgroundColor: '#C2F012'
+                        pointBackgroundColor: cores.linha
                     }]
                 },
                 options: {
@@ -193,6 +194,7 @@
         }
 
         function initChartComparativo(dash) {
+            const cores = coresGrafico();
             const canvas = document.getElementById("chartResumoComparativo");
             if (!canvas) return;
 
@@ -214,7 +216,7 @@
                     datasets: [{
                         label: 'Consumo (kWh)',
                         data: dadosExibicao.map(p => p.consumoKwh || p.valor || 0),
-                        backgroundColor: '#C2F012',
+                        backgroundColor: cores.linha,
                         borderRadius: 4,
                         maxBarThickness: 36
                     }]
@@ -255,6 +257,7 @@
         }
 
         function initChartValorConta(dash) {
+            const cores = coresGrafico();
             const canvas = document.getElementById("chartValorConta");
             if (!canvas) return;
 
@@ -270,7 +273,7 @@
                     datasets: [{
                         label: 'Valor Estimado (R$)',
                         data: listaMeses.map(p => p.valor),
-                        backgroundColor: '#C2F012',
+                        backgroundColor: cores.linha,
                         borderRadius: 4,
                         maxBarThickness: 36
                     }]
@@ -293,6 +296,37 @@
                     }
                 }
             });
+        }
+
+        function coresGrafico() {
+            const raiz = document.documentElement;
+            const estilos = getComputedStyle(raiz);
+
+            const escuro = raiz.getAttribute('data-tema') === 'escuro';
+
+            const primaria = estilos.getPropertyValue('--cor-primaria-400').trim() || '#E6FB1A';
+
+            // Cria a cor com transparência para o gráfico de linha
+            const corTemporaria = document.createElement('span');
+            corTemporaria.style.color = primaria;
+            document.body.appendChild(corTemporaria);
+
+            const corRGB = getComputedStyle(corTemporaria).color;
+            corTemporaria.remove();
+
+            const preenchimento = corRGB.replace(
+                /^rgb\((.+)\)$/,
+                'rgba($1, 0.25)'
+            );
+
+            return {
+                linha: primaria,
+                preenchimento: preenchimento,
+                texto: escuro ? '#FFFFFF' : '#434343',
+                grade: escuro
+                    ? 'rgba(255, 255, 255, 0.08)'
+                    : 'rgba(0, 0, 0, 0.08)'
+            };
         }
 
         // Carga Inicial
@@ -338,6 +372,34 @@
                     .catch(err => console.error("Erro ao sincronizar SSE:", err));
             });
         }
+
+
+        function atualizarCoresGraficos() {
+            const cores = coresGrafico();
+
+            [chartRealtime, chartComparativo, chartValorConta].forEach(chart => {
+                if (!chart) return;
+
+                chart.data.datasets.forEach(dataset => {
+                    dataset.backgroundColor = chart.config.type === 'line'
+                        ? cores.preenchimento
+                        : cores.linha;
+
+                    if (chart.config.type === 'line') {
+                        dataset.borderColor = cores.linha;
+                        dataset.pointBackgroundColor = cores.linha;
+                    }
+                });
+
+                chart.options.scales.y.grid.color = cores.grade;
+                chart.options.scales.y.ticks.color = cores.texto;
+                chart.options.scales.x.ticks.color = cores.texto;
+
+                chart.update('none');
+            });
+        }
+
+        document.addEventListener('zatts:tema', atualizarCoresGraficos);
     });
 </script>
 
