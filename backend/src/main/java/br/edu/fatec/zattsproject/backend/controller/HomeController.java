@@ -44,10 +44,12 @@ public class HomeController {
 
     @GetMapping("/historico")
     public String historico(Model model, HttpSession session) {
-        if (obterUsuarioLogado(session) == null) {
+        Usuario usuario = obterUsuarioLogado(session);
+        if (usuario == null) {
             return "redirect:/login";
         }
         model.addAttribute("paginaAtual", "historico");
+        model.addAttribute("usuarioId", usuario.getId());
         return "historico";
     }
 

@@ -38,119 +38,78 @@
     <section class="card-dispositivos">
 
         <div class="disp-cabecalho">
-            <div>
-                <h2 class="secao-titulo">Dispositivos</h2>
-                <p class="disp-descricao">Gerencie os quadros de energia e sensores conectados à sua conta.</p>
-            </div>
-
-            <button type="button" class="disp-btn-adicionar" id="btnAdicionarDispositivo">
-                <span class="material-symbols-outlined">add</span>
-                Adicionar dispositivo
-            </button>
+            <h2 class="secao-titulo">Sessões</h2>
+            <span class="disp-contagem" id="dispContagem">2 dispositivos</span>
         </div>
 
-        <form class="disp-novo" id="formNovoDispositivo" hidden>
-            <div class="campo">
-                <label for="dispNome">Nome do dispositivo</label>
-                <div class="campo-input">
-                    <input type="text" id="dispNome" name="nome" placeholder="Ex.: Quadro da sala" required>
-                </div>
+        <div class="bloco-disp">
+
+            <div class="bloco-disp-info">
+                <h3>Ativas</h3>
+                <p>Dispositivos conectados à sua conta.</p>
             </div>
 
-            <div class="campo">
-                <label for="dispCodigo">Código do dispositivo</label>
-                <div class="campo-input">
-                    <input type="text" id="dispCodigo" name="codigo" placeholder="Ex.: ZT-4F2A91" required>
-                </div>
+            <div class="bloco-disp-conteudo">
+
+                <ul class="disp-lista" id="listaDispositivos">
+
+                    <li class="disp-item">
+                        <div class="disp-icone">
+                            <span class="material-symbols-outlined">language</span>
+                        </div>
+
+                        <div class="disp-info">
+                            <strong class="disp-nome">Firefox (Windows 11)</strong>
+                            <span class="disp-detalhe">
+                                <span>Conectado às 17:33</span>
+                                <span class="disp-ativo">
+                                    <span class="disp-ponto"></span>
+                                    Ativo
+                                </span>
+                            </span>
+                        </div>
+
+                        <button type="button" class="disp-btn-desconectar" data-acao="desconectar">
+                            Desconectar
+                        </button>
+                    </li>
+
+                    <li class="disp-item">
+                        <div class="disp-icone">
+                            <span class="material-symbols-outlined">android</span>
+                        </div>
+
+                        <div class="disp-info">
+                            <strong class="disp-nome">Samsung M13</strong>
+                            <span class="disp-detalhe">
+                                <span>17 de setembro de 2026</span>
+                                <span class="disp-ativo">
+                                    <span class="disp-ponto"></span>
+                                    Ativo
+                                </span>
+                            </span>
+                        </div>
+
+                        <button type="button" class="disp-btn-desconectar" data-acao="desconectar">
+                            Desconectar
+                        </button>
+                    </li>
+
+                </ul>
+
+                <p class="disp-vazio" id="dispVazio" hidden>
+                    Nenhuma sessão ativa no momento.
+                </p>
+
             </div>
 
-            <div class="disp-novo-acoes">
-                <button type="submit" class="btn-salvar-tudo">Conectar</button>
-                <button type="button" class="btn-cancelar-tudo" id="btnCancelarNovo">Cancelar</button>
-            </div>
-        </form>
+        </div>
 
-        <ul class="disp-lista" id="listaDispositivos">
+        <hr class="divisor-disp">
 
-            <li class="disp-item">
-                <div class="disp-icone">
-                    <span class="material-symbols-outlined">electric_meter</span>
-                </div>
-
-                <div class="disp-info">
-                    <strong class="disp-nome">Quadro de energia principal</strong>
-                    <span class="disp-detalhe">Código ZT-4F2A91 · Última leitura há 2 minutos</span>
-                </div>
-
-                <span class="disp-status disp-conectado">
-                    <span class="disp-ponto"></span>
-                    Conectado
-                </span>
-
-                <div class="disp-acoes">
-                    <button type="button" class="disp-btn-icone" data-acao="renomear" aria-label="Renomear dispositivo">
-                        <span class="material-symbols-outlined">edit</span>
-                    </button>
-                    <button type="button" class="disp-btn-icone disp-btn-remover" data-acao="remover" aria-label="Remover dispositivo">
-                        <span class="material-symbols-outlined">delete</span>
-                    </button>
-                </div>
-            </li>
-
-            <li class="disp-item">
-                <div class="disp-icone">
-                    <span class="material-symbols-outlined">sensors</span>
-                </div>
-
-                <div class="disp-info">
-                    <strong class="disp-nome">Sensor da cozinha</strong>
-                    <span class="disp-detalhe">Código ZT-8C10B7 · Última leitura há 14 minutos</span>
-                </div>
-
-                <span class="disp-status disp-conectado">
-                    <span class="disp-ponto"></span>
-                    Conectado
-                </span>
-
-                <div class="disp-acoes">
-                    <button type="button" class="disp-btn-icone" data-acao="renomear" aria-label="Renomear dispositivo">
-                        <span class="material-symbols-outlined">edit</span>
-                    </button>
-                    <button type="button" class="disp-btn-icone disp-btn-remover" data-acao="remover" aria-label="Remover dispositivo">
-                        <span class="material-symbols-outlined">delete</span>
-                    </button>
-                </div>
-            </li>
-
-            <li class="disp-item">
-                <div class="disp-icone">
-                    <span class="material-symbols-outlined">sensors</span>
-                </div>
-
-                <div class="disp-info">
-                    <strong class="disp-nome">Sensor da garagem</strong>
-                    <span class="disp-detalhe">Código ZT-1D77E3 · Última leitura há 3 dias</span>
-                </div>
-
-                <span class="disp-status disp-desconectado">
-                    <span class="disp-ponto"></span>
-                    Desconectado
-                </span>
-
-                <div class="disp-acoes">
-                    <button type="button" class="disp-btn-icone" data-acao="renomear" aria-label="Renomear dispositivo">
-                        <span class="material-symbols-outlined">edit</span>
-                    </button>
-                    <button type="button" class="disp-btn-icone disp-btn-remover" data-acao="remover" aria-label="Remover dispositivo">
-                        <span class="material-symbols-outlined">delete</span>
-                    </button>
-                </div>
-            </li>
-
-        </ul>
-
-        <p class="disp-vazio" id="dispVazio" hidden>
-            Nenhum dispositivo conectado ainda. Clique em "Adicionar dispositivo" para começar.
+        <p class="disp-aviso">
+            <span class="material-symbols-outlined">info</span>
+            Confira os dispositivos que têm acesso à sua conta Zatts. Por segurança, mantenha sua conta conectada apenas em dispositivos confiáveis. Se não reconhecer algum dispositivo, desconecte-o imediatamente para proteger sua conta.
         </p>
 
     </section>

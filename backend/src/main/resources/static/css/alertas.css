@@ -491,8 +491,12 @@
 
     .opcao-icone:has(input:checked) {
         border-color: var(--cor-primaria-400);
-        background: #F1F1F1;
+        background: var(--cor-primaria-400);
         box-shadow: 0 0 6px var(--cor-primaria-400);
+    }
+
+    .opcao-icone:has(input:checked) .material-symbols-outlined {
+        color: var(--cor-primaria-950);
     }
 
     .grupo-canais {
@@ -822,7 +826,23 @@ html[data-tema="escuro"] .botao-criar {
 }
 
 /* Responsividade no tema escuro */
+html[data-tema="escuro"] .opcao-icone {
+    background: #1A1A1A;
+    border-color: #444444;
+}
 
+html[data-tema="escuro"] .opcao-icone .material-symbols-outlined {
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .opcao-icone:has(input:checked) {
+    background: var(--cor-primaria-400);
+    border-color: var(--cor-primaria-400);
+}
+
+html[data-tema="escuro"] .opcao-icone:has(input:checked) .material-symbols-outlined {
+    color: var(--cor-primaria-950);
+}
 @media (max-width: 1000px) {
 
     html[data-tema="escuro"] .alerta-ativacao,

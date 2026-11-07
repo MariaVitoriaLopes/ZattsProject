@@ -665,7 +665,7 @@ span.material-symbols-outlined.visibility, span.material-symbols-outlined.visibi
 
 
 .btnEntrar:hover{
-    background-color: var(--cor-padrao);
+    background-color: #E6FB1A;
     color: black;
 }
 
