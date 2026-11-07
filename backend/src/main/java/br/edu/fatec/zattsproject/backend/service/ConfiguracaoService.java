@@ -182,4 +182,28 @@ public class ConfiguracaoService {
 
         return repository.save(configuracao);
     }
+
+    public double obterTarifaKwh(String usuarioId) {
+        Configuracao configuracao = buscarPorUsuario(usuarioId);
+
+        if (configuracao == null
+                || configuracao.getTarifaKwh() == null
+                || configuracao.getTarifaKwh() <= 0) {
+            return 0.88;
+        }
+
+        return configuracao.getTarifaKwh();
+    }
+
+    public double obterCipReais(String usuarioId) {
+        Configuracao configuracao = buscarPorUsuario(usuarioId);
+
+        if (configuracao == null
+                || configuracao.getCipReais() == null
+                || configuracao.getCipReais() < 0) {
+            return 12.50;
+        }
+
+        return configuracao.getCipReais();
+    }
 }

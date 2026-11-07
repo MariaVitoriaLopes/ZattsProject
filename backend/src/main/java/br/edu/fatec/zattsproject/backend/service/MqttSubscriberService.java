@@ -26,7 +26,7 @@ public class MqttSubscriberService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @ServiceActivator(inputChannel = "mqttInputChannel")
+    // @ServiceActivator(inputChannel = "mqttInputChannel")
     public void handleMessage(Message<String> message) {
         String payload = message.getPayload();
         System.out.println(">>> MENSAGEM MQTT RECEBIDA: " + payload);

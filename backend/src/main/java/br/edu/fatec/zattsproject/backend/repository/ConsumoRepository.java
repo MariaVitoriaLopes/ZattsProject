@@ -2,6 +2,7 @@ package br.edu.fatec.zattsproject.backend.repository;
 
 import br.edu.fatec.zattsproject.backend.model.Consumo;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -25,4 +26,14 @@ public interface ConsumoRepository extends MongoRepository<Consumo, String> {
 
     // Retorna a ÚLTIMA leitura geral do sistema (Caso o MQTT ainda não grave o usuarioId de imediato)
     Optional<Consumo> findTopByOrderByDataHoraDesc();
+
+    @Query(
+            value = "{ 'usuarioId': ?0, 'dataHora': { $gte: ?1, $lt: ?2 } }",
+            sort = "{ 'dataHora': 1 }"
+    )
+    List<Consumo> buscarPorUsuarioEIntervaloOrdenado(
+            String usuarioId,
+            LocalDateTime inicio,
+            LocalDateTime fim
+    );
 }

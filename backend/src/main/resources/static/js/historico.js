@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const pagina = document.querySelector('.hist-pagina');
-    const usuarioId = pagina.dataset.usuarioId;
-
     const abas = document.querySelectorAll('.hist-aba');
     const vistas = {
         semanal: document.getElementById('vistaSemanal'),
@@ -67,9 +64,11 @@ document.addEventListener('DOMContentLoaded', function () {
         return lista
             .map(function (item) {
                 return {
-                    data: paraData(item.dataHora),
-                    kwh: Number(item.consumoKwh) || 0,
-                    reais: Number(item.valorEstimadoReais) || 0
+                    // T00:00:00 evita o JavaScript interpretar YYYY-MM-DD como UTC
+                    // e deslocar o dia no fuso do Brasil.
+                    data: paraData(item.dia + 'T00:00:00'),
+                    kwh: Number(item.kwh) || 0,
+                    reais: Number(item.reais) || 0
                 };
             })
             .filter(function (item) {
@@ -633,19 +632,26 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function carregar() {
-        if (!usuarioId) {
-            atualizarTudo();
-            definirEstado('Não foi possível identificar o usuário.');
-            definirEstadoSemanal('Não foi possível identificar o usuário.');
-            definirEstadoComparativo('Não foi possível identificar o usuário.');
-            return;
-        }
-
         definirEstado('Carregando leituras...');
         definirEstadoSemanal('Carregando leituras...');
         definirEstadoComparativo('Carregando leituras...');
 
-        fetch('/api/consumos/usuario/' + encodeURIComponent(usuarioId))
+        const hoje = new Date();
+
+        const inicio = new Date(
+            hoje.getFullYear() - 1,
+            0,
+            1
+        );
+
+        const inicioFormatado = chaveDia(inicio);
+        const fimFormatado = chaveDia(hoje);
+
+        fetch(
+            '/api/consumos/diario'
+            + '?inicio=' + encodeURIComponent(inicioFormatado)
+            + '&fim=' + encodeURIComponent(fimFormatado)
+        )
             .then(function (resposta) {
                 if (!resposta.ok) {
                     throw new Error('Falha ao carregar as leituras');
@@ -654,15 +660,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 return resposta.json();
             })
             .then(function (lista) {
-                consumos = prepararLeituras(Array.isArray(lista) ? lista : []);
+                consumos = prepararLeituras(
+                    Array.isArray(lista) ? lista : []
+                );
+
                 atualizarTudo();
             })
-            .catch(function () {
+            .catch(function (erro) {
+                console.error(
+                    'Erro ao carregar histórico:',
+                    erro
+                );
+
                 consumos = [];
                 atualizarTudo();
-                definirEstado('Não foi possível carregar as leituras. Tente novamente mais tarde.');
-                definirEstadoSemanal('Não foi possível carregar as leituras. Tente novamente mais tarde.');
-                definirEstadoComparativo('Não foi possível carregar as leituras. Tente novamente mais tarde.');
+
+                definirEstado(
+                    'Não foi possível carregar as leituras. Tente novamente mais tarde.'
+                );
+                definirEstadoSemanal(
+                    'Não foi possível carregar as leituras. Tente novamente mais tarde.'
+                );
+                definirEstadoComparativo(
+                    'Não foi possível carregar as leituras. Tente novamente mais tarde.'
+                );
             });
     }
 

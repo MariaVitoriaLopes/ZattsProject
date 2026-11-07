@@ -31,4 +31,8 @@ public class Configuracao {
     private String uf;
     private BandeiraTarifaria bandeiraAtual;
     private String fusoHorario;
+    @Builder.Default
+    private Double tarifaKwh = 0.88;
+    @Builder.Default
+    private Double cipReais = 12.50;
 }
