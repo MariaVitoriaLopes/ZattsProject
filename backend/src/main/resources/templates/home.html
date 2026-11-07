@@ -77,7 +77,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
 <script th:src="@{/js/script.js}"></script>
 
-<!-- INTEGRAÇÃO COM BACKEND ZATTS (FIGMA COMPLIED + SSE) -->
+<!-- INTEGRAÇÃO COM BACKEND ZATTS (ESTRUTURA EXATA DO FIGMA + SSE) -->
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function () {
         const initialDash = /*[[${dash}]]*/ null;
@@ -85,6 +85,9 @@
         let chartRealtime = null;
         let chartComparativo = null;
         let chartValorConta = null;
+
+        const TARIFA_KWH = 0.85;
+        const CIP_FIXA = 12.50;
 
         // 1. ATUALIZA TEXTOS, CARDS DA UI E COMPONENTES DE META
         function atualizarInterface(dash) {
@@ -98,12 +101,12 @@
 
             // Componentes do Quadro "Meta de Consumo Mensal"
             const progressoMeta = document.getElementById("progressoMeta");
-            const consumoAtualTexto = document.getElementById("consumoAtualTexto"); // Rótulo na esquerda da barra
-            const consumoMensal = document.getElementById("consumoMensal");         // Texto na legenda da bolinha
+            const consumoAtualTexto = document.getElementById("consumoAtualTexto");
+            const consumoMensal = document.getElementById("consumoMensal");
             const limiteMeta = document.getElementById("limiteMeta");
             const valorMeta = document.getElementById("valorMeta");
 
-            // Consumo ACUMULADO DO MÊS (ex: 3.1 kWh)
+            // Consumo ACUMULADO DO MÊS
             const acumuladoMes = dash.metaConsumoMensalAtualKwh !== undefined ? dash.metaConsumoMensalAtualKwh : (dash.consumoTotalDiarioKwh || 0);
             const limite = dash.metaGastoKwh || dash.metaConsumoMensalLimiteKwh || 250;
 
@@ -112,27 +115,31 @@
                 progressoMeta.style.width = (perc > 100 ? 100 : perc) + "%";
             }
 
-            // Exibe estritamente o ACUMULADO DO MÊS nos dois textos da barra de meta
-            if (consumoAtualTexto) consumoAtualTexto.innerText = acumuladoMes + " kWh";
-            if (consumoMensal) consumoMensal.innerText = acumuladoMes + " kWh";
+            if (consumoAtualTexto) consumoAtualTexto.innerText = acumuladoMes.toFixed(2) + " kWh";
+            if (consumoMensal) consumoMensal.innerText = acumuladoMes.toFixed(2) + " kWh";
             if (limiteMeta) limiteMeta.innerText = "Meta: " + limite + " kWh";
             if (valorMeta) valorMeta.innerText = limite + " kWh";
 
-            // Cards de Resumo Superiores (cards.html)
-            const elConsumo = document.getElementById("cardConsumoTotalDiario");
-            const elCusto = document.getElementById("cardCustoDiario");
-            const elMeta = document.getElementById("cardMetaGasto");
+            // CARDS SUPERIORES DE RESUMO
+            const elConsumo = document.getElementById("cardConsumoTotalDiario"); // Card 1
+            const elCusto = document.getElementById("cardCustoDiario");           // Card 2
+            const elMeta = document.getElementById("cardMetaGasto");             // Card 3
             const elPercentual = document.getElementById("cardPercentualMeta");
-            const elConta = document.getElementById("cardValorContaEstimado");
+            const elConta = document.getElementById("cardValorContaEstimado");   // Card 4
 
-            if (elConsumo && dash.consumoTotalDiarioKwh !== undefined) {
-                elConsumo.innerText = dash.consumoTotalDiarioKwh.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+            // Card 1: Consumo Total Diário em kWh (2 casas decimais)
+            const consumoDiarioKwh = dash.consumoTotalDiarioKwh || 0;
+            if (elConsumo) {
+                elConsumo.innerText = consumoDiarioKwh.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
 
-            if (elCusto && dash.custoDiarioReais !== undefined) {
-                elCusto.innerText = dash.custoDiarioReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            // Card 2: Custo Diário em Reais (R$)
+            const custoDiario = consumoDiarioKwh * TARIFA_KWH;
+            if (elCusto) {
+                elCusto.innerText = custoDiario.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
 
+            // Card 3: Meta de Gasto em kWh
             if (elMeta && dash.metaGastoKwh !== undefined) {
                 elMeta.innerText = Math.round(dash.metaGastoKwh);
             }
@@ -141,12 +148,14 @@
                 elPercentual.innerText = "↗ " + Math.round(dash.percentualMetaAtingida) + "% da meta atingida";
             }
 
-            if (elConta && dash.valorContaEstimadoMesReais !== undefined) {
-                elConta.innerText = dash.valorContaEstimadoMesReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            // Card 4: Estimativa da Conta de Luz em Reais (Dinâmica)
+            const estimativaConta = (acumuladoMes * TARIFA_KWH) + CIP_FIXA;
+            if (elConta) {
+                elConta.innerText = estimativaConta.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
         }
 
-        // 2. GRÁFICO 1 (ESQUERDA): CONSUMO ATUAL (MINUTO A MINUTO - LINHA)
+        // 2. GRÁFICO 1 (ESQUERDA): CONSUMO ATUAL (MINUTO A MINUTO - PADRÃO FIGMA)
         function initChartRealtime(dash) {
             const canvas = document.getElementById("chartConsumoRealtime");
             if (!canvas) return;
@@ -183,7 +192,6 @@
             });
         }
 
-        // 3. GRÁFICO 2 (MEIO): CONSUMO DIÁRIO - EIXO Y EXATO DO FIGMA (0 A 50 DE 10 EM 10)
         function initChartComparativo(dash) {
             const canvas = document.getElementById("chartResumoComparativo");
             if (!canvas) return;
@@ -202,7 +210,7 @@
                 data: {
                     labels: dadosExibicao.length > 0
                         ? dadosExibicao.map(p => p.hora || (p.horaInt !== undefined ? p.horaInt + 'h' : ''))
-                        : ['5h','6h','7h','8h','9h','10h','11h','12h','13h','14h','15h'],
+                        : ['2h','12h','13h'],
                     datasets: [{
                         label: 'Consumo (kWh)',
                         data: dadosExibicao.map(p => p.consumoKwh || p.valor || 0),
@@ -238,7 +246,6 @@
             });
         }
 
-        // 4. GRÁFICO 3 (DIREITA): ESTIMATIVA DA CONTA - EIXO Y EXATO DO FIGMA (0 A 300 DE 50 EM 50)
         function initChartValorConta(dash) {
             const canvas = document.getElementById("chartValorConta");
             if (!canvas) return;
@@ -288,7 +295,6 @@
             initChartValorConta(initialDash);
         }
 
-        // 5. OUVINTE DE TEMPO REAL SSE VIA ESP32 / MQTT
         if (window.EventSource) {
             const eventSource = new EventSource('/api/v1/web/dashboard/sse');
 
@@ -298,14 +304,13 @@
                     .then(dash => {
                         atualizarInterface(dash);
 
-                        // Atualiza Gráfico 1 (Minuto a Minuto)
                         if (chartRealtime && dash.consumoTempoReal) {
                             chartRealtime.data.labels = dash.consumoTempoReal.map(p => p.hora || p.horario || p.instante);
                             chartRealtime.data.datasets[0].data = dash.consumoTempoReal.map(p => p.consumoKwh);
                             chartRealtime.update();
                         }
 
-                        // Atualiza Gráfico 2 (Hora a Hora)
+                        // Atualiza o Gráfico 2
                         if (chartComparativo && dash.consumoDiarioHoras) {
                             const horasFiltradas = dash.consumoDiarioHoras.filter(p => (p.consumoKwh && p.consumoKwh > 0) || (p.valor && p.valor > 0));
                             const dadosExibicao = horasFiltradas.length > 0 ? horasFiltradas : dash.consumoDiarioHoras;
@@ -315,14 +320,14 @@
                             chartComparativo.update();
                         }
 
-                        // Atualiza Gráfico 3 (Meses R$)
+                        // Atualiza o Gráfico 3
                         if (chartValorConta && dash.valorContaEstimadoReais) {
                             chartValorConta.data.labels = dash.valorContaEstimadoReais.map(p => p.mes);
                             chartValorConta.data.datasets[0].data = dash.valorContaEstimadoReais.map(p => p.valor);
                             chartValorConta.update();
                         }
                     })
-                    .catch(err => console.error("Erro ao atualizar métricas SSE:", err));
+                    .catch(err => console.error("Erro ao sincronizar SSE:", err));
             });
         }
     });

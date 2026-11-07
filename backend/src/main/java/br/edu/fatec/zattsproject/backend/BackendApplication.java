@@ -22,7 +22,7 @@ public class BackendApplication {
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule()); // Suporte para LocalDateTime
+        mapper.registerModule(new JavaTimeModule());
         return mapper;
     }
 
