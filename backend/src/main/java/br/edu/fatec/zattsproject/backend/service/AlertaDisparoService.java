@@ -34,21 +34,55 @@ public class AlertaDisparoService {
 
     public void avaliar(String usuarioId) {
 
-        if (usuarioId == null || usuarioId.isBlank()) {
+        avaliarInterno(
+                usuarioId,
+                0.0,
+                0.0
+        );
+    }
+
+    public void avaliarEmTempoReal(
+            String usuarioId,
+            double consumoHoraAtualKwh,
+            double potenciaMediaWatts) {
+
+        avaliarInterno(
+                usuarioId,
+                sanitizarNaoNegativo(
+                        consumoHoraAtualKwh
+                ),
+                sanitizarNaoNegativo(
+                        potenciaMediaWatts
+                )
+        );
+    }
+
+    private void avaliarInterno(
+            String usuarioId,
+            double consumoNaoPersistidoKwh,
+            double potenciaMediaWatts) {
+
+        if (usuarioId == null
+                || usuarioId.isBlank()) {
+
             return;
         }
 
         List<Alerta> alertas =
-                alertaRepository.findByUsuarioIdAndAtivoTrue(
-                        usuarioId
-                );
+                alertaRepository
+                        .findByUsuarioIdAndAtivoTrue(
+                                usuarioId
+                        );
 
         if (alertas.isEmpty()) {
             return;
         }
 
         Configuracao configuracao =
-                configuracaoService.buscarPorUsuario(usuarioId);
+                configuracaoService
+                        .buscarPorUsuario(
+                                usuarioId
+                        );
 
         if (configuracao != null
                 && Boolean.FALSE.equals(
@@ -58,7 +92,8 @@ public class AlertaDisparoService {
             return;
         }
 
-        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime agora =
+                LocalDateTime.now();
 
         LocalDateTime inicioMes =
                 agora.toLocalDate()
@@ -77,24 +112,32 @@ public class AlertaDisparoService {
                         );
 
         double consumoMesKwh =
-                calcularConsumoTotal(consumosMes);
+                calcularConsumoTotal(
+                        consumosMes
+                )
+                        + consumoNaoPersistidoKwh;
 
         double tarifaKwh =
-                configuracaoService.obterTarifaKwh(
-                        usuarioId
-                );
+                configuracaoService
+                        .obterTarifaKwh(
+                                usuarioId
+                        );
 
         double gastoMesReais =
-                consumoMesKwh * tarifaKwh;
+                consumoMesKwh
+                        * tarifaKwh;
 
         for (Alerta alerta : alertas) {
 
             try {
+
                 avaliarAlerta(
                         alerta,
                         configuracao,
                         consumoMesKwh,
                         gastoMesReais,
+                        potenciaMediaWatts,
+                        tarifaKwh,
                         agora
                 );
 
@@ -115,35 +158,61 @@ public class AlertaDisparoService {
             Configuracao configuracao,
             double consumoMesKwh,
             double gastoMesReais,
+            double potenciaMediaWatts,
+            double tarifaKwh,
             LocalDateTime agora) {
 
         if (alerta == null
-                || !Boolean.TRUE.equals(alerta.getAtivo())) {
+                || !Boolean.TRUE.equals(
+                alerta.getAtivo()
+        )) {
+
             return;
         }
 
         String tipo =
-                normalizar(alerta.getTipo());
+                normalizar(
+                        alerta.getTipo()
+                );
 
         double valorAtual;
 
         Double meta;
 
+        double crescimentoPorHora;
+
         if ("CONSUMO".equals(tipo)) {
 
-            valorAtual = consumoMesKwh;
+            valorAtual =
+                    consumoMesKwh;
 
-            meta = configuracao != null
-                    ? configuracao.getMetaConsumoKwh()
-                    : null;
+            meta =
+                    configuracao != null
+                            ? configuracao
+                            .getMetaConsumoKwh()
+                            : null;
+
+            crescimentoPorHora =
+                    potenciaMediaWatts
+                            / 1000.0;
 
         } else if ("GASTO".equals(tipo)) {
 
-            valorAtual = gastoMesReais;
+            valorAtual =
+                    gastoMesReais;
 
-            meta = configuracao != null
-                    ? configuracao.getMetaGastoReais()
-                    : null;
+            meta =
+                    configuracao != null
+                            ? configuracao
+                            .getMetaGastoReais()
+                            : null;
+
+            crescimentoPorHora =
+                    (
+                            potenciaMediaWatts
+                                    / 1000.0
+                    )
+                            * tarifaKwh;
 
         } else {
 
@@ -156,12 +225,6 @@ public class AlertaDisparoService {
             return;
         }
 
-        boolean limiteAbsolutoAtingido =
-                verificarLimiteAbsoluto(
-                        alerta,
-                        valorAtual
-                );
-
         boolean percentualMetaAtingido =
                 verificarPercentualMeta(
                         alerta,
@@ -169,27 +232,60 @@ public class AlertaDisparoService {
                         meta
                 );
 
-        if (!limiteAbsolutoAtingido
-                && !percentualMetaAtingido) {
+        ResultadoLembrete resultadoLembrete =
+                avaliarLembrete(
+                        alerta,
+                        valorAtual,
+                        meta,
+                        crescimentoPorHora
+                );
+
+        if (!resultadoLembrete
+                .deveDisparar()) {
 
             return;
         }
 
         if (!repeticaoPermiteDisparo(
                 alerta,
-                agora)) {
+                agora
+        )) {
+
+            return;
+        }
+
+        Notificacao.Categoria
+                categoriaNotificacao =
+                determinarCategoriaNotificacao(
+                        alerta,
+                        tipo,
+                        percentualMetaAtingido
+                                || resultadoLembrete
+                                .alvoPercentual()
+                );
+
+        if (!categoriaPermitida(
+                configuracao,
+                categoriaNotificacao
+        )) {
 
             return;
         }
 
         boolean canalApp =
-                canalAtivo(alerta.getCanalApp());
+                canalAtivo(
+                        alerta.getCanalApp()
+                );
 
         boolean canalEmail =
-                canalAtivo(alerta.getCanalEmail());
+                canalAtivo(
+                        alerta.getCanalEmail()
+                );
 
         boolean canalPush =
-                canalAtivo(alerta.getCanalPush());
+                canalAtivo(
+                        alerta.getCanalPush()
+                );
 
         if (!canalApp
                 && !canalEmail
@@ -199,84 +295,238 @@ public class AlertaDisparoService {
         }
 
         String titulo =
-                construirTitulo(alerta);
+                construirTitulo(
+                        alerta,
+                        resultadoLembrete
+                );
 
         String mensagem =
                 construirMensagem(
                         alerta,
                         tipo,
                         valorAtual,
-                        meta
+                        meta,
+                        resultadoLembrete
                 );
 
-        boolean algumCanalEnviado = false;
+        boolean algumCanalEnviado =
+                false;
 
         if (canalApp) {
 
             Notificacao notificacao =
-                    notificacaoService.criar(
-                            alerta.getUsuarioId(),
-                            Notificacao.Categoria.ALERTA,
-                            titulo,
-                            mensagem,
-                            alerta.getId()
-                    );
+                    notificacaoService
+                            .criar(
+                                    alerta.getUsuarioId(),
+                                    categoriaNotificacao,
+                                    titulo,
+                                    mensagem,
+                                    alerta.getId()
+                            );
 
             if (notificacao != null) {
-                algumCanalEnviado = true;
+
+                algumCanalEnviado =
+                        true;
             }
         }
 
-        if (canalEmail) {
+        if (canalEmail
+                && enviarEmail(
+                alerta.getUsuarioId(),
+                titulo,
+                mensagem
+        )) {
 
-            if (enviarEmail(
-                    alerta.getUsuarioId(),
-                    titulo,
-                    mensagem)) {
-
-                algumCanalEnviado = true;
-            }
+            algumCanalEnviado =
+                    true;
         }
 
         if (canalPush) {
 
             log.info(
                     "Alerta {} solicitou canal PUSH, "
-                            + "mas não existe provedor push configurado no backend.",
+                            + "mas não existe provedor push "
+                            + "configurado no backend.",
                     alerta.getId()
             );
         }
 
         if (algumCanalEnviado) {
 
-            alerta.setUltimoDisparoEm(agora);
+            alerta.setUltimoDisparoEm(
+                    agora
+            );
 
-            alertaRepository.save(alerta);
+            alertaRepository.save(
+                    alerta
+            );
 
             log.info(
-                    "Alerta disparado: id={} usuarioId={} tipo={}",
+                    "Alerta disparado: "
+                            + "id={} "
+                            + "usuarioId={} "
+                            + "tipo={} "
+                            + "categoria={} "
+                            + "lembrete={} "
+                            + "antecipado={} "
+                            + "minutosEstimados={}",
                     alerta.getId(),
                     alerta.getUsuarioId(),
-                    tipo
+                    tipo,
+                    categoriaNotificacao,
+                    normalizarLembrete(
+                            alerta.getLembrete()
+                    ),
+                    resultadoLembrete
+                            .antecipado(),
+                    resultadoLembrete
+                            .minutosEstimados()
             );
         }
     }
 
-    private boolean verificarLimiteAbsoluto(
+    private ResultadoLembrete avaliarLembrete(
             Alerta alerta,
-            double valorAtual) {
+            double valorAtual,
+            Double meta,
+            double crescimentoPorHora) {
 
-        Double limite =
-                alerta.getValorLimite();
+        AlvoAlerta alvo =
+                determinarAlvoMaisProximo(
+                        alerta,
+                        meta
+                );
 
-        if (limite == null
-                || !Double.isFinite(limite)
-                || limite <= 0) {
+        if (alvo == null) {
 
-            return false;
+            return ResultadoLembrete
+                    .naoDisparar();
         }
 
-        return valorAtual >= limite;
+        if (valorAtual
+                >= alvo.valor()) {
+
+            return ResultadoLembrete
+                    .dispararNaHora(
+                            alvo.percentual()
+                    );
+        }
+
+        int antecedenciaMinutos =
+                obterAntecedenciaMinutos(
+                        alerta.getLembrete()
+                );
+
+        if (antecedenciaMinutos <= 0) {
+
+            return ResultadoLembrete
+                    .naoDisparar();
+        }
+
+        if (!Double.isFinite(
+                crescimentoPorHora
+        )
+                || crescimentoPorHora <= 0) {
+
+            return ResultadoLembrete
+                    .naoDisparar();
+        }
+
+        double restante =
+                alvo.valor()
+                        - valorAtual;
+
+        double minutosAteLimite =
+                (
+                        restante
+                                / crescimentoPorHora
+                )
+                        * 60.0;
+
+        if (!Double.isFinite(
+                minutosAteLimite
+        )
+                || minutosAteLimite < 0
+                || minutosAteLimite
+                > antecedenciaMinutos) {
+
+            return ResultadoLembrete
+                    .naoDisparar();
+        }
+
+        long minutosParaMensagem =
+                Math.max(
+                        1L,
+                        (long) Math.ceil(
+                                minutosAteLimite
+                        )
+                );
+
+        return ResultadoLembrete
+                .dispararAntecipado(
+                        alvo.percentual(),
+                        minutosParaMensagem
+                );
+    }
+
+    private AlvoAlerta determinarAlvoMaisProximo(
+            Alerta alerta,
+            Double meta) {
+
+        AlvoAlerta melhorAlvo =
+                null;
+
+        Double valorLimite =
+                alerta.getValorLimite();
+
+        if (valorPositivoValido(
+                valorLimite
+        )) {
+
+            melhorAlvo =
+                    new AlvoAlerta(
+                            valorLimite,
+                            false
+                    );
+        }
+
+        Double percentualLimite =
+                alerta.getPercentualLimite();
+
+        if (valorPositivoValido(
+                percentualLimite
+        )
+                && valorPositivoValido(
+                meta
+        )) {
+
+            double alvoPercentual =
+                    meta
+                            * (
+                            percentualLimite
+                                    / 100.0
+                    );
+
+            if (Double.isFinite(
+                    alvoPercentual
+            )
+                    && alvoPercentual > 0
+                    && (
+                    melhorAlvo == null
+                            || alvoPercentual
+                            < melhorAlvo.valor()
+            )) {
+
+                melhorAlvo =
+                        new AlvoAlerta(
+                                alvoPercentual,
+                                true
+                        );
+            }
+        }
+
+        return melhorAlvo;
     }
 
     private boolean verificarPercentualMeta(
@@ -287,24 +537,148 @@ public class AlertaDisparoService {
         Double percentualLimite =
                 alerta.getPercentualLimite();
 
-        if (percentualLimite == null
-                || !Double.isFinite(percentualLimite)
-                || percentualLimite <= 0) {
-
-            return false;
-        }
-
-        if (meta == null
-                || !Double.isFinite(meta)
-                || meta <= 0) {
+        if (!valorPositivoValido(
+                percentualLimite
+        )
+                || !valorPositivoValido(
+                meta
+        )) {
 
             return false;
         }
 
         double percentualAtual =
-                (valorAtual / meta) * 100.0;
+                (
+                        valorAtual
+                                / meta
+                )
+                        * 100.0;
 
-        return percentualAtual >= percentualLimite;
+        return percentualAtual
+                >= percentualLimite;
+    }
+
+    private int obterAntecedenciaMinutos(
+            String lembrete) {
+
+        return switch (
+                normalizarLembrete(
+                        lembrete
+                )
+                ) {
+
+            case "5_MIN" ->
+                    5;
+
+            case "15_MIN" ->
+                    15;
+
+            case "1_HORA" ->
+                    60;
+
+            default ->
+                    0;
+        };
+    }
+
+    private String normalizarLembrete(
+            String lembrete) {
+
+        String valor =
+                normalizar(
+                        lembrete
+                );
+
+        return valor.isBlank()
+                ? "NA_HORA"
+                : valor;
+    }
+
+    private Notificacao.Categoria
+    determinarCategoriaNotificacao(
+            Alerta alerta,
+            String tipo,
+            boolean percentualMetaRelacionado) {
+
+        String categoriaAlerta =
+                normalizar(
+                        alerta.getCategoria()
+                );
+
+        if ("META".equals(
+                categoriaAlerta
+        )
+                || percentualMetaRelacionado) {
+
+            return Notificacao
+                    .Categoria
+                    .META;
+        }
+
+        if ("GASTO".equals(
+                tipo
+        )) {
+
+            return Notificacao
+                    .Categoria
+                    .CONTA;
+        }
+
+        if ("CONSUMO".equals(
+                tipo
+        )) {
+
+            return Notificacao
+                    .Categoria
+                    .CONSUMO;
+        }
+
+        return Notificacao
+                .Categoria
+                .ALERTA;
+    }
+
+    private boolean categoriaPermitida(
+            Configuracao configuracao,
+            Notificacao.Categoria categoria) {
+
+        if (configuracao == null) {
+
+            return true;
+        }
+
+        return switch (categoria) {
+
+            case GERAIS ->
+                    !Boolean.FALSE.equals(
+                            configuracao
+                                    .getNotifGerais()
+                    );
+
+            case CONTA ->
+                    !Boolean.FALSE.equals(
+                            configuracao
+                                    .getNotifConta()
+                    );
+
+            case ALERTA ->
+                    !Boolean.FALSE.equals(
+                            configuracao
+                                    .getNotifAlerta()
+                    );
+
+            case CONSUMO ->
+                    !Boolean.FALSE.equals(
+                            configuracao
+                                    .getNotifConsumo()
+                    );
+
+            case META ->
+                    !Boolean.FALSE.equals(
+                            configuracao
+                                    .getNotifMeta()
+                    );
+        };
     }
 
     private boolean repeticaoPermiteDisparo(
@@ -315,19 +689,25 @@ public class AlertaDisparoService {
                 alerta.getUltimoDisparoEm();
 
         if (ultimo == null) {
+
             return true;
         }
 
         String repetir =
-                normalizar(alerta.getRepetir());
+                normalizar(
+                        alerta.getRepetir()
+                );
 
         if (repetir.isBlank()) {
-            repetir = "NUNCA";
+
+            repetir =
+                    "NUNCA";
         }
 
         return switch (repetir) {
 
-            case "NUNCA" -> false;
+            case "NUNCA" ->
+                    false;
 
             case "1_HORA" ->
                     !agora.isBefore(
@@ -344,7 +724,8 @@ public class AlertaDisparoService {
                             ultimo.plusDays(1)
                     );
 
-            default -> false;
+            default ->
+                    false;
         };
     }
 
@@ -356,15 +737,17 @@ public class AlertaDisparoService {
         try {
 
             Optional<Usuario> usuarioOpt =
-                    usuarioRepository.findById(
-                            usuarioId
-                    );
+                    usuarioRepository
+                            .findById(
+                                    usuarioId
+                            );
 
             if (usuarioOpt.isEmpty()) {
 
                 log.warn(
-                        "Não foi possível enviar e-mail do alerta: "
-                                + "usuário {} não encontrado.",
+                        "Não foi possível enviar e-mail "
+                                + "do alerta: usuário {} "
+                                + "não encontrado.",
                         usuarioId
                 );
 
@@ -372,32 +755,37 @@ public class AlertaDisparoService {
             }
 
             String email =
-                    usuarioOpt.get().getEmail();
+                    usuarioOpt
+                            .get()
+                            .getEmail();
 
             if (email == null
                     || email.isBlank()) {
 
                 log.warn(
-                        "Usuário {} não possui e-mail válido "
-                                + "para receber o alerta.",
+                        "Usuário {} não possui "
+                                + "e-mail válido para "
+                                + "receber o alerta.",
                         usuarioId
                 );
 
                 return false;
             }
 
-            emailService.enviarAlerta(
-                    email,
-                    titulo,
-                    mensagem
-            );
+            emailService
+                    .enviarAlerta(
+                            email,
+                            titulo,
+                            mensagem
+                    );
 
             return true;
 
         } catch (Exception e) {
 
             log.error(
-                    "Erro ao enviar alerta por e-mail para usuarioId={}",
+                    "Erro ao enviar alerta por "
+                            + "e-mail para usuarioId={}",
                     usuarioId,
                     e
             );
@@ -407,102 +795,192 @@ public class AlertaDisparoService {
     }
 
     private String construirTitulo(
-            Alerta alerta) {
+            Alerta alerta,
+            ResultadoLembrete resultadoLembrete) {
 
         String nome =
                 alerta.getNome() != null
-                        && !alerta.getNome().isBlank()
-                        ? alerta.getNome().trim()
+                        && !alerta
+                        .getNome()
+                        .isBlank()
+                        ? alerta
+                        .getNome()
+                        .trim()
                         : "Alerta";
 
-        return "Alerta disparado: " + nome;
+        if (resultadoLembrete
+                .antecipado()) {
+
+            return "Lembrete de alerta: "
+                    + nome;
+        }
+
+        return "Alerta disparado: "
+                + nome;
     }
 
     private String construirMensagem(
             Alerta alerta,
             String tipo,
             double valorAtual,
-            Double meta) {
+            Double meta,
+            ResultadoLembrete resultadoLembrete) {
 
         StringBuilder mensagem =
                 new StringBuilder();
 
-        if ("GASTO".equals(tipo)) {
+        if ("GASTO".equals(
+                tipo
+        )) {
 
-            mensagem.append(
-                    "Seu gasto acumulado no mês chegou a R$ "
-            );
-
-            mensagem.append(
-                    formatar(valorAtual, 2)
-            );
-
-            mensagem.append(".");
-
-            if (alerta.getValorLimite() != null) {
+            if (resultadoLembrete
+                    .antecipado()) {
 
                 mensagem.append(
-                        " Limite configurado: R$ "
+                        "Seu gasto acumulado "
+                                + "no mês está em R$ "
                 );
 
+            } else {
+
                 mensagem.append(
-                        formatar(
-                                alerta.getValorLimite(),
-                                2
+                        "Seu gasto acumulado "
+                                + "no mês chegou a R$ "
+                );
+            }
+
+            mensagem
+                    .append(
+                            formatar(
+                                    valorAtual,
+                                    2
+                            )
+                    )
+                    .append(".");
+
+            if (alerta
+                    .getValorLimite()
+                    != null) {
+
+                mensagem
+                        .append(
+                                " Limite configurado: R$ "
                         )
-                );
-
-                mensagem.append(".");
+                        .append(
+                                formatar(
+                                        alerta
+                                                .getValorLimite(),
+                                        2
+                                )
+                        )
+                        .append(".");
             }
 
         } else {
 
-            mensagem.append(
-                    "Seu consumo acumulado no mês chegou a "
-            );
-
-            mensagem.append(
-                    formatar(valorAtual, 2)
-            );
-
-            mensagem.append(" kWh.");
-
-            if (alerta.getValorLimite() != null) {
+            if (resultadoLembrete
+                    .antecipado()) {
 
                 mensagem.append(
-                        " Limite configurado: "
+                        "Seu consumo acumulado "
+                                + "no mês está em "
                 );
 
+            } else {
+
                 mensagem.append(
-                        formatar(
-                                alerta.getValorLimite(),
-                                2
+                        "Seu consumo acumulado "
+                                + "no mês chegou a "
+                );
+            }
+
+            mensagem
+                    .append(
+                            formatar(
+                                    valorAtual,
+                                    2
+                            )
+                    )
+                    .append(
+                            " kWh."
+                    );
+
+            if (alerta
+                    .getValorLimite()
+                    != null) {
+
+                mensagem
+                        .append(
+                                " Limite configurado: "
                         )
-                );
-
-                mensagem.append(" kWh.");
+                        .append(
+                                formatar(
+                                        alerta
+                                                .getValorLimite(),
+                                        2
+                                )
+                        )
+                        .append(
+                                " kWh."
+                        );
             }
         }
 
-        if (meta != null
-                && meta > 0
-                && alerta.getPercentualLimite() != null) {
+        if (valorPositivoValido(
+                meta
+        )
+                && alerta
+                .getPercentualLimite()
+                != null) {
 
             double percentualAtual =
-                    (valorAtual / meta) * 100.0;
-
-            mensagem.append(
-                    " Percentual atual da meta: "
-            );
-
-            mensagem.append(
-                    formatar(
-                            percentualAtual,
-                            1
+                    (
+                            valorAtual
+                                    / meta
                     )
+                            * 100.0;
+
+            mensagem
+                    .append(
+                            " Percentual atual da meta: "
+                    )
+                    .append(
+                            formatar(
+                                    percentualAtual,
+                                    1
+                            )
+                    )
+                    .append("%.");
+        }
+
+        if (resultadoLembrete
+                .antecipado()) {
+
+            mensagem.append(
+                    " Mantido o ritmo atual, "
+                            + "o limite deverá ser atingido "
+                            + "em aproximadamente "
             );
 
-            mensagem.append("%.");
+            mensagem.append(
+                    resultadoLembrete
+                            .minutosEstimados()
+            );
+
+            if (resultadoLembrete
+                    .minutosEstimados()
+                    == 1) {
+
+                mensagem.append(
+                        " minuto."
+                );
+
+            } else {
+
+                mensagem.append(
+                        " minutos."
+                );
+            }
         }
 
         return mensagem.toString();
@@ -511,7 +989,8 @@ public class AlertaDisparoService {
     private double calcularConsumoTotal(
             List<Consumo> consumos) {
 
-        double total = 0.0;
+        double total =
+                0.0;
 
         for (Consumo consumo : consumos) {
 
@@ -523,28 +1002,63 @@ public class AlertaDisparoService {
                     consumo.getConsumoKwh();
 
             if (kwh == null
-                    || !Double.isFinite(kwh)
+                    || !Double.isFinite(
+                    kwh
+            )
                     || kwh <= 0) {
 
                 continue;
             }
 
-            total += kwh;
+            total +=
+                    kwh;
         }
 
         return total;
     }
 
-    private boolean canalAtivo(Boolean valor) {
+    private boolean canalAtivo(
+            Boolean valor) {
 
-        return !Boolean.FALSE.equals(valor);
+        return !Boolean.FALSE.equals(
+                valor
+        );
     }
 
-    private String normalizar(String valor) {
+    private boolean valorPositivoValido(
+            Double valor) {
+
+        return valor != null
+                && Double.isFinite(
+                valor
+        )
+                && valor > 0;
+    }
+
+    private double sanitizarNaoNegativo(
+            double valor) {
+
+        if (!Double.isFinite(
+                valor
+        )
+                || valor < 0) {
+
+            return 0.0;
+        }
+
+        return valor;
+    }
+
+    private String normalizar(
+            String valor) {
 
         return valor == null
                 ? ""
-                : valor.trim().toUpperCase();
+                : valor
+                .trim()
+                .toUpperCase(
+                        Locale.ROOT
+                );
     }
 
     private String formatar(
@@ -556,5 +1070,53 @@ public class AlertaDisparoService {
                 "%." + casas + "f",
                 valor
         );
+    }
+
+    private record AlvoAlerta(
+            double valor,
+            boolean percentual) {
+    }
+
+    private record ResultadoLembrete(
+            boolean deveDisparar,
+            boolean antecipado,
+            boolean alvoPercentual,
+            long minutosEstimados) {
+
+        static ResultadoLembrete
+        naoDisparar() {
+
+            return new ResultadoLembrete(
+                    false,
+                    false,
+                    false,
+                    0L
+            );
+        }
+
+        static ResultadoLembrete
+        dispararNaHora(
+                boolean alvoPercentual) {
+
+            return new ResultadoLembrete(
+                    true,
+                    false,
+                    alvoPercentual,
+                    0L
+            );
+        }
+
+        static ResultadoLembrete
+        dispararAntecipado(
+                boolean alvoPercentual,
+                long minutosEstimados) {
+
+            return new ResultadoLembrete(
+                    true,
+                    true,
+                    alvoPercentual,
+                    minutosEstimados
+            );
+        }
     }
 }
