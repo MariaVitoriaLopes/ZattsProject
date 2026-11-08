@@ -176,7 +176,15 @@ public class AlertaService {
 
         Alerta alerta = alertaOpt.get();
 
+        boolean estavaAtivo =
+                Boolean.TRUE.equals(alerta.getAtivo());
+
         alerta.setAtivo(ativo);
+
+        if (!estavaAtivo && ativo) {
+            alerta.setUltimoDisparoEm(null);
+        }
+
         alerta.setAtualizadoEm(LocalDateTime.now());
 
         repository.save(alerta);

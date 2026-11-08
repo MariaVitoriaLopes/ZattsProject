@@ -2,7 +2,6 @@ package br.edu.fatec.zattsproject.backend.service;
 
 import br.edu.fatec.zattsproject.backend.model.Consumo;
 import br.edu.fatec.zattsproject.backend.model.Dispositivo;
-import br.edu.fatec.zattsproject.backend.repository.ConsumoRepository;
 import br.edu.fatec.zattsproject.backend.repository.DispositivoRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,132 +19,208 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class MqttLeituraService {
 
-    private final ConsumoRepository consumoRepository;
+    private final ConsumoService consumoService;
     private final DispositivoRepository dispositivoRepository;
     private final ObjectMapper objectMapper;
     private final SseService sseService;
 
-    // Guarda em memória o consumo de cada usuário até fechar a hora.
-    private final Map<String, AcumuladorHora> bufferAcumulado = new ConcurrentHashMap<>();
+    private final Map<String, AcumuladorHora>
+            bufferAcumulado =
+            new ConcurrentHashMap<>();
 
     private static class AcumuladorHora {
+
         LocalDateTime horaChave;
+
         double somaKwh;
         double somaPotenciaWatts;
         double somaCorrenteAmperes;
+
         int quantidadeLeituras;
+
         String dispositivoId;
 
-        AcumuladorHora(LocalDateTime horaChave, String dispositivoId) {
+        AcumuladorHora(
+                LocalDateTime horaChave,
+                String dispositivoId) {
+
             this.horaChave = horaChave;
             this.dispositivoId = dispositivoId;
         }
     }
 
-    public void processarEMensurarLeitura(String payloadJson) {
-        try {
-            Consumo consumoInstantaneo = objectMapper.readValue(payloadJson, Consumo.class);
+    public void processarEMensurarLeitura(
+            String payloadJson) {
 
-            if (consumoInstantaneo.getDataHora() == null) {
-                consumoInstantaneo.setDataHora(LocalDateTime.now());
+        try {
+
+            Consumo consumoInstantaneo =
+                    objectMapper.readValue(
+                            payloadJson,
+                            Consumo.class
+                    );
+
+            if (consumoInstantaneo.getDataHora()
+                    == null) {
+
+                consumoInstantaneo.setDataHora(
+                        LocalDateTime.now()
+                );
             }
 
-            String usuarioId = resolverUsuario(consumoInstantaneo);
+            String usuarioId =
+                    resolverUsuario(
+                            consumoInstantaneo
+                    );
 
             if (usuarioId == null) {
+
                 log.warn(
-                        "Leitura MQTT ignorada: não foi possível identificar o usuário. macAddress={}",
+                        "Leitura MQTT ignorada: "
+                                + "não foi possível identificar o usuário. "
+                                + "macAddress={}",
                         consumoInstantaneo.getMacAddress()
                 );
+
                 return;
             }
 
-            consumoInstantaneo.setUsuarioId(usuarioId);
+            consumoInstantaneo.setUsuarioId(
+                    usuarioId
+            );
 
-            // A Dashboard continua recebendo a leitura instantânea em tempo real.
-            sseService.sendConsumoToAll(consumoInstantaneo);
+            sseService.sendConsumoToAll(
+                    consumoInstantaneo
+            );
 
-            double kwhPulso = consumoInstantaneo.getConsumoKwh() != null
-                    ? consumoInstantaneo.getConsumoKwh()
-                    : 0.0;
+            double kwhPulso =
+                    consumoInstantaneo.getConsumoKwh()
+                            != null
+                            ? consumoInstantaneo
+                            .getConsumoKwh()
+                            : 0.0;
 
             LocalDateTime horaAtualTruncada =
-                    consumoInstantaneo.getDataHora().truncatedTo(ChronoUnit.HOURS);
+                    consumoInstantaneo
+                            .getDataHora()
+                            .truncatedTo(
+                                    ChronoUnit.HOURS
+                            );
 
-            bufferAcumulado.compute(usuarioId, (id, acumulador) -> {
+            bufferAcumulado.compute(
+                    usuarioId,
+                    (id, acumulador) -> {
 
-                if (acumulador != null
-                        && !acumulador.horaChave.equals(horaAtualTruncada)) {
+                        if (acumulador != null
+                                && !acumulador
+                                .horaChave
+                                .equals(
+                                        horaAtualTruncada
+                                )) {
 
-                    salvarConsumoFechadoNoAtlas(id, acumulador);
-                    acumulador = null;
-                }
+                            salvarConsumoFechadoNoAtlas(
+                                    id,
+                                    acumulador
+                            );
 
-                if (acumulador == null) {
-                    acumulador = new AcumuladorHora(
-                            horaAtualTruncada,
-                            consumoInstantaneo.getDispositivoId()
-                    );
-                }
+                            acumulador = null;
+                        }
 
-                acumulador.somaKwh += kwhPulso;
+                        if (acumulador == null) {
 
-                acumulador.somaPotenciaWatts +=
-                        consumoInstantaneo.getPotenciaWatts() != null
-                                ? consumoInstantaneo.getPotenciaWatts()
-                                : 0.0;
+                            acumulador =
+                                    new AcumuladorHora(
+                                            horaAtualTruncada,
+                                            consumoInstantaneo
+                                                    .getDispositivoId()
+                                    );
+                        }
 
-                acumulador.somaCorrenteAmperes +=
-                        consumoInstantaneo.getCorrenteAmperes() != null
-                                ? consumoInstantaneo.getCorrenteAmperes()
-                                : 0.0;
+                        acumulador.somaKwh +=
+                                kwhPulso;
 
-                acumulador.quantidadeLeituras++;
+                        acumulador.somaPotenciaWatts +=
+                                consumoInstantaneo
+                                        .getPotenciaWatts()
+                                        != null
+                                        ? consumoInstantaneo
+                                        .getPotenciaWatts()
+                                        : 0.0;
 
-                return acumulador;
-            });
+                        acumulador.somaCorrenteAmperes +=
+                                consumoInstantaneo
+                                        .getCorrenteAmperes()
+                                        != null
+                                        ? consumoInstantaneo
+                                        .getCorrenteAmperes()
+                                        : 0.0;
+
+                        acumulador.quantidadeLeituras++;
+
+                        return acumulador;
+                    }
+            );
 
         } catch (Exception e) {
-            log.error("Erro ao processar leitura do MQTT:", e);
+
+            log.error(
+                    "Erro ao processar leitura do MQTT:",
+                    e
+            );
         }
     }
 
-    private String resolverUsuario(Consumo consumo) {
+    private String resolverUsuario(
+            Consumo consumo) {
 
-        // Compatibilidade: se futuramente o dispositivo já enviar usuarioId,
-        // podemos utilizá-lo diretamente.
         if (consumo.getUsuarioId() != null
-                && !consumo.getUsuarioId().isBlank()) {
+                && !consumo.getUsuarioId()
+                .isBlank()) {
+
             return consumo.getUsuarioId();
         }
 
         if (consumo.getMacAddress() == null
-                || consumo.getMacAddress().isBlank()) {
+                || consumo.getMacAddress()
+                .isBlank()) {
+
             return null;
         }
 
         Optional<Dispositivo> dispositivo =
-                dispositivoRepository.findByMacAddress(consumo.getMacAddress());
+                dispositivoRepository
+                        .findByMacAddress(
+                                consumo.getMacAddress()
+                        );
 
         if (dispositivo.isEmpty()) {
+
             log.warn(
-                    "Nenhum dispositivo encontrado para o MAC {}",
+                    "Nenhum dispositivo encontrado "
+                            + "para o MAC {}",
                     consumo.getMacAddress()
             );
+
             return null;
         }
 
-        Dispositivo encontrado = dispositivo.get();
+        Dispositivo encontrado =
+                dispositivo.get();
 
         if (!encontrado.isAtivo()) {
+
             log.warn(
-                    "Leitura ignorada porque o dispositivo {} está inativo.",
+                    "Leitura ignorada porque "
+                            + "o dispositivo {} está inativo.",
                     consumo.getMacAddress()
             );
+
             return null;
         }
 
-        consumo.setDispositivoId(encontrado.getId());
+        consumo.setDispositivoId(
+                encontrado.getId()
+        );
 
         return encontrado.getUsuarioId();
     }
@@ -154,34 +229,59 @@ public class MqttLeituraService {
             String usuarioId,
             AcumuladorHora acumulador) {
 
-        double potenciaMedia = acumulador.quantidadeLeituras > 0
-                ? acumulador.somaPotenciaWatts / acumulador.quantidadeLeituras
-                : 0.0;
+        double potenciaMedia =
+                acumulador.quantidadeLeituras > 0
+                        ? acumulador.somaPotenciaWatts
+                        / acumulador.quantidadeLeituras
+                        : 0.0;
 
-        double correnteMedia = acumulador.quantidadeLeituras > 0
-                ? acumulador.somaCorrenteAmperes / acumulador.quantidadeLeituras
-                : 0.0;
+        double correnteMedia =
+                acumulador.quantidadeLeituras > 0
+                        ? acumulador.somaCorrenteAmperes
+                        / acumulador.quantidadeLeituras
+                        : 0.0;
 
-        Consumo consumoFechado = Consumo.builder()
-                .dispositivoId(acumulador.dispositivoId)
-                .usuarioId(usuarioId)
-                .consumoKwh(
-                        Math.round(acumulador.somaKwh * 100000.0) / 100000.0
-                )
-                .potenciaWatts(
-                        Math.round(potenciaMedia * 100.0) / 100.0
-                )
-                .correnteAmperes(
-                        Math.round(correnteMedia * 100.0) / 100.0
-                )
-                .voltagem(220.0)
-                .dataHora(acumulador.horaChave)
-                .build();
+        Consumo consumoFechado =
+                Consumo.builder()
+                        .dispositivoId(
+                                acumulador.dispositivoId
+                        )
+                        .usuarioId(
+                                usuarioId
+                        )
+                        .consumoKwh(
+                                Math.round(
+                                        acumulador.somaKwh
+                                                * 100000.0
+                                ) / 100000.0
+                        )
+                        .potenciaWatts(
+                                Math.round(
+                                        potenciaMedia
+                                                * 100.0
+                                ) / 100.0
+                        )
+                        .correnteAmperes(
+                                Math.round(
+                                        correnteMedia
+                                                * 100.0
+                                ) / 100.0
+                        )
+                        .voltagem(220.0)
+                        .dataHora(
+                                acumulador.horaChave
+                        )
+                        .build();
 
-        Consumo salvo = consumoRepository.save(consumoFechado);
+        Consumo salvo =
+                consumoService.salvar(
+                        consumoFechado
+                );
 
         log.info(
-                ">>> CONSUMO CONSOLIDADO DA HORA SALVO NO ATLAS: ID={} | Hora={} | Total={} kWh",
+                ">>> CONSUMO CONSOLIDADO DA HORA "
+                        + "SALVO NO ATLAS: "
+                        + "ID={} | Hora={} | Total={} kWh",
                 salvo.getId(),
                 acumulador.horaChave,
                 salvo.getConsumoKwh()
