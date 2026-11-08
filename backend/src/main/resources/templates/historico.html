@@ -1,19 +1,327 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
     <title>Histórico</title>
-    <link rel="stylesheet" th:href="@{/css/manutencao.css}">
+
     <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/historico.css}">
     <th:block th:replace="~{fragments/headTema :: tema}"></th:block>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
+
 <body>
-    <div th:replace="~{fragments/headerTelas :: header}"></div>
-    <div th:replace="~{fragments/manutencao :: manutencao}"></div>
+
+<div th:replace="~{fragments/headerTelas :: header}"></div>
+
+<main class="hist-pagina" th:attr="data-usuario-id=${usuarioId}">
+
+    <div class="hist-topo">
+
+        <div class="hist-abas" role="tablist">
+            <button type="button" class="hist-aba" data-vista="semanal" role="tab">Semanal</button>
+            <button type="button" class="hist-aba ativa" data-vista="mensal" role="tab">Mensal</button>
+            <button type="button" class="hist-aba" data-vista="comparativo" role="tab">Comparativo mensal</button>
+        </div>
+
+        <button type="button" class="hist-btn-exportar" id="btnExportarPdf">
+            <span class="material-symbols-outlined">download</span>
+            Exportar PDF
+        </button>
+
+    </div>
+
+    <section class="hist-vista" id="vistaSemanal" hidden>
+
+        <div class="hist-titulo-linha">
+            <h1>Histórico Semanal</h1>
+
+            <div class="hist-seletor">
+                <span class="material-symbols-outlined">calendar_month</span>
+                <select id="semanalSeletor" aria-label="Escolher a semana"></select>
+                <span class="material-symbols-outlined hist-seletor-seta">expand_more</span>
+            </div>
+        </div>
+
+        <div class="hist-cards hist-cards-semanal">
+
+            <article class="hist-card">
+                <div class="hist-card-icone">
+                    <span class="material-symbols-outlined">bolt</span>
+                </div>
+
+                <div class="hist-card-corpo">
+                    <h2>Consumo de energia</h2>
+                    <strong class="hist-valor"><span id="semanalKwh">0</span> <small>kWh</small></strong>
+                    <p>Total de energia consumida na semana</p>
+                </div>
+            </article>
+
+            <article class="hist-card">
+                <div class="hist-card-icone">
+                    <span class="material-symbols-outlined">paid</span>
+                </div>
+
+                <div class="hist-card-corpo">
+                    <h2>Custo estimado</h2>
+                    <strong class="hist-valor"><span id="semanalCusto">0,00</span> <small>Reais</small></strong>
+                    <p>Valor estimado na semana com base na tarifa</p>
+                </div>
+            </article>
+
+            <article class="hist-card">
+                <div class="hist-card-icone">
+                    <span class="material-symbols-outlined">close_fullscreen</span>
+                </div>
+
+                <div class="hist-card-corpo">
+                    <h2>Valor total por semana</h2>
+
+                    <div class="hist-duplo">
+                        <div class="hist-caixa">
+                            <span id="semanalRotuloAtual">Semana atual</span>
+                            <strong id="semanalValorAtual">R$ 0,00</strong>
+                        </div>
+
+                        <div class="hist-caixa">
+                            <span>Semana anterior</span>
+                            <strong id="semanalValorAnterior">R$ 0,00</strong>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+        <article class="hist-grafico-card">
+
+            <div class="hist-grafico-cabecalho">
+                <div>
+                    <h2>Consumo de energia semanal</h2>
+                    <p>Veja o consumo de energia (kWh) de cada dia da semana</p>
+                </div>
+
+                <span class="hist-legenda">
+                    <span class="hist-bolinha"></span>
+                    Consumo diário
+                </span>
+            </div>
+
+            <p class="hist-estado" id="semanalEstado" hidden></p>
+
+            <div class="hist-grafico">
+                <canvas id="graficoSemanal"></canvas>
+            </div>
+
+        </article>
+
+    </section>
+
+    <section class="hist-vista" id="vistaMensal">
+
+        <div class="hist-titulo-linha">
+            <h1>Histórico Mensal</h1>
+
+            <div class="hist-seletor">
+                <span class="material-symbols-outlined">calendar_month</span>
+                <select id="mensalSeletor" aria-label="Escolher o mês"></select>
+                <span class="material-symbols-outlined hist-seletor-seta">expand_more</span>
+            </div>
+        </div>
+
+        <div class="hist-cards hist-cards-mensal">
+
+            <article class="hist-card">
+                <div class="hist-card-icone">
+                    <span class="material-symbols-outlined">bolt</span>
+                </div>
+
+                <div class="hist-card-corpo">
+                    <h2>Consumo de energia</h2>
+                    <strong class="hist-valor"><span id="mensalKwh">0</span> <small>kWh</small></strong>
+                    <p>Total de energia consumida no mês</p>
+                </div>
+            </article>
+
+            <article class="hist-card">
+                <div class="hist-card-icone">
+                    <span class="material-symbols-outlined">paid</span>
+                </div>
+
+                <div class="hist-card-corpo">
+                    <h2>Custo estimado</h2>
+                    <strong class="hist-valor"><span id="mensalCusto">0,00</span> <small>Reais</small></strong>
+                    <p>Valor estimado no mês com base na tarifa</p>
+                </div>
+            </article>
+
+            <article class="hist-card">
+                <div class="hist-card-icone">
+                    <span class="material-symbols-outlined">close_fullscreen</span>
+                </div>
+
+                <div class="hist-card-corpo">
+                    <h2>Valor total por mês</h2>
+
+                    <div class="hist-duplo">
+                        <div class="hist-caixa">
+                            <span id="mensalRotuloAtual">Mês atual</span>
+                            <strong id="mensalValorAtual">R$ 0,00</strong>
+                        </div>
+
+                        <div class="hist-caixa">
+                            <span>Mês anterior</span>
+                            <strong id="mensalValorAnterior">R$ 0,00</strong>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+        <article class="hist-grafico-card">
+
+            <div class="hist-grafico-cabecalho">
+                <div>
+                    <h2>Consumo de energia mensal</h2>
+                    <p>Veja o consumo de energia (kWh) de cada dia do mês</p>
+                </div>
+
+                <span class="hist-legenda">
+                    <span class="hist-bolinha"></span>
+                    Consumo diário
+                </span>
+            </div>
+
+            <p class="hist-estado" id="mensalEstado" hidden></p>
+
+            <div class="hist-grafico">
+                <canvas id="graficoMensal"></canvas>
+            </div>
+
+            <p class="hist-nota">
+                <span class="material-symbols-outlined">info</span>
+                Os valores monetários são estimativas baseadas na tarifa configurada.
+            </p>
+
+        </article>
+
+    </section>
+
+    <section class="hist-vista" id="vistaComparativo" hidden>
+
+        <div class="hist-titulo-linha">
+            <h1>Histórico Comparativo</h1>
+
+            <div class="hist-seletor">
+                <span class="material-symbols-outlined">calendar_month</span>
+                <select id="comparativoSeletor" aria-label="Escolher o mês a comparar"></select>
+                <span class="material-symbols-outlined hist-seletor-seta">expand_more</span>
+            </div>
+        </div>
+
+        <div class="hist-cards hist-cards-comparativo">
+
+            <article class="hist-card">
+                <div class="hist-card-icone">
+                    <span class="material-symbols-outlined">bolt</span>
+                </div>
+
+                <div class="hist-card-corpo">
+                    <h2>Consumo de energia</h2>
+
+                    <div class="hist-duplo">
+                        <div class="hist-caixa">
+                            <span id="comparativoRotuloKwhAtual">Mês atual</span>
+                            <strong id="comparativoKwhAtual">0 kWh</strong>
+                        </div>
+
+                        <div class="hist-caixa">
+                            <span>Mês anterior</span>
+                            <strong id="comparativoKwhAnterior">0 kWh</strong>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hist-card hist-card-variacao">
+                <h2>Variação de Gastos</h2>
+                <strong class="hist-valor" id="comparativoVariacao">R$ 0,00</strong>
+                <p id="comparativoVariacaoTexto">Sem dados para comparar</p>
+            </article>
+
+            <article class="hist-card">
+                <div class="hist-card-icone">
+                    <span class="material-symbols-outlined">close_fullscreen</span>
+                </div>
+
+                <div class="hist-card-corpo">
+                    <h2>Valor total por mês</h2>
+
+                    <div class="hist-duplo">
+                        <div class="hist-caixa">
+                            <span id="comparativoRotuloValorAtual">Mês atual</span>
+                            <strong id="comparativoValorAtual">R$ 0,00</strong>
+                        </div>
+
+                        <div class="hist-caixa">
+                            <span>Mês anterior</span>
+                            <strong id="comparativoValorAnterior">R$ 0,00</strong>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+        <article class="hist-grafico-card">
+
+            <div class="hist-grafico-cabecalho">
+                <div>
+                    <h2>Comparativo entre os meses</h2>
+                    <p>Veja o consumo de energia (kWh) comparativo entre os meses</p>
+                </div>
+
+                <div class="hist-legenda-grupo">
+                    <span class="hist-legenda">
+                        <span class="hist-bolinha"></span>
+                        <span id="comparativoLegendaAtual">Consumo no mês atual</span>
+                    </span>
+
+                    <span class="hist-legenda">
+                        <span class="hist-bolinha hist-bolinha-secundaria"></span>
+                        <span id="comparativoLegendaAnterior">Consumo no mês anterior</span>
+                    </span>
+                </div>
+            </div>
+
+            <p class="hist-estado" id="comparativoEstado" hidden></p>
+
+            <div class="hist-grafico">
+                <canvas id="graficoComparativo"></canvas>
+            </div>
+
+            <p class="hist-nota">
+                <span class="material-symbols-outlined">info</span>
+                Os valores monetários são estimativas baseadas na tarifa configurada.
+            </p>
+
+        </article>
+
+    </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8"></script>
+<script th:src="@{/js/script.js}"></script>
+<script th:src="@{/js/historico.js}"></script>
+
 </body>
+
 </html>

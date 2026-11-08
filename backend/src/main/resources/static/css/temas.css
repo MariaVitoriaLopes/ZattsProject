@@ -369,8 +369,8 @@ html[data-tema="escuro"] .btnEntrar {
 }
 
 html[data-tema="escuro"] .btnEntrar:hover {
-    background-color: var(--cor-primaria-400);
-    color: var(--cor-primaria-950);
+    background-color: #E6FB1A;
+    color: #3B3903;
 }
 
 html[data-tema="escuro"] .alert-danger {

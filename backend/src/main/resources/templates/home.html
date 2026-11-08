@@ -186,7 +186,7 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' } },
+                        y: { beginAtZero: true, grace: '15%', grid: { color: 'rgba(255,255,255,0.08)' } },
                         x: { grid: { display: false }, ticks: {maxTicksLimit: 10} }
                     }
                 }
@@ -235,11 +235,12 @@
                     scales: {
                         y: {
                             beginAtZero: true,
+                            grace: '15%',
                             grid: {
                                 color: 'rgba(255,255,255,0.08)'
                             },
                             ticks: {
-                                precision: 0
+                                maxTicksLimit: 6
                             }
                         },
                         x: {
