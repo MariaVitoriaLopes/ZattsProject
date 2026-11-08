@@ -126,4 +126,12 @@ public class ConsumoService {
         double fator = Math.pow(10, casas);
         return Math.round(valor * fator) / fator;
     }
+    public long apagarHistoricoPorUsuario(String usuarioId) {
+
+        if (usuarioId == null || usuarioId.isBlank()) {
+            throw new IllegalArgumentException("Usuário inválido.");
+        }
+
+        return repository.deleteByUsuarioId(usuarioId);
+    }
 }

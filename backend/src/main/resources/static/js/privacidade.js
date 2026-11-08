@@ -6,20 +6,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let temporizador = null;
 
-    function ler(chave, padrao) {
-        if (window.zattsTema) {
-            return window.zattsTema.ler(chave, padrao);
-        }
-
-        return padrao;
-    }
-
-    function gravar(chave, valor) {
-        if (window.zattsTema) {
-            window.zattsTema.gravar(chave, valor);
-        }
-    }
-
     function mostrarRetorno(texto, erro) {
         clearTimeout(temporizador);
 
@@ -32,33 +18,143 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 6000);
     }
 
-    interruptores.forEach(function (interruptor) {
-        const chave = 'zatts-priv-' + interruptor.id;
-        const salvo = ler(chave, null);
+    async function salvarPreferencias() {
+        const dados = new URLSearchParams();
 
-        if (salvo !== null) {
-            interruptor.checked = salvo === 'sim';
+        dados.append(
+            'compartilharDadosUso',
+            document.getElementById('privUsoAnonimo').checked
+        );
+
+        dados.append(
+            'recomendacoesPersonalizadas',
+            document.getElementById('privRecomendacoes').checked
+        );
+
+        dados.append(
+            'comparacaoResidencias',
+            document.getElementById('privComparativo').checked
+        );
+
+        try {
+            const resposta = await fetch(
+                '/configuracoes/privacidade',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':
+                            'application/x-www-form-urlencoded;charset=UTF-8'
+                    },
+                    body: dados
+                }
+            );
+
+            if (resposta.status === 401) {
+                window.location.href = '/login';
+                return;
+            }
+
+            const retornoBackend = await resposta.json();
+
+            if (!resposta.ok) {
+                mostrarRetorno(
+                    retornoBackend.erro ||
+                    'Não foi possível salvar suas preferências.',
+                    true
+                );
+                return;
+            }
+
+            mostrarRetorno(
+                retornoBackend.mensagem ||
+                'Preferências salvas com sucesso.',
+                false
+            );
+
+        } catch (erro) {
+            console.error(
+                'Erro ao salvar preferências de privacidade:',
+                erro
+            );
+
+            mostrarRetorno(
+                'Não foi possível conectar ao servidor.',
+                true
+            );
         }
+    }
 
-        interruptor.addEventListener('change', function () {
-            gravar(chave, interruptor.checked ? 'sim' : 'nao');
-        });
+    interruptores.forEach(function (interruptor) {
+        interruptor.addEventListener(
+            'change',
+            salvarPreferencias
+        );
     });
 
-    btnExportar.addEventListener('click', function () {
+    btnExportar.addEventListener('click', async function () {
         if (!confirm('Deseja exportar uma cópia dos seus dados?')) {
             return;
         }
 
         btnExportar.disabled = true;
 
-        setTimeout(function () {
+        try {
+            const resposta = await fetch(
+                '/configuracoes/privacidade/exportar'
+            );
+
+            if (resposta.status === 401) {
+                window.location.href = '/login';
+                return;
+            }
+
+            if (!resposta.ok) {
+                const retornoBackend = await resposta.json();
+
+                mostrarRetorno(
+                    retornoBackend.erro ||
+                    'Não foi possível exportar seus dados.',
+                    true
+                );
+                return;
+            }
+
+            const arquivo = await resposta.blob();
+            const url = URL.createObjectURL(arquivo);
+
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.download = 'zatts-dados.json';
+
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            URL.revokeObjectURL(url);
+
+            mostrarRetorno(
+                'Dados exportados com sucesso.',
+                false
+            );
+
+        } catch (erro) {
+            console.error(
+                'Erro ao exportar dados:',
+                erro
+            );
+
+            mostrarRetorno(
+                'Não foi possível conectar ao servidor.',
+                true
+            );
+
+        } finally {
             btnExportar.disabled = false;
-            mostrarRetorno('Exportação solicitada com sucesso.', false);
-        }, 800);
+        }
     });
 
-    btnApagar.addEventListener('click', function () {
+    btnApagar.addEventListener('click', async function () {
         const confirmar = confirm(
             'Tem certeza que deseja apagar o histórico de consumo?\n\n' +
             'Todas as leituras salvas serão removidas e a ação não pode ser desfeita.'
@@ -70,9 +166,49 @@ document.addEventListener('DOMContentLoaded', function () {
 
         btnApagar.disabled = true;
 
-        setTimeout(function () {
+        try {
+            const resposta = await fetch(
+                '/configuracoes/privacidade/apagar-historico',
+                {
+                    method: 'POST'
+                }
+            );
+
+            if (resposta.status === 401) {
+                window.location.href = '/login';
+                return;
+            }
+
+            const retornoBackend = await resposta.json();
+
+            if (!resposta.ok) {
+                mostrarRetorno(
+                    retornoBackend.erro ||
+                    'Não foi possível apagar o histórico de consumo.',
+                    true
+                );
+                return;
+            }
+
+            mostrarRetorno(
+                retornoBackend.mensagem ||
+                'Histórico de consumo apagado com sucesso.',
+                false
+            );
+
+        } catch (erro) {
+            console.error(
+                'Erro ao apagar histórico de consumo:',
+                erro
+            );
+
+            mostrarRetorno(
+                'Não foi possível conectar ao servidor.',
+                true
+            );
+
+        } finally {
             btnApagar.disabled = false;
-            mostrarRetorno('Histórico de consumo apagado.', false);
-        }, 800);
+        }
     });
 });

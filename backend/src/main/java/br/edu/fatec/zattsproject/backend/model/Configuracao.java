@@ -35,4 +35,10 @@ public class Configuracao {
     private Double tarifaKwh = 0.88;
     @Builder.Default
     private Double cipReais = 12.50;
+    @Builder.Default
+    private Boolean compartilharDadosUso = true;
+    @Builder.Default
+    private Boolean recomendacoesPersonalizadas = true;
+    @Builder.Default
+    private Boolean comparacaoResidencias = false;
 }

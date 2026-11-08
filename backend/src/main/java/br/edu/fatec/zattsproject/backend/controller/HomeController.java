@@ -115,11 +115,20 @@ public class HomeController {
     }
 
     @GetMapping("/configuracoes/privacidade")
-    public String configuracoesPrivacidade(Model model, HttpSession session) {
-        if (obterUsuarioLogado(session) == null) {
+    public String configuracoesPrivacidade(
+            Model model,
+            HttpSession session) {
+        Usuario usuario = obterUsuarioLogado(session);
+        if (usuario == null) {
             return "redirect:/login";
         }
         model.addAttribute("paginaAtual", "configuracoes");
+        model.addAttribute(
+                "configuracao",
+                configuracaoService.buscarPrivacidade(
+                        usuario.getId()
+                )
+        );
         return "configuracoes-privacidade";
     }
 

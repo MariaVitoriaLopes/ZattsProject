@@ -53,7 +53,7 @@
                         <strong>Dados de uso anônimos</strong>
                         <span>Ajuda a melhorar o sistema, sem identificar você.</span>
                     </div>
-                    <input type="checkbox" class="priv-interruptor" id="privUsoAnonimo" checked>
+                    <input type="checkbox" class="priv-interruptor" id="privUsoAnonimo" th:checked="${configuracao.compartilharDadosUso}">
                 </label>
 
                 <label class="priv-linha">
@@ -61,7 +61,7 @@
                         <strong>Recomendações personalizadas</strong>
                         <span>Usa seu histórico de consumo para sugerir formas de economizar.</span>
                     </div>
-                    <input type="checkbox" class="priv-interruptor" id="privRecomendacoes" checked>
+                    <input type="checkbox" class="priv-interruptor" id="privRecomendacoes" th:checked="${configuracao.recomendacoesPersonalizadas}">
                 </label>
 
                 <label class="priv-linha">
@@ -69,7 +69,7 @@
                         <strong>Comparar com residências semelhantes</strong>
                         <span>Compara seu consumo com a média de casas parecidas, de forma anônima.</span>
                     </div>
-                    <input type="checkbox" class="priv-interruptor" id="privComparativo">
+                    <input type="checkbox" class="priv-interruptor" id="privComparativo" th:checked="${configuracao.comparacaoResidencias}">
                 </label>
 
             </div>

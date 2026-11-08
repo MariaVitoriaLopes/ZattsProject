@@ -206,4 +206,59 @@ public class ConfiguracaoService {
 
         return configuracao.getCipReais();
     }
+    public Configuracao buscarPrivacidade(String usuarioId) {
+
+        Configuracao configuracao = buscarPorUsuario(usuarioId);
+
+        if (configuracao == null) {
+            configuracao = Configuracao.builder()
+                    .usuarioId(usuarioId)
+                    .build();
+
+            return repository.save(configuracao);
+        }
+
+        boolean alterado = false;
+
+        if (configuracao.getCompartilharDadosUso() == null) {
+            configuracao.setCompartilharDadosUso(true);
+            alterado = true;
+        }
+
+        if (configuracao.getRecomendacoesPersonalizadas() == null) {
+            configuracao.setRecomendacoesPersonalizadas(true);
+            alterado = true;
+        }
+
+        if (configuracao.getComparacaoResidencias() == null) {
+            configuracao.setComparacaoResidencias(false);
+            alterado = true;
+        }
+
+        if (alterado) {
+            return repository.save(configuracao);
+        }
+
+        return configuracao;
+    }
+    public Configuracao salvarPrivacidade(
+            String usuarioId,
+            boolean compartilharDadosUso,
+            boolean recomendacoesPersonalizadas,
+            boolean comparacaoResidencias) {
+
+        Configuracao configuracao = buscarPorUsuario(usuarioId);
+
+        if (configuracao == null) {
+            configuracao = Configuracao.builder()
+                    .usuarioId(usuarioId)
+                    .build();
+        }
+
+        configuracao.setCompartilharDadosUso(compartilharDadosUso);
+        configuracao.setRecomendacoesPersonalizadas(recomendacoesPersonalizadas);
+        configuracao.setComparacaoResidencias(comparacaoResidencias);
+
+        return repository.save(configuracao);
+    }
 }

@@ -36,4 +36,5 @@ public interface ConsumoRepository extends MongoRepository<Consumo, String> {
             LocalDateTime inicio,
             LocalDateTime fim
     );
+    long deleteByUsuarioId(String usuarioId);
 }
