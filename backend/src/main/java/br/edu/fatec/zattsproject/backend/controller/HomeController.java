@@ -5,11 +5,17 @@ import br.edu.fatec.zattsproject.backend.model.Usuario;
 import br.edu.fatec.zattsproject.backend.service.AlertaService;
 import br.edu.fatec.zattsproject.backend.service.ConfiguracaoService;
 import br.edu.fatec.zattsproject.backend.service.DashboardService;
+import br.edu.fatec.zattsproject.backend.model.Notificacao;
+import br.edu.fatec.zattsproject.backend.service.NotificacaoService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -18,6 +24,7 @@ public class HomeController {
     private final ConfiguracaoService configuracaoService;
     private final AlertaService alertaService;
     private final DashboardService dashboardService;
+    private final NotificacaoService notificacaoService;
 
     private Usuario obterUsuarioLogado(HttpSession session) {
         return (Usuario) session.getAttribute("usuarioLogado");
@@ -26,22 +33,17 @@ public class HomeController {
     @GetMapping("/home")
     public String home(Model model, HttpSession session) {
         Usuario usuario = obterUsuarioLogado(session);
-
         if (usuario == null) {
             return "redirect:/login";
         }
-
         model.addAttribute("paginaAtual", "home");
         model.addAttribute("usuario", usuario);
         model.addAttribute("configuracao", configuracaoService.buscarPorUsuario(usuario.getId()));
-
         DashboardDTO dashboardData = dashboardService.obterDadosDashboard(usuario.getId());
         model.addAttribute("dash", dashboardData);
         model.addAttribute("usuarioId", usuario.getId());
-
         return "home";
     }
-
     @GetMapping("/historico")
     public String historico(Model model, HttpSession session) {
         Usuario usuario = obterUsuarioLogado(session);
@@ -52,7 +54,6 @@ public class HomeController {
         model.addAttribute("usuarioId", usuario.getId());
         return "historico";
     }
-
     @GetMapping("/alertas")
     public String alertas(Model model, HttpSession session) {
         Usuario usuario = obterUsuarioLogado(session);
@@ -63,15 +64,34 @@ public class HomeController {
         model.addAttribute("alertas", alertaService.listar(usuario.getId()));
         return "alertas";
     }
-
     @GetMapping("/notificacoes")
-    public String notificacoes(Model model, HttpSession session) {
+    public String notificacoes(
+            @RequestParam(defaultValue = "0") int pagina,
+            Model model,
+            HttpSession session) {
         Usuario usuario = obterUsuarioLogado(session);
         if (usuario == null) {
             return "redirect:/login";
         }
+        int paginaSegura = Math.max(pagina, 0);
+        Page<Notificacao> paginaNotificacoes =
+                notificacaoService.listar(
+                        usuario.getId(),
+                        PageRequest.of(paginaSegura, 10)
+                );
         model.addAttribute("paginaAtual", "notificacoes");
-        model.addAttribute("configuracao", configuracaoService.buscarPorUsuario(usuario.getId()));
+        model.addAttribute(
+                "configuracao",
+                configuracaoService.buscarPorUsuario(usuario.getId())
+        );
+        model.addAttribute(
+                "notificacoes",
+                paginaNotificacoes.getContent()
+        );
+        model.addAttribute(
+                "paginaNotificacoes",
+                paginaNotificacoes
+        );
         return "notificacoes";
     }
 

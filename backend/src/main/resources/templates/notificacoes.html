@@ -62,105 +62,62 @@
 
     <section class="card-notificacoes" id="aba-geral">
 
-        <ul class="lista-notificacoes">
+        <ul class="lista-notificacoes"
+            th:if="${notificacoes != null and !#lists.isEmpty(notificacoes)}">
 
-            <li class="notificacao">
+            <li class="notificacao"
+                th:each="notificacao : ${notificacoes}"
+                th:attr="data-notificacao-id=${notificacao.id},
+                     data-lida=${notificacao.lida}">
 
                 <div class="notificacao-icone">
-                    <span class="material-symbols-outlined">bolt</span>
+
+                <span class="material-symbols-outlined"
+                      th:switch="${notificacao.categoria.name()}">
+
+                    <th:block th:case="'GERAIS'">notifications</th:block>
+                    <th:block th:case="'CONTA'">person</th:block>
+                    <th:block th:case="'ALERTA'">notifications_active</th:block>
+                    <th:block th:case="'CONSUMO'">bolt</th:block>
+                    <th:block th:case="'META'">flag</th:block>
+                    <th:block th:case="*">notifications</th:block>
+
+                </span>
+
                 </div>
 
                 <div class="notificacao-texto">
-                    <p class="notificacao-titulo">
-                        Queda de energia foi disparado
+
+                    <p class="notificacao-titulo"
+                       th:text="${notificacao.titulo}">
+                        Notificação
                     </p>
-                    <small class="notificacao-tempo">
-                        1 hora atrás
+
+                    <small class="notificacao-tempo"
+                           th:text="${notificacao.mensagem}">
+                        Mensagem da notificação.
                     </small>
+
                 </div>
-
-                <button type="button"
-                        class="notificacao-excluir"
-                        aria-label="Excluir notificação">
-                    <span class="material-symbols-outlined">delete</span>
-                </button>
-
-            </li>
-
-            <li class="notificacao">
-
-                <div class="notificacao-icone">
-                    <span class="material-symbols-outlined">gpp_maybe</span>
-                </div>
-
-                <div class="notificacao-texto">
-                    <p class="notificacao-titulo">
-                        Alerta “Queda de energia” criado
-                    </p>
-                    <small class="notificacao-tempo">
-                        2 horas atrás
-                    </small>
-                </div>
-
-                <button type="button"
-                        class="notificacao-excluir"
-                        aria-label="Excluir notificação">
-                    <span class="material-symbols-outlined">delete</span>
-                </button>
-
-            </li>
-
-            <li class="notificacao">
-
-                <div class="notificacao-icone">
-                    <span class="material-symbols-outlined">flag</span>
-                </div>
-
-                <div class="notificacao-texto">
-                    <p class="notificacao-titulo">
-                        Meta criada para até 250 kWh
-                    </p>
-                    <small class="notificacao-tempo">
-                        6 de Outubro
-                    </small>
-                </div>
-
-                <button type="button"
-                        class="notificacao-excluir"
-                        aria-label="Excluir notificação">
-                    <span class="material-symbols-outlined">delete</span>
-                </button>
-
-            </li>
-
-            <li class="notificacao">
-
-                <div class="notificacao-icone">
-                    <span class="material-symbols-outlined">how_to_reg</span>
-                </div>
-
-                <div class="notificacao-texto">
-                    <p class="notificacao-titulo">
-                        Bem-vindo! Sua conta foi criada com sucesso
-                    </p>
-                    <small class="notificacao-tempo">
-                        27 de Dezembro de 2025
-                    </small>
-                </div>
-
-                <button type="button"
-                        class="notificacao-excluir"
-                        aria-label="Excluir notificação">
-                    <span class="material-symbols-outlined">delete</span>
-                </button>
 
             </li>
 
         </ul>
 
-        <p class="sem-notificacoes">
-            Sem mais notificações
-        </p>
+        <div class="alertas-vazio"
+             th:if="${notificacoes == null or #lists.isEmpty(notificacoes)}">
+
+        <span class="material-symbols-outlined">
+            notifications_off
+        </span>
+
+            <h3>Nenhuma notificação recebida</h3>
+
+            <p>
+                Suas notificações aparecerão aqui quando houver novidades.
+            </p>
+
+        </div>
 
     </section>
 
