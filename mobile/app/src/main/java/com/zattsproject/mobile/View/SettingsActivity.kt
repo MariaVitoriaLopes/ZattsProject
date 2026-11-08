@@ -30,11 +30,41 @@ class SettingsActivity : AppCompatActivity() {
                 )
             }
 
+        // Abrir Notificações
+        findViewById<View>(R.id.item_notificacoes)
+            .setOnClickListener {
+                startActivity(
+                    Intent(
+                        this,
+                        ConfigNotificacoesActivity::class.java
+                    )
+                )
+            }
+
         // Abrir Preferências
         findViewById<View>(R.id.item_preferencias)
             .setOnClickListener {
                 startActivity(
                     Intent(this, PreferenciasActivity::class.java)
+                )
+            }
+
+        // Abrir Dispositivos
+        findViewById<View>(R.id.item_dispositivos)
+            .setOnClickListener {
+                startActivity(
+                    Intent(this, DispositivosActivity::class.java)
+                )
+            }
+
+        // Abrir Privadicade e dados
+        findViewById<View>(R.id.item_privacidade)
+            .setOnClickListener {
+                startActivity(
+                    Intent(
+                        this,
+                        PrivacidadeDadosActivity::class.java
+                    )
                 )
             }
     }

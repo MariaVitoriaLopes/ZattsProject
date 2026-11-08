@@ -1,6 +1,201 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/bg_card_alerta">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- IDENTIFICAÇÃO -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/iconeAlerta"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:src="@drawable/ic_bolt"
+            android:contentDescription="Ícone do alerta"
+            android:background="@drawable/bg_icone_alerta"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txvTituloAlerta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Queda de Energia"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurface"/>
+
+            <TextView
+                android:id="@+id/txvDescricaoAlerta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Dispara sempre que a energia chega a 0 kWh em até 1 hora."
+                android:textSize="13sp"
+                android:textColor="?android:attr/textColorSecondary"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- CONDIÇÃO -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="Condição"
+        android:textSize="14sp"
+        android:textColor="?attr/colorOnSurface"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/txvCondicao"
+            style="@style/ZattsChipAlerta"
+            android:text="Energia = 0 kWh"/>
+
+        <TextView
+            android:id="@+id/txvPeriodo"
+            style="@style/ZattsChipAlerta"
+            android:layout_marginStart="12dp"
+            android:text="Em até 1 hora"/>
+
+    </LinearLayout>
+
+    <!-- NOTIFICAR POR -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Notificar por"
+        android:textSize="14sp"
+        android:textColor="?attr/colorOnSurface"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/txvEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp"
+            android:background="@drawable/bg_chip_alerta">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_mail"
+                android:contentDescription="E-mail"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="E-mail"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurface"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/txvPush"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginStart="12dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp"
+            android:background="@drawable/bg_chip_alerta">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_push"
+                android:contentDescription="Push"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Push"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurface"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- AÇÕES -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ativar alerta"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurface"/>
+
+            <Switch
+                android:id="@+id/switchAlerta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:checked="true"/>
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnEditarAlerta"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="12dp"
+            android:padding="12dp"
+            android:background="@drawable/bg_icone_alerta"
+            android:src="@drawable/ic_conta_editar"
+            android:contentDescription="Editar alerta"/>
+
+        <ImageButton
+            android:id="@+id/btnExcluirAlerta"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:background="@drawable/bg_icone_alerta"
+            android:src="@drawable/ic_delete"
+            android:contentDescription="Excluir alerta"
+            android:tint="#B8321C"/>
+
+    </LinearLayout>
+
+</LinearLayout>

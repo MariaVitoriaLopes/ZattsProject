@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/corFundoTela">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingBottom="88dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="32dp">
+
+            <!-- CABEÇALHO -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnVoltar"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:clickable="true"
+                    android:contentDescription="Voltar"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:text="‹"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="36sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Novo alerta"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorOnSurface"/>
+
+            </LinearLayout>
+
+            <!-- ÍCONES -->
+            <TextView
+                style="@style/NovoAlertaRotulo"
+                android:text="Ícone"/>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/grupoIcones"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/iconeRaio"
+                        style="@style/NovoAlertaIcone"
+                        android:src="@drawable/ic_bolt"
+                        android:contentDescription="Raio"/>
+
+                    <ImageView
+                        android:id="@+id/iconeBandeira"
+                        style="@style/NovoAlertaIcone"
+                        android:src="@drawable/ic_flag"
+                        android:contentDescription="Bandeira"/>
+
+                    <ImageView
+                        android:id="@+id/iconeEscudo"
+                        style="@style/NovoAlertaIcone"
+                        android:src="@drawable/ic_maybe"
+                        android:contentDescription="Escudo"/>
+
+                    <ImageView
+                        android:id="@+id/iconeWifi"
+                        style="@style/NovoAlertaIcone"
+                        android:src="@drawable/ic_wifi_off"
+                        android:contentDescription="Wi-Fi desligado"/>
+
+                    <ImageView
+                        android:id="@+id/iconeAlvo"
+                        style="@style/NovoAlertaIcone"
+                        android:src="@drawable/ic_crisis_alert"
+                        android:contentDescription="Alvo"/>
+
+                    <ImageView
+                        android:id="@+id/iconeRelogio"
+                        style="@style/NovoAlertaIcone"
+                        android:src="@drawable/ic_alarm"
+                        android:contentDescription="Relógio"/>
+
+                    <ImageView
+                        android:id="@+id/iconeLuz"
+                        style="@style/NovoAlertaIcone"
+                        android:src="@drawable/ic_emergency"
+                        android:contentDescription="Luz de alerta"/>
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- NOME -->
+            <TextView
+                style="@style/NovoAlertaRotulo"
+                android:layout_marginTop="18dp"
+                android:text="Nome"/>
+
+            <EditText
+                android:id="@+id/edtNomeAlerta"
+                style="@style/NovoAlertaCampo"
+                android:hint="Queda de energia"
+                android:inputType="textCapSentences"
+                android:minHeight="48dp" />
+
+            <!-- CATEGORIA -->
+            <TextView
+                style="@style/NovoAlertaRotulo"
+                android:layout_marginTop="18dp"
+                android:text="Categoria"/>
+
+            <Spinner
+                android:id="@+id/spinnerCategoria"
+                style="@style/NovoAlertaSpinner"
+                android:minHeight="48dp" />
+
+            <!-- TIPO DE ALERTA -->
+            <TextView
+                style="@style/NovoAlertaRotulo"
+                android:layout_marginTop="18dp"
+                android:text="Tipo de alerta"/>
+
+            <Spinner
+                android:id="@+id/spinnerTipoAlerta"
+                style="@style/NovoAlertaSpinner"
+                android:minHeight="48dp" />
+
+            <!-- LIMITE E PERCENTUAL -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/NovoAlertaRotulo"
+                        android:text="Limite de consumo (kWh)"/>
+
+                    <EditText
+                        android:id="@+id/edtLimiteConsumo"
+                        style="@style/NovoAlertaCampo"
+                        android:hint="0.0"
+                        android:inputType="numberDecimal"
+                        android:minHeight="48dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/NovoAlertaRotulo"
+                        android:text="Percentual atingido"/>
+
+                    <EditText
+                        android:id="@+id/edtPercentual"
+                        style="@style/NovoAlertaCampo"
+                        android:hint="70.0"
+                        android:inputType="numberDecimal"
+                        android:minHeight="48dp" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- NOTIFICAÇÕES -->
+            <TextView
+                style="@style/NovoAlertaRotulo"
+                android:layout_marginTop="18dp"
+                android:text="Notificações"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <CheckBox
+                    android:id="@+id/checkPush"
+                    style="@style/NovoAlertaCheckbox"
+                    android:text="Push"
+                    android:checked="true"/>
+
+                <CheckBox
+                    android:id="@+id/checkEmail"
+                    style="@style/NovoAlertaCheckbox"
+                    android:text="E-mail"
+                    android:checked="true"/>
+
+                <CheckBox
+                    android:id="@+id/checkApenasApp"
+                    style="@style/NovoAlertaCheckbox"
+                    android:text="Apenas no aplicativo"
+                    android:checked="true"/>
+
+            </LinearLayout>
+
+            <!-- LEMBRETES -->
+            <TextView
+                style="@style/NovoAlertaRotulo"
+                android:layout_marginTop="18dp"
+                android:text="Lembretes"/>
+
+            <Spinner
+                android:id="@+id/spinnerLembretes"
+                style="@style/NovoAlertaSpinner"
+                android:minHeight="48dp" />
+
+            <!-- REPETIR -->
+            <TextView
+                style="@style/NovoAlertaRotulo"
+                android:layout_marginTop="18dp"
+                android:text="Repetir"/>
+
+            <Spinner
+                android:id="@+id/spinnerRepetir"
+                style="@style/NovoAlertaSpinner"/>
+
+            <!-- ATIVAR -->
+            <CheckBox
+                android:id="@+id/checkAtivarAlerta"
+                style="@style/NovoAlertaCheckbox"
+                android:layout_marginTop="18dp"
+                android:text="Ativar alerta"
+                android:checked="true"/>
+
+            <!-- BOTÕES -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <Button
+                    android:id="@+id/btnCancelar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="12dp"
+                    android:paddingHorizontal="20dp"
+                    android:text="Cancelar"
+                    android:textAllCaps="false"
+                    android:textColor="@color/textos_pretos"
+                    android:backgroundTint="@color/fundo_50"/>
+
+                <Button
+                    android:id="@+id/btnCriarNovoAlerta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:drawableStart="@drawable/ic_add"
+                    android:drawablePadding="10dp"
+                    android:paddingHorizontal="18dp"
+                    android:text="Criar novo alerta"
+                    android:textAllCaps="false"
+                    android:textColor="@color/textos_pretos"
+                    android:backgroundTint="@color/cor_primaria_400"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- NAVBAR -->
+    <com.zattsproject.mobile.AppNavBar
+        android:id="@+id/navBar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom"
+        android:background="?attr/corFundoTela"/>
+
+</FrameLayout>
