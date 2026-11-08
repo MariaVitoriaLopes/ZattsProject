@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
 
 
 @Controller
@@ -22,6 +25,9 @@ public class AlertaWebController {
     @PostMapping("/criar")
     public String criar(
             @ModelAttribute Alerta alerta,
+            @RequestParam(defaultValue = "false") boolean canalPush,
+            @RequestParam(defaultValue = "false") boolean canalEmail,
+            @RequestParam(defaultValue = "false") boolean canalApp,
             HttpSession session,
             RedirectAttributes redirect) {
 
@@ -32,6 +38,10 @@ public class AlertaWebController {
         }
 
         alerta.setUsuarioId(usuario.getId());
+
+        alerta.setCanalPush(canalPush);
+        alerta.setCanalEmail(canalEmail);
+        alerta.setCanalApp(canalApp);
 
         ResultadoAlerta resultado = alertaService.cadastrar(alerta);
 
@@ -60,6 +70,9 @@ public class AlertaWebController {
     public String editar(
             @PathVariable String id,
             @ModelAttribute Alerta dados,
+            @RequestParam(defaultValue = "false") boolean canalPush,
+            @RequestParam(defaultValue = "false") boolean canalEmail,
+            @RequestParam(defaultValue = "false") boolean canalApp,
             HttpSession session,
             RedirectAttributes redirect) {
 
@@ -68,6 +81,10 @@ public class AlertaWebController {
         if (usuario == null) {
             return "redirect:/login";
         }
+
+        dados.setCanalPush(canalPush);
+        dados.setCanalEmail(canalEmail);
+        dados.setCanalApp(canalApp);
 
         ResultadoAlerta resultado = alertaService.atualizar(
                 id,
@@ -82,6 +99,43 @@ public class AlertaWebController {
         }
 
         return "redirect:/alertas";
+    }
+
+    @PostMapping("/{id}/ativar")
+    public ResponseEntity<?> ativar(
+            @PathVariable String id,
+            @RequestParam boolean ativo,
+            HttpSession session) {
+
+        Usuario usuario =
+                (Usuario) session.getAttribute("usuarioLogado");
+
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "erro",
+                            "Sua sessão expirou. Faça login novamente."
+                    ));
+        }
+
+        ResultadoAlerta resultado = alertaService.ativar(
+                id,
+                usuario.getId(),
+                ativo
+        );
+
+        if (resultado == ResultadoAlerta.NAO_ENCONTRADO) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "ativo",
+                        ativo,
+                        "mensagem",
+                        "Estado do alerta atualizado com sucesso."
+                )
+        );
     }
 
     @PostMapping("/{id}/excluir")

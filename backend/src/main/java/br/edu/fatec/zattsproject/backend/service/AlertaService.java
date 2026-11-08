@@ -48,7 +48,9 @@ public class AlertaService {
         alerta.setId(null);
         alerta.setNome(alerta.getNome().trim());
         alerta.setTipo(alerta.getTipo().trim());
-        alerta.setAtivo(true);
+        if (alerta.getAtivo() == null) {
+            alerta.setAtivo(true);
+        }
         alerta.setCriadoEm(LocalDateTime.now());
         alerta.setAtualizadoEm(LocalDateTime.now());
 
@@ -113,6 +115,34 @@ public class AlertaService {
             alerta.setAtivo(dados.getAtivo());
         }
 
+        if (dados.getIcone() != null) {
+            alerta.setIcone(dados.getIcone());
+        }
+
+        if (dados.getCategoria() != null) {
+            alerta.setCategoria(dados.getCategoria());
+        }
+
+        if (dados.getCanalPush() != null) {
+            alerta.setCanalPush(dados.getCanalPush());
+        }
+
+        if (dados.getCanalEmail() != null) {
+            alerta.setCanalEmail(dados.getCanalEmail());
+        }
+
+        if (dados.getCanalApp() != null) {
+            alerta.setCanalApp(dados.getCanalApp());
+        }
+
+        if (dados.getLembrete() != null) {
+            alerta.setLembrete(dados.getLembrete());
+        }
+
+        if (dados.getRepetir() != null) {
+            alerta.setRepetir(dados.getRepetir());
+        }
+
         if ((alerta.getPercentualLimite() == null
                 && alerta.getValorLimite() == null)
                 || (alerta.getPercentualLimite() != null
@@ -125,6 +155,28 @@ public class AlertaService {
             return ResultadoAlerta.LIMITE_INVALIDO;
         }
 
+        alerta.setAtualizadoEm(LocalDateTime.now());
+
+        repository.save(alerta);
+
+        return ResultadoAlerta.SUCESSO;
+    }
+
+    public ResultadoAlerta ativar(
+            String id,
+            String usuarioId,
+            boolean ativo) {
+
+        Optional<Alerta> alertaOpt =
+                repository.findByIdAndUsuarioId(id, usuarioId);
+
+        if (alertaOpt.isEmpty()) {
+            return ResultadoAlerta.NAO_ENCONTRADO;
+        }
+
+        Alerta alerta = alertaOpt.get();
+
+        alerta.setAtivo(ativo);
         alerta.setAtualizadoEm(LocalDateTime.now());
 
         repository.save(alerta);

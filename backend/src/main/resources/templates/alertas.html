@@ -55,7 +55,7 @@
             <div class="alerta-descricao">
 
                 <span class="icone-alerta material-symbols-outlined"
-                      th:text="${alerta.tipo == 'GASTO' ? 'payments' : 'bolt'}">
+                      th:text="${alerta.icone != null ? alerta.icone : 'bolt'}">
                     bolt
                 </span>
 
@@ -101,10 +101,25 @@
                 <strong>Notificar por</strong>
 
                 <div class="chips">
-                    <span class="chip">
+
+                    <span class="chip"
+                          th:if="${alerta.canalPush == true}">
                         <span class="material-symbols-outlined">notifications</span>
-                        Notificação
+                        Push
                     </span>
+
+                    <span class="chip"
+                          th:if="${alerta.canalEmail == true}">
+                    <span class="material-symbols-outlined">mail</span>
+                    E-mail
+                    </span>
+
+                    <span class="chip"
+                          th:if="${alerta.canalApp == true}">
+                    <span class="material-symbols-outlined">smartphone</span>
+                            Aplicativo
+                    </span>
+
                 </div>
 
             </div>
@@ -134,11 +149,18 @@
                         class="editar-alerta"
                         aria-label="Editar alerta"
                         th:attr="data-id=${alerta.id},
-                                 data-nome=${alerta.nome},
-                                 data-tipo=${alerta.tipo},
-                                 data-valor=${alerta.valorLimite},
-                                 data-percentual=${alerta.percentualLimite},
-                                 data-ativo=${alerta.ativo}">
+                             data-nome=${alerta.nome},
+                             data-icone=${alerta.icone},
+                             data-categoria=${alerta.categoria},
+                             data-tipo=${alerta.tipo},
+                             data-valor=${alerta.valorLimite},
+                             data-percentual=${alerta.percentualLimite},
+                             data-canal-push=${alerta.canalPush},
+                             data-canal-email=${alerta.canalEmail},
+                             data-canal-app=${alerta.canalApp},
+                             data-lembrete=${alerta.lembrete},
+                             data-repetir=${alerta.repetir},
+                             data-ativo=${alerta.ativo}">
 
                     <span class="material-symbols-outlined">edit</span>
 
