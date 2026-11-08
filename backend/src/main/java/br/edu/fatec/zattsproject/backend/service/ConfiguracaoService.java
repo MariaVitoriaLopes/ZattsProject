@@ -261,4 +261,28 @@ public class ConfiguracaoService {
 
         return repository.save(configuracao);
     }
+    public Configuracao salvarNotificacoes(
+            String usuarioId,
+            boolean notifGerais,
+            boolean notifConta,
+            boolean notifAlerta,
+            boolean notifConsumo,
+            boolean notifMeta) {
+
+        Configuracao configuracao = buscarPorUsuario(usuarioId);
+
+        if (configuracao == null) {
+            configuracao = Configuracao.builder()
+                    .usuarioId(usuarioId)
+                    .build();
+        }
+
+        configuracao.setNotifGerais(notifGerais);
+        configuracao.setNotifConta(notifConta);
+        configuracao.setNotifAlerta(notifAlerta);
+        configuracao.setNotifConsumo(notifConsumo);
+        configuracao.setNotifMeta(notifMeta);
+
+        return repository.save(configuracao);
+    }
 }

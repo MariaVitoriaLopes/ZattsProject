@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -200,6 +203,44 @@ public class ConfiguracaoController {
         );
 
         return "redirect:/configuracoes";
+    }
+
+    @PostMapping("/notificacoes")
+    @ResponseBody
+    public ResponseEntity<?> salvarNotificacoes(
+            @RequestParam boolean notifGerais,
+            @RequestParam boolean notifConta,
+            @RequestParam boolean notifAlerta,
+            @RequestParam boolean notifConsumo,
+            @RequestParam boolean notifMeta,
+            HttpSession session) {
+
+        Usuario usuario =
+                (Usuario) session.getAttribute("usuarioLogado");
+
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "erro",
+                            "Sua sessão expirou. Faça login novamente."
+                    ));
+        }
+
+        configuracaoService.salvarNotificacoes(
+                usuario.getId(),
+                notifGerais,
+                notifConta,
+                notifAlerta,
+                notifConsumo,
+                notifMeta
+        );
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "mensagem",
+                        "Preferências de notificações salvas com sucesso."
+                )
+        );
     }
 
     // ==========================================

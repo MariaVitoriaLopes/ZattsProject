@@ -54,7 +54,7 @@
                         <h3>Notificações Gerais</h3>
                         <p>Receba comunicados sobre atualizações da plataforma, termos de uso, política de privacidade, novidades e suporte.</p>
                     </div>
-                    <input type="checkbox" class="interruptor" name="notifGerais" aria-label="Notificações Gerais" checked>
+                    <input type="checkbox" class="interruptor" name="notifGerais" aria-label="Notificações Gerais" th:checked="${configuracao.notifGerais}">
                 </section>
 
                 <section class="cfg-notif-secao">
@@ -62,7 +62,7 @@
                         <h3>Notificações de Conta</h3>
                         <p>Seja informado sempre que houver alterações no seu perfil, atualização de senha, exclusão da conta ou conexão de um novo dispositivo.</p>
                     </div>
-                    <input type="checkbox" class="interruptor" name="notifConta" aria-label="Notificações de Conta" checked>
+                    <input type="checkbox" class="interruptor" name="notifConta" aria-label="Notificações de Conta" th:checked="${configuracao.notifConta}">
                 </section>
 
                 <section class="cfg-notif-secao">
@@ -70,7 +70,7 @@
                         <h3>Notificações de Alerta</h3>
                         <p>Receba lembretes para consultar seu consumo, acompanhar suas metas e manter suas configurações em dia.</p>
                     </div>
-                    <input type="checkbox" class="interruptor" name="notifAlerta" aria-label="Notificações de Alerta" checked>
+                    <input type="checkbox" class="interruptor" name="notifAlerta" aria-label="Notificações de Alerta" th:checked="${configuracao.notifAlerta}">
                 </section>
 
             </div>
@@ -82,7 +82,7 @@
                         <h3>Notificações de Consumo</h3>
                         <p>Receba atualizações sobre o consumo de energia da sua residência e acompanhe as informações registradas pelo dispositivo de monitoramento.</p>
                     </div>
-                    <input type="checkbox" class="interruptor" name="notifConsumo" aria-label="Notificações de Consumo" checked>
+                    <input type="checkbox" class="interruptor" name="notifConsumo" aria-label="Notificações de Consumo" th:checked="${configuracao.notifConsumo}">
                 </section>
 
                 <section class="cfg-notif-secao">
@@ -90,7 +90,7 @@
                         <h3>Notificações de Meta</h3>
                         <p>Saiba quando atingir os percentuais definidos para suas metas de consumo e acompanhe seu progresso.</p>
                     </div>
-                    <input type="checkbox" class="interruptor" name="notifMeta" aria-label="Notificações de Meta" checked>
+                    <input type="checkbox" class="interruptor" name="notifMeta" aria-label="Notificações de Meta" th:checked="${configuracao.notifMeta}">
                 </section>
 
             </div>

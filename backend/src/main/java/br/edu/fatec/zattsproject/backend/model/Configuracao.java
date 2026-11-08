@@ -41,4 +41,14 @@ public class Configuracao {
     private Boolean recomendacoesPersonalizadas = true;
     @Builder.Default
     private Boolean comparacaoResidencias = false;
+    @Builder.Default
+    private Boolean notifGerais = true;
+    @Builder.Default
+    private Boolean notifConta = true;
+    @Builder.Default
+    private Boolean notifAlerta = true;
+    @Builder.Default
+    private Boolean notifConsumo = true;
+    @Builder.Default
+    private Boolean notifMeta = true;
 }

@@ -97,11 +97,18 @@ public class HomeController {
     }
 
     @GetMapping("/configuracoes/notificacoes")
-    public String configuracoesNotificacoes(Model model, HttpSession session) {
-        if (obterUsuarioLogado(session) == null) {
+    public String configuracoesNotificacoes(
+            Model model,
+            HttpSession session) {
+        Usuario usuario = obterUsuarioLogado(session);
+        if (usuario == null) {
             return "redirect:/login";
         }
         model.addAttribute("paginaAtual", "configuracoes");
+        model.addAttribute(
+                "configuracao",
+                configuracaoService.buscarPorUsuario(usuario.getId())
+        );
         return "configuracoes-notificacoes";
     }
 
