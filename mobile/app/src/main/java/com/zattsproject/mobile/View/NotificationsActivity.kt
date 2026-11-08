@@ -93,12 +93,27 @@ class NotificationsActivity : AppCompatActivity() {
 
     private fun selecionarAba(abaSelecionada: TextView) {
 
-        listOf(abaGeral, abaMetas, abaAlertas).forEach {
-            it.setBackgroundResource(0)
+        listOf(abaGeral, abaMetas, abaAlertas).forEach { aba ->
+
+            aba.setBackgroundResource(0)
+
+            aba.setTextColor(
+                com.google.android.material.color.MaterialColors.getColor(
+                    aba,
+                    com.google.android.material.R.attr.colorOnSurface
+                )
+            )
         }
 
         abaSelecionada.setBackgroundResource(
             R.drawable.bg_notificacoes_aba_ativa
+        )
+
+        abaSelecionada.setTextColor(
+            com.google.android.material.color.MaterialColors.getColor(
+                abaSelecionada,
+                com.google.android.material.R.attr.colorOnPrimary
+            )
         )
     }
 

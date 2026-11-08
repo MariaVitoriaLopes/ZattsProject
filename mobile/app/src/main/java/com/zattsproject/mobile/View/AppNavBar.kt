@@ -72,14 +72,25 @@ class AppNavBar @JvmOverloads constructor(
     }
 
     private fun navigateTo(tab: NavTab) {
+
         // Já está nessa tela, não faz nada
         if (tab == selectedTab) return
 
         val intent = Intent(context, tab.destination).apply {
-            // Evita empilhar a mesma tela várias vezes
-            addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NO_ANIMATION)
+
+            // Reutiliza a Activity existente, se estiver na pilha
+            addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+
         }
-        context.startActivity(intent)
+
+        // Transição suave entre as telas
+        val options = android.app.ActivityOptions.makeCustomAnimation(
+            context,
+            R.anim.nav_enter,
+            R.anim.nav_exit
+        )
+
+        context.startActivity(intent, options.toBundle())
     }
 
     fun setSelected(tab: NavTab, animate: Boolean = false) {

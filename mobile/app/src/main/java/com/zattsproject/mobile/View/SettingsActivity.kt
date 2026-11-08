@@ -67,6 +67,17 @@ class SettingsActivity : AppCompatActivity() {
                     )
                 )
             }
+
+        // Abrir Ajuda e suporte
+        findViewById<View>(R.id.item_suporte)
+            .setOnClickListener {
+                startActivity(
+                    Intent(
+                        this,
+                        AjudaSuporteActivity::class.java
+                    )
+                )
+            }
     }
 
     override fun onResume() {

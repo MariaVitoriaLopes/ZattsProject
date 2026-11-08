@@ -24,15 +24,15 @@
 
             <TextView
                 android:id="@+id/btnVoltarDispositivos"
-                android:layout_width="42dp"
+                android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:clickable="true"
+                android:contentDescription="Voltar"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:text="‹"
-                android:textSize="36sp"
                 android:textColor="?attr/colorOnSurface"
-                android:contentDescription="Voltar"
-                android:clickable="true"
-                android:focusable="true"/>
+                android:textSize="36sp" />
 
             <TextView
                 android:layout_width="wrap_content"

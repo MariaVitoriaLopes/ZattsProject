@@ -60,20 +60,17 @@
                     android:id="@+id/abaGeral"
                     style="@style/NotificacoesAba"
                     android:text="Geral"
-                    android:background="@drawable/bg_notificacoes_aba_ativa"
-                    android:textColor="@color/textos_pretos"/>
+                    android:background="@drawable/bg_notificacoes_aba_ativa" />
 
                 <TextView
                     android:id="@+id/abaMetas"
                     style="@style/NotificacoesAba"
-                    android:text="Metas"
-                    android:textColor="@color/textos_pretos"/>
+                    android:text="Metas" />
 
                 <TextView
                     android:id="@+id/abaAlertas"
                     style="@style/NotificacoesAba"
-                    android:text="Alertas personalizados"
-                    android:textColor="@color/textos_pretos"/>
+                    android:text="Alertas personalizados" />
 
             </LinearLayout>
         </HorizontalScrollView>

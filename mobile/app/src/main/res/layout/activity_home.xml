@@ -120,6 +120,7 @@
                 </LinearLayout>
             </LinearLayout>
 
+
             <!-- INDICADORES: PRIMEIRA LINHA -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -127,22 +128,61 @@
                 android:layout_marginTop="30dp"
                 android:orientation="horizontal">
 
+                <!-- ESTIMATIVA DA CONTA DE LUZ -->
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="126dp"
-                    android:layout_weight="1"
+                    android:layout_height="140dp"
                     android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
                     android:background="@drawable/bg_card_home"
-                    android:padding="18dp"
                     android:gravity="center_vertical"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="18dp">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Consumo Total Diário"
-                        android:textSize="12sp"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:text="Estimativa de conta de luz"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txv_economia"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="95,56 Reais"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="21sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="26dp"
+                        android:layout_marginTop="8dp"
+                        android:minHeight="60dp"
+                        android:text="Estimativa baseada na tarifa configurada"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <!-- CONSUMO DE ENERGIA HOJE -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="140dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_card_home"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Consumo de energia hoje"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/txv_consumoDiario"
@@ -150,54 +190,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="32,8 kWh"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="21sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txv_variacaoConsumo"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="26dp"
                         android:layout_marginTop="8dp"
-                        android:text="↗ 8% a mais que ontem"
-                        android:textSize="10sp"
-                        android:textColor="#C23B22" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="126dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="5dp"
-                    android:background="@drawable/bg_card_home"
-                    android:padding="18dp"
-                    android:gravity="center_vertical"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Custo Diário"
-                        android:textSize="12sp"
-                        android:textColor="?attr/colorOnSurface" />
-
-                    <TextView
-                        android:id="@+id/txv_custoDiario"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="3,57 Reais"
-                        android:textSize="21sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorOnSurface" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="→ Valor estimado normal"
-                        android:textSize="10sp"
-                        android:textColor="?android:attr/textColorSecondary" />
+                        android:text="Consumo de energia em tempo real"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="10sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -208,22 +212,60 @@
                 android:layout_marginTop="8dp"
                 android:orientation="horizontal">
 
+                <!-- ESTIMATIVA DE CUSTO ATUAL -->
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="126dp"
-                    android:layout_weight="1"
+                    android:layout_height="140dp"
                     android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
                     android:background="@drawable/bg_card_home"
-                    android:padding="18dp"
                     android:gravity="center_vertical"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Estimativa de custo atual"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txv_custoDiario"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="3,57 Reais"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="21sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Estimativa de custo baseado no consumo"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <!-- META DE GASTO -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="140dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_card_home"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:padding="18dp">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Meta de Gasto"
-                        android:textSize="12sp"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/txv_metaGasto"
@@ -231,54 +273,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="250 kWh"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="21sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txv_metaDescricao"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="↗ 64% da meta atingida"
-                        android:textSize="10sp"
-                        android:textColor="#FF8000" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="126dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="5dp"
-                    android:background="@drawable/bg_card_home"
-                    android:padding="18dp"
-                    android:gravity="center_vertical"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Economia Estimada"
-                        android:textSize="12sp"
-                        android:textColor="?attr/colorOnSurface" />
-
-                    <TextView
-                        android:id="@+id/txv_economia"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="3,45 Reais"
-                        android:textSize="21sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorOnSurface" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="↘ 10% em relação ao mês anterior"
-                        android:textSize="10sp"
-                        android:textColor="#07815B" />
+                        android:text="Meta definida com o limite de 250 kWh"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="10sp" />
                 </LinearLayout>
             </LinearLayout>
 
