@@ -3,6 +3,7 @@ package br.edu.fatec.zattsproject.backend.controller.mobile;
 import br.edu.fatec.zattsproject.backend.model.Usuario;
 import br.edu.fatec.zattsproject.backend.repository.UsuarioRepository;
 import br.edu.fatec.zattsproject.backend.service.AutenticacaoService;
+import br.edu.fatec.zattsproject.backend.service.SessaoService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -22,6 +23,7 @@ public class AutenticacaoApiController {
 
     private final AutenticacaoService autenticacaoService;
     private final UsuarioRepository usuarioRepository;
+    private final SessaoService sessaoService;
 
     public record CadastroRequest(
             String email,
@@ -103,22 +105,40 @@ public class AutenticacaoApiController {
                     );
 
             case SUCESSO -> {
-                Usuario usuario = autenticacaoService
-                        .buscarUsuarioPorEmail(dados.email())
-                        .orElseThrow();
+                Usuario usuario =
+                        autenticacaoService
+                                .buscarUsuarioPorEmail(
+                                        dados.email()
+                                )
+                                .orElseThrow();
+                HttpSession session =
+                        request.getSession(true);
+                sessaoService.encerrarPorSessionId(
+                        session.getId()
+                );
+                String novoSessionId =
+                        request.changeSessionId();
+                usuario.setSenha(null);
 
-                HttpSession session = request.getSession(true);
-
-                request.changeSessionId();
-
-                session.setAttribute("usuarioLogado", usuario);
-
+                session.setAttribute(
+                        "usuarioLogado",
+                        usuario
+                );
+                sessaoService.registrarAndroid(
+                        usuario.getId(),
+                        novoSessionId,
+                        request.getHeader("X-Dispositivo")
+                );
                 yield ResponseEntity.ok(
                         Map.of(
-                                "mensagem", "Login realizado com sucesso!",
-                                "usuarioId", usuario.getId(),
-                                "email", usuario.getEmail(),
-                                "questionarioRespondido", usuario.isQuestionarioRespondido()
+                                "mensagem",
+                                "Login realizado com sucesso!",
+                                "usuarioId",
+                                usuario.getId(),
+                                "email",
+                                usuario.getEmail(),
+                                "questionarioRespondido",
+                                usuario.isQuestionarioRespondido()
                         )
                 );
             }
@@ -154,19 +174,22 @@ public class AutenticacaoApiController {
         );
     }
 
-    // LOGOUT
     @PostMapping("/logout")
     public ResponseEntity<?> logout(
-            HttpServletRequest request
-    ) {
-        HttpSession session = request.getSession(false);
-
+            HttpServletRequest request) {
+        HttpSession session =
+                request.getSession(false);
         if (session != null) {
+            sessaoService.encerrarPorSessionId(
+                    session.getId()
+            );
             session.invalidate();
         }
-
         return ResponseEntity.ok(
-                Map.of("mensagem", "Logout realizado com sucesso!")
+                Map.of(
+                        "mensagem",
+                        "Logout realizado com sucesso!"
+                )
         );
     }
 
@@ -187,6 +210,10 @@ public class AutenticacaoApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("erro", "Usuário não autenticado."));
         }
+
+        sessaoService.excluirPorUsuario(
+                usuario.getId()
+        );
 
         usuarioRepository.deleteById(usuario.getId());
 

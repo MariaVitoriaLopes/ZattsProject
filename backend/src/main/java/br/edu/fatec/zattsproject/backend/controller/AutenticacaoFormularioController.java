@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import br.edu.fatec.zattsproject.backend.service.SessaoService;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequiredArgsConstructor
 public class AutenticacaoFormularioController {
 
     private final AutenticacaoService autenticacaoService;
+    private final SessaoService sessaoService;
 
     // --- MÉTODOS GET (Carregam as páginas no navegador) ---
 
@@ -97,59 +100,88 @@ public class AutenticacaoFormularioController {
     public String autenticar(
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String senha,
-            HttpSession session,
+            HttpServletRequest request,
             RedirectAttributes atributos) {
 
         AutenticacaoService.ResultadoLogin resultado =
-                autenticacaoService.autenticar(email, senha);
+                autenticacaoService.autenticar(
+                        email,
+                        senha
+                );
 
         switch (resultado) {
+
             case CAMPOS_OBRIGATORIOS:
+
                 atributos.addFlashAttribute(
                         "erro",
                         "E-mail e senha são obrigatórios."
                 );
+
                 return "redirect:/login";
 
             case CREDENCIAIS_INVALIDAS:
+
                 atributos.addFlashAttribute(
                         "erro",
                         "E-mail ou senha inválidos."
                 );
+
                 return "redirect:/login";
 
             case SUCESSO:
 
-                Usuario usuario = autenticacaoService
-                        .buscarUsuarioPorEmail(email)
-                        .orElse(null);
+                Usuario usuario =
+                        autenticacaoService
+                                .buscarUsuarioPorEmail(email)
+                                .orElse(null);
 
                 if (usuario == null) {
+
                     atributos.addFlashAttribute(
                             "erro",
                             "Não foi possível recuperar os dados do usuário."
                     );
+
                     return "redirect:/login";
                 }
 
-                // Guarda o usuário completo na sessão
+                HttpSession session =
+                        request.getSession(true);
+
+                // Caso exista registro de uma sessão anterior
+                // usando este mesmo HttpSession.
+                sessaoService.encerrarPorSessionId(
+                        session.getId()
+                );
+
+                String novoSessionId =
+                        request.changeSessionId();
+
                 usuario.setSenha(null);
-                session.setAttribute("usuarioLogado", usuario);
+
+                session.setAttribute(
+                        "usuarioLogado",
+                        usuario
+                );
+
+                sessaoService.registrarWeb(
+                        usuario.getId(),
+                        novoSessionId,
+                        request.getHeader("User-Agent")
+                );
 
                 atributos.addFlashAttribute(
                         "sucesso",
                         "Login realizado com sucesso!"
                 );
 
-                // Verifica se o usuário já respondeu ao questionário
                 if (!usuario.isQuestionarioRespondido()) {
                     return "redirect:/questionario";
                 }
 
-                // Se já respondeu, direciona para a Home
                 return "redirect:/home";
         }
-
         return "redirect:/login";
     }
 }

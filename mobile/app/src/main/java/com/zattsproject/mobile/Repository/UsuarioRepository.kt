@@ -22,7 +22,17 @@ class UsuarioRepository {
     suspend fun login(
         login: Login
     ): Response<AutenticacaoResponse> {
-        return api.login(login)
+
+        val resposta =
+            api.login(login)
+
+        if (resposta.isSuccessful) {
+
+            RetrofitClient
+                .marcarSessaoAutenticada()
+        }
+
+        return resposta
     }
 
     suspend fun verificarSessao(

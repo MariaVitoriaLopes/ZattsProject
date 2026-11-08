@@ -110,6 +110,7 @@ public class UsuarioService {
         mongoTemplate.remove(query, "alertas");
         mongoTemplate.remove(query, "ContaEnergia");
         mongoTemplate.remove(query, "Questionario");
+        mongoTemplate.remove(query, "sessoes");
 
         repository.delete(usuario);
 

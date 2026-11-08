@@ -1,4 +1,3 @@
-
 package com.zattsproject.mobile
 
 import android.content.Intent
@@ -12,8 +11,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+
+import com.zattsproject.mobile.Network.RetrofitClient
+import com.zattsproject.mobile.Repository.UsuarioRepository
+
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+
+    private val usuarioRepository =
+        UsuarioRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +64,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         imvLogo.setImageDrawable(
-            AppCompatResources.getDrawable(this, logo)
+            AppCompatResources.getDrawable(
+                this,
+                logo
+            )
         )
 
         // BOTÃO COMEÇAR
@@ -65,12 +76,69 @@ class MainActivity : AppCompatActivity() {
         )
 
         btnComecar.setOnClickListener {
+
             val intent = Intent(
                 this,
                 CadastroActivity::class.java
             )
 
             startActivity(intent)
+        }
+
+        verificarSessaoExistente()
+    }
+
+    private fun verificarSessaoExistente() {
+
+        lifecycleScope.launch {
+
+            try {
+
+                val resposta =
+                    usuarioRepository.verificarSessao()
+
+                // Não existe mais sessão válida
+                if (!resposta.isSuccessful) {
+
+                    if (resposta.code() == 401) {
+                        RetrofitClient.limparCookies()
+                    }
+
+                    return@launch
+                }
+
+                val usuario =
+                    resposta.body()
+                        ?: return@launch
+
+                RetrofitClient
+                    .marcarSessaoAutenticada()
+
+                val destino =
+                    if (usuario.questionarioRespondido == true) {
+
+                        HomeActivity::class.java
+
+                    } else {
+
+                        IniciarPesquisaActivity::class.java
+                    }
+
+                val intent = Intent(
+                    this@MainActivity,
+                    destino
+                )
+
+                intent.flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                startActivity(intent)
+
+                finish()
+
+            } catch (e: Exception) {
+            }
         }
     }
 }

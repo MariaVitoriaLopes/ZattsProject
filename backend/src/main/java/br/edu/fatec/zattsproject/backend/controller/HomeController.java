@@ -7,6 +7,7 @@ import br.edu.fatec.zattsproject.backend.service.ConfiguracaoService;
 import br.edu.fatec.zattsproject.backend.service.DashboardService;
 import br.edu.fatec.zattsproject.backend.model.Notificacao;
 import br.edu.fatec.zattsproject.backend.service.NotificacaoService;
+import br.edu.fatec.zattsproject.backend.service.SessaoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +26,7 @@ public class HomeController {
     private final AlertaService alertaService;
     private final DashboardService dashboardService;
     private final NotificacaoService notificacaoService;
+    private final SessaoService sessaoService;
 
     private Usuario obterUsuarioLogado(HttpSession session) {
         return (Usuario) session.getAttribute("usuarioLogado");
@@ -133,11 +135,22 @@ public class HomeController {
     }
 
     @GetMapping("/configuracoes/dispositivos")
-    public String configuracoesDispositivos(Model model, HttpSession session) {
-        if (obterUsuarioLogado(session) == null) {
+    public String configuracoesDispositivos(
+            Model model,
+            HttpSession session) {
+
+        Usuario usuario =
+                obterUsuarioLogado(session);
+
+        if (usuario == null) {
             return "redirect:/login";
         }
+        var sessoes =
+                sessaoService.listarAtivasParaTela(usuario.getId(), session.getId()
+                );
         model.addAttribute("paginaAtual", "configuracoes");
+        model.addAttribute("sessoes", sessoes);
+        model.addAttribute("quantidadeSessoes", sessoes.size());
         return "configuracoes-dispositivos";
     }
 

@@ -38,66 +38,96 @@
     <section class="card-dispositivos">
 
         <div class="disp-cabecalho">
-            <h2 class="secao-titulo">Sessões</h2>
-            <span class="disp-contagem" id="dispContagem">2 dispositivos</span>
+
+            <h2 class="secao-titulo">
+                Sessões
+            </h2>
+
+            <span class="disp-contagem"
+                  id="dispContagem"
+                  th:text="${quantidadeSessoes == 1
+                    ? '1 dispositivo'
+                    : quantidadeSessoes + ' dispositivos'}">
+            0 dispositivos
+        </span>
+
         </div>
 
         <div class="bloco-disp">
 
             <div class="bloco-disp-info">
+
                 <h3>Ativas</h3>
-                <p>Dispositivos conectados à sua conta.</p>
+
+                <p>
+                    Dispositivos conectados à sua conta.
+                </p>
+
             </div>
 
             <div class="bloco-disp-conteudo">
 
-                <ul class="disp-lista" id="listaDispositivos">
+                <ul class="disp-lista"
+                    id="listaDispositivos">
 
-                    <li class="disp-item">
+                    <li class="disp-item"
+                        th:each="sessao : ${sessoes}"
+                        th:attr="data-sessao-id=${sessao.id}">
+
                         <div class="disp-icone">
-                            <span class="material-symbols-outlined">language</span>
+
+                        <span class="material-symbols-outlined"
+                              th:text="${sessao.tipo == 'ANDROID'
+                                    ? 'android'
+                                    : 'language'}">
+                            language
+                        </span>
+
                         </div>
 
                         <div class="disp-info">
-                            <strong class="disp-nome">Firefox (Windows 11)</strong>
+
+                            <strong class="disp-nome"
+                                    th:text="${sessao.nome}">
+                                Firefox (Windows)
+                            </strong>
+
                             <span class="disp-detalhe">
-                                <span>Conectado às 17:33</span>
-                                <span class="disp-ativo">
-                                    <span class="disp-ponto"></span>
+
+                            <span th:text="${sessao.conectadoEm}">
+                            </span>
+
+                            <span class="disp-ativo">
+
+                                <span class="disp-ponto"></span>
+
+                                <span th:text="${sessao.atual
+                                        ? 'Este dispositivo'
+                                        : 'Ativo'}">
                                     Ativo
                                 </span>
+
                             </span>
+
+                        </span>
+
                         </div>
 
-                        <button type="button" class="disp-btn-desconectar" data-acao="desconectar">
+                        <button type="button"
+                                class="disp-btn-desconectar"
+                                data-acao="desconectar"
+                                th:attr="data-sessao-id=${sessao.id},
+                                     data-atual=${sessao.atual}">
                             Desconectar
                         </button>
-                    </li>
 
-                    <li class="disp-item">
-                        <div class="disp-icone">
-                            <span class="material-symbols-outlined">android</span>
-                        </div>
-
-                        <div class="disp-info">
-                            <strong class="disp-nome">Samsung M13</strong>
-                            <span class="disp-detalhe">
-                                <span>17 de setembro de 2026</span>
-                                <span class="disp-ativo">
-                                    <span class="disp-ponto"></span>
-                                    Ativo
-                                </span>
-                            </span>
-                        </div>
-
-                        <button type="button" class="disp-btn-desconectar" data-acao="desconectar">
-                            Desconectar
-                        </button>
                     </li>
 
                 </ul>
 
-                <p class="disp-vazio" id="dispVazio" hidden>
+                <p class="disp-vazio"
+                   id="dispVazio"
+                   th:hidden="${quantidadeSessoes > 0}">
                     Nenhuma sessão ativa no momento.
                 </p>
 
@@ -108,8 +138,16 @@
         <hr class="divisor-disp">
 
         <p class="disp-aviso">
-            <span class="material-symbols-outlined">info</span>
-            Confira os dispositivos que têm acesso à sua conta Zatts. Por segurança, mantenha sua conta conectada apenas em dispositivos confiáveis. Se não reconhecer algum dispositivo, desconecte-o imediatamente para proteger sua conta.
+
+        <span class="material-symbols-outlined">
+            info
+        </span>
+
+            Confira os dispositivos que têm acesso à sua conta Zatts.
+            Por segurança, mantenha sua conta conectada apenas em
+            dispositivos confiáveis. Se não reconhecer algum dispositivo,
+            desconecte-o imediatamente para proteger sua conta.
+
         </p>
 
     </section>

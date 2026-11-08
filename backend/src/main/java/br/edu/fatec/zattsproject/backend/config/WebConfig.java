@@ -25,7 +25,12 @@ public class WebConfig implements WebMvcConfigurer {
                         "/configuracoes",
                         "/configuracoes/**",
                         "/questionario",
-                        "/questionario/**"
+                        "/questionario/**",
+                        "/api/mobile/**"
+                )
+                .excludePathPatterns(
+                        "/api/mobile/auth/login",
+                        "/api/mobile/auth/cadastro"
                 );
 
         // Verifica se o usuário já respondeu ao questionário

@@ -5,6 +5,7 @@ import br.edu.fatec.zattsproject.backend.model.Configuracao;
 import br.edu.fatec.zattsproject.backend.model.Usuario;
 import br.edu.fatec.zattsproject.backend.service.ConfiguracaoService;
 import br.edu.fatec.zattsproject.backend.service.UsuarioService;
+import br.edu.fatec.zattsproject.backend.service.SessaoService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -21,6 +22,7 @@ public class ConfiguracaoController {
 
     private final UsuarioService usuarioService;
     private final ConfiguracaoService configuracaoService;
+    private final SessaoService sessaoService;
 
     // ==========================================
     // EDITAR DADOS PESSOAIS
@@ -248,10 +250,12 @@ public class ConfiguracaoController {
     // ==========================================
 
     @PostMapping("/sair")
-    public String sair(HttpSession session) {
-
+    public String sair(
+            HttpSession session) {
+        sessaoService.encerrarPorSessionId(
+                session.getId()
+        );
         session.invalidate();
-
         return "redirect:/login";
     }
 
