@@ -10,7 +10,15 @@
             <h2>Meta de consumo mensal</h2>
             <p>Acompanhe sua meta para economizar</p>
         </div>
-        <button class="btn-editar-meta"><span class="material-symbols-outlined">edit</span></button>
+
+        <button class="btn-editar-meta"
+                type="button"
+                aria-label="Editar meta">
+
+            <span class="material-symbols-outlined">edit</span>
+
+        </button>
+
     </div>
 
     <div class="barra-meta">
@@ -24,32 +32,44 @@
 
     <div class="meta-info">
 
-        <span id="consumoAtualTexto" th:text="${dash != null ? dash.consumoTotalDiarioKwh + ' kWh' : '0 kWh'}">0 kWh</span>
+        <span id="consumoAtualTexto"
+              th:text="${dash != null ? dash.consumoTotalDiarioKwh + ' kWh' : '0 kWh'}">
+            0 kWh
+        </span>
 
-        <span id="limiteMeta" th:text="${dash != null ? 'Meta: ' + dash.metaGastoKwh + ' kWh' : 'Meta não definida'}">Meta não definida</span>
+        <span id="limiteMeta"
+              th:text="${dash != null ? 'Meta: ' + dash.metaGastoKwh + ' kWh' : 'Meta não definida'}">
+            Meta não definida
+        </span>
 
     </div>
 
     <div class="legenda-meta">
 
         <div>
+
             <span class="bolinha-verde"></span>
 
             Consumo atual:
 
-            <strong id="consumoMensal" th:text="${dash != null ? dash.metaConsumoMensalAtualKwh + ' kWh' : '-- kWh'}">
+            <strong id="consumoMensal"
+                    th:text="${dash != null ? dash.metaConsumoMensalAtualKwh + ' kWh' : '-- kWh'}">
                 -- kWh
             </strong>
+
         </div>
 
         <div>
+
             <span class="bolinha-cinza"></span>
 
             Meta:
 
-            <strong id="valorMeta" th:text="${dash != null ? dash.metaGastoKwh + ' kWh' : '-- kWh'}">
+            <strong id="valorMeta"
+                    th:text="${dash != null ? dash.metaGastoKwh + ' kWh' : '-- kWh'}">
                 -- kWh
             </strong>
+
         </div>
 
     </div>

@@ -2,20 +2,13 @@
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 
 <section th:fragment="valor"
-         class="dashboard-card">
+         class="dashboard-card card-valor-conta">
 
     <div class="card-header-dashboard">
 
         <div>
-
-            <h2>
-                Estimativa da conta de energia
-            </h2>
-
-            <p>
-                Comparativo dos últimos meses
-            </p>
-
+            <h2>Estimativa da conta de energia</h2>
+            <p>Comparativo dos últimos meses</p>
         </div>
 
     </div>
@@ -23,17 +16,24 @@
     <div class="grafico conta">
 
         <canvas id="chartValorConta"></canvas>
+
         <div class="chart-legenda">
+
             <span class="badge-dashboard">
-                    <span></span>
-                    Quadro 1
+                <span></span>
+                Quadro 1
             </span>
 
             <div class="legenda-grafico">
+
                 <span class="material-symbols-outlined">info</span>
-                Os valores monetários são estimativas baseada na tarifa configurada.
+
+                Os valores monetários são estimativas baseadas na tarifa configurada.
+
             </div>
+
         </div>
+
     </div>
 
 </section>

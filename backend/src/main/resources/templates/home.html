@@ -25,7 +25,6 @@
 
 <main class="container-dashboard">
 
-    <!-- CABEÇALHO -->
     <section class="titulo-dashboard">
         <div>
             <h1>Dashboard</h1>
@@ -36,38 +35,25 @@
         </div>
 
         <div class="cardMeta status-sem-meta" id="cardStatusMeta">
-            <span class="material-symbols-outlined bandeiraMeta" id="iconeStatusMeta">
-                flag
-            </span>
-
+            <span class="material-symbols-outlined bandeiraMeta" id="iconeStatusMeta">flag</span>
             <div class="textoMeta">
-                <h2 id="textoStatusMeta">
-                    Carregando a sua meta...
-                </h2>
-
-                <p id="descricaoStatusMeta">
-                    Acompanhamento do consumo mensal
-                </p>
+                <h2 id="textoStatusMeta">Carregando a sua meta...</h2>
+                <p id="descricaoStatusMeta">Acompanhamento do consumo mensal</p>
             </div>
         </div>
     </section>
 
-    <!-- CARDS DE RESUMO EXISTENTES -->
     <div th:replace="~{fragments/cards :: cardsResumo}"></div>
 
-    <!-- GRÁFICOS -->
     <section class="dashboard-grid">
 
-        <!-- CONSUMO EM TEMPO REAL (MINUTO A MINUTO) -->
         <div th:replace="~{fragments/dashboards/consumo :: consumo}"></div>
 
-        <!-- CONSUMO DIÁRIO E META -->
         <div class="coluna-central">
             <div th:replace="~{fragments/dashboards/comparativo :: comparativo}"></div>
             <div th:replace="~{fragments/dashboards/metaConsumo :: meta}"></div>
         </div>
 
-        <!-- VALOR DA CONTA (ESTIMATIVA) -->
         <div th:replace="~{fragments/dashboards/valorConta :: valor}"></div>
 
     </section>
@@ -77,300 +63,833 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
 <script th:src="@{/js/script.js}"></script>
 
-<!-- INTEGRAÇÃO COM BACKEND ZATTS -->
 <script th:inline="javascript">
     /*<![CDATA[*/
-    document.addEventListener("DOMContentLoaded", function () {
+
+    document.addEventListener("DOMContentLoaded", () => {
+
         const initialDash = /*[[${dash}]]*/ null;
+
+        const ENDPOINT_DADOS = /*[[@{/api/v1/web/dashboard/dados}]]*/ "/api/v1/web/dashboard/dados";
+
+        const INTERVALO_ATUALIZACAO = 5000;
+        const AJUSTE_VISUAL_KWH = 0.005;
 
         let chartRealtime = null;
         let chartComparativo = null;
         let chartValorConta = null;
 
-        const TARIFA_KWH = 0.85;
-        const STORAGE_KEY_15 = "zatts_realtime_15min_data";
+        let requisicaoEmAndamento = false;
 
-        // RECUPERA CORES DO SEU SCRIPT.JS OU VARIÁVEL CSS DO TEMA SEM CAUSAR CRASH
-        function getThemeColors() {
-            try {
-                if (typeof window.coresGrafico === 'function') {
-                    return window.coresGrafico();
-                } else if (typeof coresGrafico === 'function') {
-                    return coresGrafico();
-                }
-            } catch (e) {}
+        const numero = valor => {
+            const convertido = Number(valor);
+            return Number.isFinite(convertido) ? convertido : 0;
+        };
 
-            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--cor-destaque').trim() || '#FF8C00';
+        const formatarKwh = valor => numero(valor).toLocaleString("pt-BR", {
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 5
+        }) + " kWh";
+
+        const formatarReais = valor => numero(valor).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+
+        // =====================================================
+        // CORES DO TEMA
+        // =====================================================
+
+        function obterCoresTema() {
+
+            const raiz = document.documentElement;
+            const estilos = getComputedStyle(raiz);
+
+            const escuro = raiz.getAttribute("data-tema") === "escuro";
+
+            const primaria =
+                estilos.getPropertyValue("--cor-primaria-400").trim() ||
+                estilos.getPropertyValue("--cor-destaque").trim() ||
+                "#C2F012";
+
+            const temporario = document.createElement("span");
+            temporario.style.color = primaria;
+
+            document.body.appendChild(temporario);
+
+            const corRgb = getComputedStyle(temporario).color;
+
+            temporario.remove();
+
             return {
-                linha: primaryColor,
-                preenchimento: primaryColor + '33',
-                texto: '#FFFFFF',
-                grade: 'rgba(255, 255, 255, 0.08)'
+                linha: primaria,
+                preenchimento: corRgb.replace(/^rgb\((.+)\)$/, "rgba($1, 0.22)"),
+                texto: escuro ? "#D1D5DB" : "#6B7280",
+                grade: escuro ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.08)",
+                tooltip: escuro ? "#262626" : "#1E293B"
             };
         }
 
-        function carregarPontos15() {
-            try {
-                const salvo = localStorage.getItem(STORAGE_KEY_15);
-                if (salvo) return JSON.parse(salvo);
-            } catch (e) {}
-            return [];
-        }
+        function opcoesComuns(cores) {
 
-        function salvarPontos15(pontos) {
-            try {
-                localStorage.setItem(STORAGE_KEY_15, JSON.stringify(pontos));
-            } catch (e) {}
-        }
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
 
-        function processarNovosPontos(novosDados) {
-            let pontos = carregarPontos15();
+                plugins: {
+                    legend: {
+                        display: false
+                    },
 
-            if (novosDados && Array.isArray(novosDados)) {
-                novosDados.forEach(item => {
-                    if (item && item.hora) {
-                        const idx = pontos.findIndex(p => p.hora === item.hora);
-                        if (idx !== -1) {
-                            pontos[idx].consumoKwh = item.consumoKwh;
-                        } else {
-                            pontos.push({ hora: item.hora, consumoKwh: item.consumoKwh });
-                        }
+                    tooltip: {
+                        backgroundColor: cores.tooltip,
+                        titleColor: "#FFFFFF",
+                        bodyColor: "#FFFFFF"
                     }
-                });
-            }
-
-            if (pontos.length > 15) {
-                pontos = pontos.slice(pontos.length - 15);
-            }
-
-            salvarPontos15(pontos);
-            return pontos;
+                }
+            };
         }
 
-        // 1. ATUALIZA INTERFACE E CARDS DE RESUMO
+        // =====================================================
+        // STATUS DA META
+        // =====================================================
+
+        function atualizarStatusMeta(dash) {
+
+            const card = document.getElementById("cardStatusMeta");
+            const titulo = document.getElementById("textoStatusMeta");
+            const descricao = document.getElementById("descricaoStatusMeta");
+            const icone = document.getElementById("iconeStatusMeta");
+
+            if (!card || !titulo || !descricao || !icone) return;
+
+            const limite = numero(dash.metaGastoKwh || dash.metaConsumoMensalLimiteKwh);
+
+            const acumulado = numero(dash.metaConsumoMensalAtualKwh);
+
+            const percentual = dash.percentualMetaAtingida !== undefined
+                ? numero(dash.percentualMetaAtingida)
+                : (limite > 0 ? acumulado / limite * 100 : 0);
+
+            card.classList.remove(
+                "status-verde",
+                "status-laranja",
+                "status-vermelho",
+                "status-sem-meta"
+            );
+
+            if (limite <= 0) {
+
+                card.classList.add("status-sem-meta");
+
+                titulo.textContent = "Nenhuma meta definida";
+                descricao.textContent = "Configure uma meta para acompanhar seu consumo";
+
+                icone.textContent = "flag";
+
+            } else if (percentual >= 100) {
+
+                card.classList.add("status-vermelho");
+
+                titulo.textContent = dash.mensagemStatusMeta || "Meta mensal atingida!";
+                descricao.textContent = "Você ultrapassou o limite de consumo definido";
+
+                icone.textContent = "warning";
+
+            } else if (percentual >= 80) {
+
+                card.classList.add("status-laranja");
+
+                titulo.textContent = dash.mensagemStatusMeta || "Atenção: meta próxima do limite";
+                descricao.textContent = "Você já utilizou boa parte da sua meta mensal";
+
+                icone.textContent = "priority_high";
+
+            } else {
+
+                card.classList.add("status-verde");
+
+                titulo.textContent = dash.mensagemStatusMeta || "Você está dentro da sua meta!";
+                descricao.textContent = "Seu consumo está dentro do limite mensal";
+
+                icone.textContent = "flag";
+            }
+        }
+
+        // =====================================================
+        // ATUALIZAÇÃO DOS INDICADORES
+        // =====================================================
+
         function atualizarInterface(dash) {
+
             if (!dash) return;
 
-            const consumoDiaKwh = dash.consumoTotalDiarioKwh !== undefined
-                ? dash.consumoTotalDiarioKwh
-                : 0.0;
+            const consumoDiario = numero(dash.consumoTotalDiarioKwh);
+            const consumoMensal = numero(dash.metaConsumoMensalAtualKwh);
 
-            const elConsumoAtual = document.getElementById("cardConsumoTotalDiario") || document.querySelector(".card-consumo-atual");
-            const elCustoAtual = document.getElementById("cardCustoDiario") || document.querySelector(".card-custo-atual");
-            const elMeta = document.getElementById("cardMetaGasto") || document.querySelector(".card-meta");
-            const elConta = document.getElementById("cardValorContaEstimado") || document.querySelector(".card-conta");
+            const limite = numero(
+                dash.metaGastoKwh || dash.metaConsumoMensalLimiteKwh
+            );
 
-            const casasDecimais = (consumoDiaKwh > 0 && consumoDiaKwh < 0.01) ? 4 : 2;
+            const elConsumo = document.getElementById("cardConsumoTotalDiario");
+            const elCusto = document.getElementById("cardCustoDiario");
+            const elMeta = document.getElementById("cardMetaGasto");
+            const elPercentual = document.getElementById("cardPercentualMeta");
+            const elConta = document.getElementById("cardValorContaEstimado");
 
-            if (elConsumoAtual) {
-                elConsumoAtual.innerText = consumoDiaKwh.toLocaleString('pt-BR', { minimumFractionDigits: casasDecimais, maximumFractionDigits: casasDecimais });
+            if (elConsumo) {
+                elConsumo.textContent = formatarKwh(consumoDiario).replace(" kWh", "");
             }
 
-            if (elCustoAtual) {
-                const custoRealtime = (consumoDiaKwh * TARIFA_KWH);
-                elCustoAtual.innerText = custoRealtime.toLocaleString('pt-BR', { minimumFractionDigits: casasDecimais, maximumFractionDigits: casasDecimais });
+            if (elCusto) {
+                elCusto.textContent = formatarReais(consumoDiario * 0.85)
+                    .replace("R$", "")
+                    .trim();
             }
 
             if (elMeta) {
-                elMeta.innerText = dash.metaGastoKwh !== undefined ? Math.round(dash.metaGastoKwh) : 250;
+                elMeta.textContent = limite > 0 ? Math.round(limite) : "--";
             }
 
-            const acumuladoMes = dash.metaConsumoMensalAtualKwh || 0;
-            if (elConta) {
-                const estimativaConta = (acumuladoMes * TARIFA_KWH) + 12.50;
-                elConta.innerText = estimativaConta.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const percentual = dash.percentualMetaAtingida !== undefined
+                ? numero(dash.percentualMetaAtingida)
+                : (limite > 0 ? consumoMensal / limite * 100 : 0);
+
+            if (elPercentual) {
+                elPercentual.textContent = `${Math.round(percentual)}% da meta atingida`;
             }
 
-            const elConsumoAtualTexto = document.getElementById("consumoAtualTexto");
-            const elConsumoMensal = document.getElementById("consumoMensal");
-            if (elConsumoAtualTexto) elConsumoAtualTexto.innerText = acumuladoMes.toFixed(2) + " kWh";
-            if (elConsumoMensal) elConsumoMensal.innerText = acumuladoMes.toFixed(2) + " kWh";
+            const meses = Array.isArray(dash.valorContaEstimadoReais)
+                ? dash.valorContaEstimadoReais
+                : [];
 
-            const barraMeta = document.getElementById("progressoMeta") || document.querySelector(".progresso-meta-bar");
-            const limite = dash.metaGastoKwh || 250;
-            if (barraMeta) {
-                let perc = (limite > 0 ? (acumuladoMes / limite) * 100 : 0);
-                if (acumuladoMes > 0 && perc < 2.0) perc = 2.0;
-                barraMeta.style.width = Math.min(100, Math.max(0, perc)) + "%";
+            const estimativaAtual = meses.length
+                ? numero(meses[meses.length - 1].valor)
+                : null;
+
+            if (elConta && estimativaAtual !== null) {
+                elConta.textContent = formatarReais(estimativaAtual)
+                    .replace("R$", "")
+                    .trim();
             }
+
+            const consumoAtualTexto = document.getElementById("consumoAtualTexto");
+            const consumoMensalTexto = document.getElementById("consumoMensal");
+            const limiteMeta = document.getElementById("limiteMeta");
+            const valorMeta = document.getElementById("valorMeta");
+            const progresso = document.getElementById("progressoMeta");
+
+            if (consumoAtualTexto) {
+                consumoAtualTexto.textContent = formatarKwh(consumoDiario);
+            }
+
+            if (consumoMensalTexto) {
+                consumoMensalTexto.textContent = formatarKwh(consumoMensal);
+            }
+
+            if (limiteMeta) {
+                limiteMeta.textContent = limite > 0
+                    ? `Meta: ${formatarKwh(limite)}`
+                    : "Meta não definida";
+            }
+
+            if (valorMeta) {
+                valorMeta.textContent = limite > 0
+                    ? formatarKwh(limite)
+                    : "-- kWh";
+            }
+
+            if (progresso) {
+
+                const porcentagemBarra = limite > 0
+                    ? Math.min(100, Math.max(0, percentual))
+                    : 0;
+
+                progresso.style.width = `${porcentagemBarra}%`;
+            }
+
+            atualizarStatusMeta(dash);
         }
 
-        // 2. GRÁFICO 1: TEMPO REAL
-        function initChartRealtime(dash) {
-            const cores = getThemeColors();
+        // =====================================================
+        // JANELA FIXA DE 11 MINUTOS
+        // =====================================================
+
+        function obterJanelaDezMinutos() {
+
+            const agora = new Date();
+
+            agora.setSeconds(0, 0);
+
+            const labels = [];
+
+            // Últimos 10 minutos + minuto atual.
+            for (let i = 10; i >= 0; i--) {
+
+                const minuto = new Date(
+                    agora.getTime() - i * 60 * 1000
+                );
+
+                const horaFormatada =
+                    String(minuto.getHours()).padStart(2, "0") +
+                    ":" +
+                    String(minuto.getMinutes()).padStart(2, "0");
+
+                labels.push(horaFormatada);
+            }
+
+            return labels;
+        }
+
+        // =====================================================
+        // ORGANIZA OS DADOS POR MINUTO
+        // =====================================================
+
+        function obterPontosTempoReal(dash) {
+
+            const pontos = Array.isArray(dash?.consumoTempoReal)
+                ? dash.consumoTempoReal
+                : [];
+
+            const consumoPorMinuto = new Map();
+
+            pontos.forEach(ponto => {
+
+                const hora =
+                    ponto.hora ||
+                    ponto.horario ||
+                    ponto.instante ||
+                    "";
+
+                if (!hora) return;
+
+                consumoPorMinuto.set(
+                    hora,
+                    numero(ponto.consumoKwh)
+                );
+            });
+
+            const labels = obterJanelaDezMinutos();
+
+            return {
+
+                labels,
+
+                valores: labels.map(hora => {
+
+                    if (!consumoPorMinuto.has(hora)) {
+                        return null;
+                    }
+
+                    // Ajuste exclusivamente visual.
+                    return consumoPorMinuto.get(hora) + AJUSTE_VISUAL_KWH;
+                })
+            };
+        }
+
+        // =====================================================
+        // GRÁFICO DE CONSUMO EM TEMPO REAL
+        // =====================================================
+
+        function criarGraficoTempoReal(dash) {
+
             const canvas = document.getElementById("chartConsumoRealtime");
+
             if (!canvas) return;
 
-            const existing = Chart.getChart(canvas);
-            if (existing) existing.destroy();
+            const cores = obterCoresTema();
 
-            const pontos = processarNovosPontos(dash ? dash.consumoTempoReal : null);
+            const pontos = obterPontosTempoReal(dash);
+
+            const existente = Chart.getChart(canvas);
+
+            if (existente) {
+                existente.destroy();
+            }
 
             chartRealtime = new Chart(canvas, {
-                type: 'line',
+
+                type: "line",
+
                 data: {
-                    labels: pontos.map(p => p.hora),
+
+                    labels: pontos.labels,
+
                     datasets: [{
-                        label: 'Consumo (kWh)',
-                        data: pontos.map(p => p.consumoKwh),
+
+                        label: "Consumo (kWh)",
+
+                        data: pontos.valores,
+
                         borderColor: cores.linha,
                         backgroundColor: cores.preenchimento,
+
                         fill: true,
-                        tension: 0,
-                        pointRadius: 4,
-                        pointBackgroundColor: cores.linha
+                        tension: 0.3,
+
+                        spanGaps: false,
+
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+
+                        pointBackgroundColor: cores.linha,
+
+                        borderWidth: 2
                     }]
                 },
+
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    plugins: { legend: { display: false } },
+
+                    ...opcoesComuns(cores),
+
                     scales: {
+
                         y: {
-                            beginAtZero: false,
-                            grid: { color: 'rgba(255,255,255,0.08)' },
-                            ticks: { callback: function(val) { return val.toFixed(4); } }
+
+                            beginAtZero: true,
+                            grace: "15%",
+
+                            grid: {
+                                color: cores.grade
+                            },
+
+                            ticks: {
+
+                                color: cores.texto,
+
+                                callback: valor => numero(valor).toFixed(4)
+                            }
                         },
+
                         x: {
-                            grid: { display: false },
-                            ticks: { autoSkip: false }
+
+                            grid: {
+                                display: false
+                            },
+
+                            ticks: {
+
+                                color: cores.texto,
+
+                                // Não esconde nenhum horário.
+                                autoSkip: false,
+
+                                maxTicksLimit: 11,
+
+                                maxRotation: 0,
+                                minRotation: 0,
+
+                                font: {
+                                    size: 10
+                                }
+                            }
                         }
                     }
                 }
             });
+
+            const estado = document.getElementById("estadoConsumoRealtime");
+
+            const temMedicao = pontos.valores.some(valor => valor !== null);
+
+            if (estado) {
+                estado.textContent = temMedicao
+                    ? ""
+                    : "Aguardando medições do dispositivo...";
+            }
         }
 
-        // 3. GRÁFICO 2: DIÁRIO POR HORA
-        function initChartComparativo(dash) {
-            const cores = getThemeColors();
+        // =====================================================
+        // ATUALIZAÇÃO DO GRÁFICO EM TEMPO REAL
+        // =====================================================
+
+        function atualizarGraficoTempoReal(dash) {
+
+            if (!chartRealtime) {
+
+                criarGraficoTempoReal(dash);
+
+                return;
+            }
+
+            const cores = obterCoresTema();
+
+            const pontos = obterPontosTempoReal(dash);
+
+            // Atualiza os 11 horários conforme o relógio.
+            chartRealtime.data.labels = pontos.labels;
+
+            // Atualiza os valores correspondentes a cada minuto.
+            chartRealtime.data.datasets[0].data = pontos.valores;
+
+            chartRealtime.data.datasets[0].borderColor = cores.linha;
+
+            chartRealtime.data.datasets[0].backgroundColor = cores.preenchimento;
+
+            chartRealtime.data.datasets[0].pointBackgroundColor = cores.linha;
+
+            chartRealtime.options.scales.y.grid.color = cores.grade;
+
+            chartRealtime.options.scales.y.ticks.color = cores.texto;
+
+            chartRealtime.options.scales.x.ticks.color = cores.texto;
+
+            chartRealtime.update("none");
+
+            const estado = document.getElementById("estadoConsumoRealtime");
+
+            const temMedicao = pontos.valores.some(valor => valor !== null);
+
+            if (estado) {
+                estado.textContent = temMedicao
+                    ? ""
+                    : "Aguardando medições do dispositivo...";
+            }
+        }
+
+        // =====================================================
+        // GRÁFICO COMPARATIVO POR HORA
+        // =====================================================
+
+        function criarGraficoComparativo(dash) {
+
             const canvas = document.getElementById("chartResumoComparativo");
+
             if (!canvas) return;
 
-            const existing = Chart.getChart(canvas);
-            if (existing) existing.destroy();
+            const cores = obterCoresTema();
 
-            const listaHoras = (dash && dash.consumoDiarioHoras) ? dash.consumoDiarioHoras : [];
+            const pontos = Array.isArray(dash?.consumoDiarioHoras)
+                ? dash.consumoDiarioHoras
+                : [];
+
+            const existente = Chart.getChart(canvas);
+
+            if (existente) {
+                existente.destroy();
+            }
 
             chartComparativo = new Chart(canvas, {
-                type: 'bar',
+
+                type: "bar",
+
                 data: {
-                    labels: listaHoras.map(p => p.hora || ""),
+
+                    labels: pontos.map(p => p.hora || ""),
+
                     datasets: [{
-                        label: 'Consumo (kWh)',
-                        data: listaHoras.map(p => p.consumoKwh || p.valor || 0),
+
+                        label: "Consumo (kWh)",
+
+                        data: pontos.map(p => numero(p.consumoKwh ?? p.valor)),
+
                         backgroundColor: cores.linha,
-                        borderRadius: 4,
-                        maxBarThickness: 32
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, animation: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        }
 
-        // 4. GRÁFICO 3: ESTIMATIVA DA CONTA (MÁXIMO R$ 300)
-        function initChartValorConta(dash) {
-            const cores = getThemeColors();
-            const canvas = document.getElementById("chartValorConta");
-            if (!canvas) return;
+                        borderRadius: 5,
 
-            const existing = Chart.getChart(canvas);
-            if (existing) existing.destroy();
-
-            let listaMeses = (dash && dash.valorContaEstimadoReais) ? dash.valorContaEstimadoReais : [];
-
-            chartValorConta = new Chart(canvas, {
-                type: 'bar',
-                data: {
-                    labels: listaMeses.map(p => p.mes),
-                    datasets: [{
-                        label: 'R$',
-                        data: listaMeses.map(p => p.valor),
-                        backgroundColor: cores.linha,
-                        borderRadius: 4,
                         maxBarThickness: 36
                     }]
                 },
+
                 options: {
-                    responsive: true, maintainAspectRatio: false, animation: false,
-                    plugins: { legend: { display: false } },
+
+                    ...opcoesComuns(cores),
+
                     scales: {
+
                         y: {
+
                             beginAtZero: true,
-                            max: 300,
-                            grid: { color: 'rgba(255,255,255,0.08)' },
-                            ticks: { callback: function(value) { return 'R$ ' + value; } }
+                            grace: "15%",
+
+                            grid: {
+                                color: cores.grade
+                            },
+
+                            ticks: {
+                                color: cores.texto
+                            }
                         },
-                        x: { grid: { display: false } }
+
+                        x: {
+
+                            grid: {
+                                display: false
+                            },
+
+                            ticks: {
+                                color: cores.texto,
+                                maxRotation: 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            const estado = document.getElementById("estadoConsumoDiario");
+
+            if (estado) {
+                estado.textContent = pontos.length
+                    ? ""
+                    : "Aguardando medições horárias...";
+            }
+        }
+
+        // =====================================================
+        // GRÁFICO DE ESTIMATIVA DA CONTA
+        // =====================================================
+
+        function criarGraficoValorConta(dash) {
+
+            const canvas = document.getElementById("chartValorConta");
+
+            if (!canvas) return;
+
+            const cores = obterCoresTema();
+
+            const pontos = Array.isArray(dash?.valorContaEstimadoReais)
+                ? dash.valorContaEstimadoReais
+                : [];
+
+            const existente = Chart.getChart(canvas);
+
+            if (existente) {
+                existente.destroy();
+            }
+
+            chartValorConta = new Chart(canvas, {
+
+                type: "bar",
+
+                data: {
+
+                    labels: pontos.map(p => p.mes || ""),
+
+                    datasets: [{
+
+                        label: "Valor estimado (R$)",
+
+                        data: pontos.map(p => numero(p.valor)),
+
+                        backgroundColor: cores.linha,
+
+                        borderRadius: 5,
+
+                        maxBarThickness: 42
+                    }]
+                },
+
+                options: {
+
+                    ...opcoesComuns(cores),
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true,
+                            grace: "12%",
+
+                            grid: {
+                                color: cores.grade
+                            },
+
+                            ticks: {
+
+                                color: cores.texto,
+
+                                callback: valor => formatarReais(valor)
+                            }
+                        },
+
+                        x: {
+
+                            grid: {
+                                display: false
+                            },
+
+                            ticks: {
+                                color: cores.texto,
+                                maxRotation: 0
+                            }
+                        }
                     }
                 }
             });
         }
 
-        // 5. POLLING A CADA 5 SEGUNDOS (SINCRONIZA DADOS E TEMA AUTOMATICAMENTE)
-        function buscarDadosAtualizados() {
-            fetch('/api/v1/web/dashboard/dados')
-                .then(res => res.json())
-                .then(dash => {
-                    atualizarInterface(dash);
+        // =====================================================
+        // ATUALIZAÇÃO DOS OUTROS GRÁFICOS
+        // =====================================================
 
-                    const cores = getThemeColors();
+        function atualizarGraficoComparativo(dash) {
 
-                    if (chartRealtime) {
-                        const pontosAtuais = processarNovosPontos(dash ? dash.consumoTempoReal : null);
-                        chartRealtime.data.labels = pontosAtuais.map(p => p.hora);
-                        chartRealtime.data.datasets[0].data = pontosAtuais.map(p => p.consumoKwh);
+            if (!chartComparativo) {
 
-                        if (cores.linha) {
-                            chartRealtime.data.datasets[0].borderColor = cores.linha;
-                            chartRealtime.data.datasets[0].backgroundColor = cores.preenchimento;
-                            chartRealtime.data.datasets[0].pointBackgroundColor = cores.linha;
-                        }
-                        chartRealtime.update('none');
-                    }
+                criarGraficoComparativo(dash);
 
-                    if (chartComparativo && dash.consumoDiarioHoras) {
-                        chartComparativo.data.labels = dash.consumoDiarioHoras.map(p => p.hora || "");
-                        chartComparativo.data.datasets[0].data = dash.consumoDiarioHoras.map(p => p.consumoKwh || p.valor || 0);
+                return;
+            }
 
-                        if (cores.linha) {
-                            chartComparativo.data.datasets[0].backgroundColor = cores.linha;
-                        }
-                        chartComparativo.update('none');
-                    }
+            const cores = obterCoresTema();
 
-                    if (chartValorConta && dash.valorContaEstimadoReais) {
-                        chartValorConta.data.labels = dash.valorContaEstimadoReais.map(p => p.mes);
-                        chartValorConta.data.datasets[0].data = dash.valorContaEstimadoReais.map(p => p.valor);
+            const pontos = Array.isArray(dash?.consumoDiarioHoras)
+                ? dash.consumoDiarioHoras
+                : [];
 
-                        if (cores.linha) {
-                            chartValorConta.data.datasets[0].backgroundColor = cores.linha;
-                        }
-                        chartValorConta.update('none');
-                    }
-                })
-                .catch(err => console.error("Erro na atualização:", err));
+            chartComparativo.data.labels = pontos.map(p => p.hora || "");
+
+            chartComparativo.data.datasets[0].data =
+                pontos.map(p => numero(p.consumoKwh ?? p.valor));
+
+            chartComparativo.data.datasets[0].backgroundColor = cores.linha;
+
+            chartComparativo.options.scales.y.grid.color = cores.grade;
+
+            chartComparativo.options.scales.y.ticks.color = cores.texto;
+
+            chartComparativo.options.scales.x.ticks.color = cores.texto;
+
+            chartComparativo.update("none");
+
+            const estado = document.getElementById("estadoConsumoDiario");
+
+            if (estado) {
+                estado.textContent = pontos.length
+                    ? ""
+                    : "Aguardando medições horárias...";
+            }
         }
 
-        // CARGA INICIAL
+        function atualizarGraficoValorConta(dash) {
+
+            if (!chartValorConta) {
+
+                criarGraficoValorConta(dash);
+
+                return;
+            }
+
+            const cores = obterCoresTema();
+
+            const pontos = Array.isArray(dash?.valorContaEstimadoReais)
+                ? dash.valorContaEstimadoReais
+                : [];
+
+            chartValorConta.data.labels = pontos.map(p => p.mes || "");
+
+            chartValorConta.data.datasets[0].data =
+                pontos.map(p => numero(p.valor));
+
+            chartValorConta.data.datasets[0].backgroundColor = cores.linha;
+
+            chartValorConta.options.scales.y.grid.color = cores.grade;
+
+            chartValorConta.options.scales.y.ticks.color = cores.texto;
+
+            chartValorConta.options.scales.x.ticks.color = cores.texto;
+
+            chartValorConta.update("none");
+        }
+
+        // =====================================================
+        // APLICAÇÃO DOS DADOS
+        // =====================================================
+
+        function aplicarDados(dash) {
+
+            if (!dash) return;
+
+            atualizarInterface(dash);
+
+            atualizarGraficoTempoReal(dash);
+
+            atualizarGraficoComparativo(dash);
+
+            atualizarGraficoValorConta(dash);
+        }
+
+        // =====================================================
+        // CONSULTA À API
+        // =====================================================
+
+        async function buscarDadosAtualizados() {
+
+            if (requisicaoEmAndamento) return;
+
+            requisicaoEmAndamento = true;
+
+            try {
+
+                const resposta = await fetch(ENDPOINT_DADOS, {
+
+                    method: "GET",
+
+                    headers: {
+                        "Accept": "application/json"
+                    },
+
+                    credentials: "same-origin",
+
+                    cache: "no-store"
+                });
+
+                if (!resposta.ok) {
+
+                    throw new Error(
+                        `Falha ao consultar dashboard: HTTP ${resposta.status}`
+                    );
+                }
+
+                const dash = await resposta.json();
+
+                aplicarDados(dash);
+
+            } catch (erro) {
+
+                console.error("Erro ao atualizar o dashboard:", erro);
+
+            } finally {
+
+                requisicaoEmAndamento = false;
+            }
+        }
+
+        // =====================================================
+        // INICIALIZAÇÃO
+        // =====================================================
+
         if (initialDash) {
+
             atualizarInterface(initialDash);
-            initChartRealtime(initialDash);
-            initChartComparativo(initialDash);
-            initChartValorConta(initialDash);
+
+            criarGraficoTempoReal(initialDash);
+
+            criarGraficoComparativo(initialDash);
+
+            criarGraficoValorConta(initialDash);
+
         } else {
+
             buscarDadosAtualizados();
         }
 
-        setInterval(buscarDadosAtualizados, 5000);
+        // Consulta os dados a cada 5 segundos.
+        // Essa consulta é GET e não salva medições no banco.
+        window.setInterval(
+            buscarDadosAtualizados,
+            INTERVALO_ATUALIZACAO
+        );
+
+        // Atualização quando o tema é alterado.
+        document.addEventListener("zatts:tema", () => {
+
+            buscarDadosAtualizados();
+        });
+
     });
+
     /*]]>*/
 </script>
 
