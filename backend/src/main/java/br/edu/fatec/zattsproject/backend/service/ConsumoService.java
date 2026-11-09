@@ -3,13 +3,16 @@ package br.edu.fatec.zattsproject.backend.service;
 import br.edu.fatec.zattsproject.backend.dto.ConsumoDiarioDTO;
 import br.edu.fatec.zattsproject.backend.dto.DashboardDTO;
 import br.edu.fatec.zattsproject.backend.model.Consumo;
+import br.edu.fatec.zattsproject.backend.model.ConsumoRealtime;
 import br.edu.fatec.zattsproject.backend.repository.ConsumoRepository;
+import br.edu.fatec.zattsproject.backend.repository.ConsumoRealtimeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -19,44 +22,65 @@ import java.util.*;
 public class ConsumoService {
 
     private final ConsumoRepository repository;
+    private final ConsumoRealtimeRepository realtimeRepository;
     private final ConfiguracaoService configuracaoService;
     private final AlertaDisparoService alertaDisparoService;
+    private final CalculadoraTarifaService calculadoraTarifaService;
 
     public Consumo salvar(Consumo consumo) {
         Consumo salvo = repository.save(consumo);
 
         if (salvo.getUsuarioId() != null && !salvo.getUsuarioId().isBlank()) {
+            LocalDateTime agora = salvo.getDataHora() != null ? salvo.getDataHora() : LocalDateTime.now();
+
+            // CALCULA O MOMENTO DA PRÓXIMA MEIA-NOITE (00:00:00 DO DIA SEGUINTE)
+            LocalDateTime meiaNoiteProximoDia = agora.toLocalDate().plusDays(1).atStartOfDay();
+            Date dataExpiracaoMeiaNoite = Date.from(meiaNoiteProximoDia.atZone(ZoneId.systemDefault()).toInstant());
+
+            ConsumoRealtime rt = new ConsumoRealtime();
+            rt.setUsuarioId(salvo.getUsuarioId());
+            rt.setConsumoKwh(salvo.getConsumoKwh());
+            rt.setDataHora(agora);
+            rt.setDataExpiracao(dataExpiracaoMeiaNoite); // APAGA APENAS À MEIA-NOITE!
+
+            realtimeRepository.save(rt);
+
             try {
                 alertaDisparoService.avaliar(salvo.getUsuarioId());
             } catch (Exception e) {
                 log.error("Erro ao avaliar alertas:", e);
             }
         }
-
         return salvo;
     }
 
     public DashboardDTO obterDadosDashboard(String usuarioId) {
         LocalDate hoje = LocalDate.now();
-        LocalDateTime inicioDia = hoje.atStartOfDay();
-        LocalDateTime fimDia = hoje.plusDays(1).atStartOfDay();
-
-        // 1. TOTAIS DIÁRIO (MEIA-NOITE ATÉ AGORA) E MENSAL
-        List<Consumo> leiturasHoje = repository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioDia, fimDia);
-        double consumoTotalDiarioKwh = leiturasHoje.stream()
-                .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
-                .sum();
-
-        LocalDateTime inicioMes = hoje.withDayOfMonth(1).atStartOfDay();
-        List<Consumo> leiturasMes = repository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioMes, fimDia);
-        double acumuladoMesKwh = leiturasMes.stream()
-                .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
-                .sum();
+        double tarifaKwh = configuracaoService.obterTarifaKwh(usuarioId);
 
         double limiteMeta = 250.0;
+        try {
+            // limiteMeta = configuracaoService.obterMetaMensal(usuarioId);
+        } catch (Exception e) {
+            log.warn("Usando meta padrão de 250kWh.");
+        }
+
+        // 1. ACUMULADO DIÁRIO (BANCO PERMANENTE)
+        LocalDateTime inicioHoje = hoje.atStartOfDay();
+        LocalDateTime fimHoje = hoje.plusDays(1).atStartOfDay().minusNanos(1);
+        List<Consumo> leiturasHoje = repository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioHoje, fimHoje);
+        double consumoTotalDiarioKwh = leiturasHoje.stream()
+                .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0).sum();
+
+        // 2. ACUMULADO MENSAL (BANCO PERMANENTE)
+        LocalDateTime inicioMes = hoje.withDayOfMonth(1).atStartOfDay();
+        List<Consumo> leiturasMes = repository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioMes, fimHoje);
+        double acumuladoMesKwh = leiturasMes.stream()
+                .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0).sum();
 
         DashboardDTO dto = new DashboardDTO();
-        dto.setConsumoTotalDiarioKwh(arredondar(consumoTotalDiarioKwh, 4));
+
+        dto.setConsumoTotalDiarioKwh(arredondar(consumoTotalDiarioKwh, 5));
         dto.setMetaConsumoMensalAtualKwh(arredondar(acumuladoMesKwh, 2));
         dto.setMetaConsumoMensalLimiteKwh(limiteMeta);
         dto.setMetaGastoKwh(limiteMeta);
@@ -72,30 +96,28 @@ public class ConsumoService {
             dto.setMensagemStatusMeta("Você está dentro da sua meta estipulada!");
         }
 
-        // 2. BUSCA HISTÓRICA COMPLETA NO MONGODB ATLAS
-        List<Consumo> todasLeituras = repository.findByUsuarioIdOrderByDataHoraDesc(usuarioId);
-
-        // Envia a última leitura e o histórico recente para o frontend alimentar a janela dos 15 minutos
+        // 3. GRÁFICO 1: TEMPO REAL (JANELA DOS ÚLTIMOS 10 MINUTOS)
+        LocalDateTime agora = LocalDateTime.now();
         List<DashboardDTO.PontoGraficoMinuto> pontosGrafico1 = new ArrayList<>();
-        if (todasLeituras != null && !todasLeituras.isEmpty()) {
-            List<Consumo> recentes = todasLeituras.stream()
-                    .limit(15)
-                    .sorted(Comparator.comparing(Consumo::getDataHora))
-                    .toList();
+        for (int i = 9; i >= 0; i--) {
+            LocalDateTime minutoAlvo = agora.minusMinutes(i);
+            LocalDateTime inicioMinuto = minutoAlvo.withSecond(0).withNano(0);
+            LocalDateTime fimMinuto = minutoAlvo.withSecond(59).withNano(999999999);
 
-            for (Consumo c : recentes) {
-                DashboardDTO.PontoGraficoMinuto p = new DashboardDTO.PontoGraficoMinuto();
-                p.setHora(c.getDataHora() != null ? c.getDataHora().format(DateTimeFormatter.ofPattern("HH:mm")) : "");
-                p.setConsumoKwh(c.getConsumoKwh() != null ? arredondar(c.getConsumoKwh(), 4) : 0.0);
-                pontosGrafico1.add(p);
-            }
+            List<ConsumoRealtime> leiturasMinuto = realtimeRepository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioMinuto, fimMinuto);
+            double consumoMinuto = leiturasMinuto.stream().mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0).sum();
+
+            DashboardDTO.PontoGraficoMinuto p = new DashboardDTO.PontoGraficoMinuto();
+            p.setHora(minutoAlvo.format(DateTimeFormatter.ofPattern("HH:mm")));
+            p.setConsumoKwh(arredondar(consumoMinuto, 4));
+            pontosGrafico1.add(p);
         }
         dto.setConsumoTempoReal(pontosGrafico1);
 
-        // --- GRÁFICO 2: ÚLTIMAS 10 HORAS REGISTRADAS ---
+        // 4. GRÁFICO 2: MEDIÇÕES POR HORA DO DIA
+        List<Consumo> todasLeituras = repository.findByUsuarioIdOrderByDataHoraDesc(usuarioId);
         if (todasLeituras != null && !todasLeituras.isEmpty()) {
             Map<String, Double> consumoPorHora = new LinkedHashMap<>();
-
             for (Consumo c : todasLeituras) {
                 if (c.getDataHora() != null) {
                     String chaveHora = c.getDataHora().format(DateTimeFormatter.ofPattern("HH")) + "h";
@@ -103,32 +125,25 @@ public class ConsumoService {
                     consumoPorHora.merge(chaveHora, kwh, Double::sum);
                 }
             }
-
-            List<DashboardDTO.PontoGraficoHora> pontosGrafico2 = consumoPorHora.entrySet().stream()
-                    .map(entry -> {
-                        DashboardDTO.PontoGraficoHora p = new DashboardDTO.PontoGraficoHora();
-                        p.setHora(entry.getKey());
-                        p.setConsumoKwh(arredondar(entry.getValue(), 3));
-                        return p;
-                    })
-                    .toList();
+            List<DashboardDTO.PontoGraficoHora> pontosGrafico2 = consumoPorHora.entrySet().stream().map(entry -> {
+                DashboardDTO.PontoGraficoHora p = new DashboardDTO.PontoGraficoHora();
+                p.setHora(entry.getKey());
+                p.setConsumoKwh(arredondar(entry.getValue(), 3));
+                return p;
+            }).toList();
 
             List<DashboardDTO.PontoGraficoHora> listaOrdenada = new ArrayList<>(pontosGrafico2);
             Collections.reverse(listaOrdenada);
-
             if (listaOrdenada.size() > 10) {
                 listaOrdenada = listaOrdenada.subList(listaOrdenada.size() - 10, listaOrdenada.size());
             }
-
             dto.setConsumoDiarioHoras(listaOrdenada);
         } else {
             dto.setConsumoDiarioHoras(new ArrayList<>());
         }
 
-        // --- GRÁFICO 3: ESTIMATIVA DA CONTA (3 MESES HISTÓRICOS REAIS) ---
-        double tarifaKwh = configuracaoService.obterTarifaKwh(usuarioId);
+        // 5. GRÁFICO 3: ESTIMATIVA DA CONTA
         List<DashboardDTO.PontoGraficoMes> pontosGrafico3 = new ArrayList<>();
-
         for (int i = 2; i >= 0; i--) {
             LocalDate mesRef = hoje.minusMonths(i);
             LocalDateTime inicioM = mesRef.withDayOfMonth(1).atStartOfDay();
@@ -136,19 +151,18 @@ public class ConsumoService {
 
             List<Consumo> leiturasDoMes = repository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioM, fimM);
             double totalKwhMes = leiturasDoMes.stream()
-                    .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
-                    .sum();
+                    .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0).sum();
 
-            double valorEstimado = totalKwhMes > 0
-                    ? arredondar((totalKwhMes * tarifaKwh) + 12.50, 2)
-                    : 0.0;
+            double valorEstimado = calculadoraTarifaService.calcularEstimativaOficialContaMensal(
+                    totalKwhMes, CalculadoraTarifaService.BandeiraTarifaria.VERDE
+            );
 
             String nomeMes = mesRef.format(DateTimeFormatter.ofPattern("MMM", new Locale("pt", "BR")));
             nomeMes = nomeMes.substring(0, 1).toUpperCase() + nomeMes.substring(1).replace(".", "");
 
             DashboardDTO.PontoGraficoMes pMes = new DashboardDTO.PontoGraficoMes();
             pMes.setMes(nomeMes);
-            pMes.setValor(valorEstimado);
+            pMes.setValor(arredondar(valorEstimado, 2));
             pontosGrafico3.add(pMes);
         }
         dto.setValorContaEstimadoReais(pontosGrafico3);
@@ -160,21 +174,7 @@ public class ConsumoService {
         return repository.findByUsuarioIdOrderByDataHoraDesc(usuarioId);
     }
 
-    public List<Consumo> buscarPorUsuarioEIntervalo(String usuarioId, LocalDateTime inicio, LocalDateTime fim) {
-        return repository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicio, fim);
-    }
-
     public List<ConsumoDiarioDTO> listarTotaisDiarios(String usuarioId, LocalDate inicio, LocalDate fim) {
-        if (usuarioId == null || usuarioId.isBlank()) {
-            throw new IllegalArgumentException("Usuário não informado.");
-        }
-        if (inicio == null || fim == null) {
-            throw new IllegalArgumentException("As datas de início e fim são obrigatórias.");
-        }
-        if (fim.isBefore(inicio)) {
-            throw new IllegalArgumentException("A data final não pode ser anterior à data inicial.");
-        }
-
         LocalDateTime inicioConsulta = inicio.atStartOfDay();
         LocalDateTime fimConsulta = fim.plusDays(1).atStartOfDay();
 
