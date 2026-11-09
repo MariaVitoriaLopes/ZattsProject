@@ -182,46 +182,147 @@ public class ConsumoService {
         return repository.findByUsuarioIdOrderByDataHoraDesc(usuarioId);
     }
 
-    public List<ConsumoDiarioDTO> listarTotaisDiarios(String usuarioId, LocalDate inicio, LocalDate fim) {
-        LocalDateTime inicioConsulta = inicio.atStartOfDay();
-        LocalDateTime fimConsulta = fim.plusDays(1).atStartOfDay();
-
-        List<Consumo> leituras = repository.buscarPorUsuarioEIntervaloOrdenado(
-                usuarioId,
-                inicioConsulta,
-                fimConsulta
-        );
-
-        Map<LocalDate, Double> consumoPorDia = new TreeMap<>();
-        for (Consumo consumo : leituras) {
-            if (consumo.getDataHora() == null) continue;
-            double kwh = consumo.getConsumoKwh() != null ? consumo.getConsumoKwh() : 0.0;
-            LocalDate dia = consumo.getDataHora().toLocalDate();
-            consumoPorDia.merge(dia, kwh, Double::sum);
+    public List<ConsumoDiarioDTO> listarTotaisDiarios(
+            String usuarioId,
+            LocalDate inicio,
+            LocalDate fim) {
+        if (usuarioId == null || usuarioId.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Usuário não informado."
+            );
         }
+        if (inicio == null || fim == null) {
+            throw new IllegalArgumentException(
+                    "As datas de início e fim são obrigatórias."
+            );
+        }
+        if (fim.isBefore(inicio)) {
+            throw new IllegalArgumentException(
+                    "A data final não pode ser anterior à data inicial."
+            );
+        }
+        LocalDateTime inicioConsulta =
+                inicio.atStartOfDay();
+        LocalDateTime fimConsulta =
+                fim.plusDays(1)
+                        .atStartOfDay()
+                        .minusNanos(1);
+        List<Consumo> leituras =
+                repository.findByUsuarioIdAndDataHoraBetween(
+                        usuarioId,
+                        inicioConsulta,
+                        fimConsulta
+                );
+        Map<LocalDate, Double> consumoPorDia =
+                new TreeMap<>();
 
-        LocalDate hoje = LocalDate.now();
-        if (!hoje.isBefore(inicio) && !hoje.isAfter(fim)) {
-            LocalDateTime inicioHoje = hoje.atStartOfDay();
-            LocalDateTime fimHoje = hoje.plusDays(1).atStartOfDay().minusNanos(1);
-
-            List<ConsumoRealtime> leiturasRealtimeHoje = realtimeRepository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioHoje, fimHoje);
-            double totalRealtimeHoje = leiturasRealtimeHoje.stream()
-                    .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
-                    .sum();
-
-            if (totalRealtimeHoje > 0) {
-                consumoPorDia.merge(hoje, totalRealtimeHoje, Double::sum);
+        for (Consumo consumo : leituras) {
+            if (consumo.getDataHora() == null) {
+                continue;
+            }
+            double kwh =
+                    consumo.getConsumoKwh() != null
+                            ? consumo.getConsumoKwh()
+                            : 0.0;
+            if (!Double.isFinite(kwh) || kwh < 0) {
+                kwh = 0.0;
+            }
+            LocalDate dia =
+                    consumo.getDataHora()
+                            .toLocalDate();
+            consumoPorDia.merge(
+                    dia,
+                    kwh,
+                    Double::sum
+            );
+        }
+        LocalDate hoje =
+                LocalDate.now();
+        boolean consultaIncluiHoje =
+                !hoje.isBefore(inicio)
+                        && !hoje.isAfter(fim);
+        if (consultaIncluiHoje) {
+            LocalDateTime inicioHoje =
+                    hoje.atStartOfDay();
+            LocalDateTime fimHoje =
+                    hoje.plusDays(1)
+                            .atStartOfDay()
+                            .minusNanos(1);
+            LocalDateTime ultimaLeituraPermanenteHoje =
+                    leituras.stream()
+                            .filter(consumo ->
+                                    consumo.getDataHora() != null
+                                            && consumo.getDataHora()
+                                            .toLocalDate()
+                                            .equals(hoje)
+                            )
+                            .map(Consumo::getDataHora)
+                            .max(LocalDateTime::compareTo)
+                            .orElse(null);
+            LocalDateTime inicioRealtime =
+                    inicioHoje;
+            if (ultimaLeituraPermanenteHoje != null) {
+                inicioRealtime =
+                        ultimaLeituraPermanenteHoje
+                                .withMinute(0)
+                                .withSecond(0)
+                                .withNano(0)
+                                .plusHours(1);
+            }
+            if (!inicioRealtime.isAfter(fimHoje)) {
+                List<ConsumoRealtime> realtime =
+                        realtimeRepository
+                                .findByUsuarioIdAndDataHoraBetween(
+                                        usuarioId,
+                                        inicioRealtime,
+                                        fimHoje
+                                );
+                double consumoRealtime =
+                        realtime.stream()
+                                .mapToDouble(item -> {
+                                    Double valor =
+                                            item.getConsumoKwh();
+                                    if (valor == null
+                                            || !Double.isFinite(valor)
+                                            || valor < 0) {
+                                        return 0.0;
+                                    }
+                                    return valor;
+                                })
+                                .sum();
+                if (consumoRealtime > 0) {
+                    consumoPorDia.merge(
+                            hoje,
+                            consumoRealtime,
+                            Double::sum
+                    );
+                }
             }
         }
-
-        double tarifaKwh = configuracaoService.obterTarifaKwh(usuarioId);
-
-        return consumoPorDia.entrySet().stream()
+        double tarifaKwh =
+                configuracaoService
+                        .obterTarifaKwh(
+                                usuarioId
+                        );
+        return consumoPorDia
+                .entrySet()
+                .stream()
                 .map(entry -> {
-                    double kwh = arredondar(entry.getValue(), 5);
-                    double reais = arredondar(kwh * tarifaKwh, 2);
-                    return new ConsumoDiarioDTO(entry.getKey(), kwh, reais);
+                    double kwh =
+                            arredondar(
+                                    entry.getValue(),
+                                    5
+                            );
+                    double reais =
+                            arredondar(
+                                    kwh * tarifaKwh,
+                                    2
+                            );
+                    return new ConsumoDiarioDTO(
+                            entry.getKey(),
+                            kwh,
+                            reais
+                    );
                 })
                 .toList();
     }

@@ -55,6 +55,29 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function coresDoTema() {
+        const raiz = document.documentElement;
+        const estilos = getComputedStyle(raiz);
+        const destaque =
+            estilos
+                .getPropertyValue('--cor-primaria-400')
+                .trim() || '#DFFF00';
+        const escuro =
+            raiz.getAttribute('data-tema') === 'escuro';
+        return {
+            destaque: destaque,
+            texto: escuro
+                ? '#F2F2F2'
+                : '#1C1C1C',
+            grade: escuro
+                ? 'rgba(255, 255, 255, 0.10)'
+                : 'rgba(0, 0, 0, 0.10)',
+            tooltip: escuro
+                ? '#2A2A2A'
+                : '#1C1C1C'
+        };
+    }
+
     function definirEstado(texto) {
         estadoMensal.textContent = texto || '';
         estadoMensal.hidden = !texto;
