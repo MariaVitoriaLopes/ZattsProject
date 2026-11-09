@@ -32,17 +32,17 @@ public class SessaoService {
 
     @PostConstruct
     public void garantirIndiceSessionId() {
-
-        mongoTemplate
-                .indexOps(Sessao.class)
-                .ensureIndex(
-                        new Index()
-                                .on(
-                                        "sessionId",
-                                        Sort.Direction.ASC
-                                )
-                                .unique()
-                );
+        try {
+            mongoTemplate
+                    .indexOps(Sessao.class)
+                    .createIndex(
+                            new Index()
+                                    .on("sessionId", Sort.Direction.ASC)
+                                    .unique()
+                    );
+        } catch (Exception e) {
+            // Log preventivo para evitar travamento do contexto Spring caso o índice já exista
+        }
     }
 
     public Sessao registrarWeb(
@@ -65,11 +65,9 @@ public class SessaoService {
             String sessionId,
             String nomeDispositivo) {
 
-        String nome =
-                nomeDispositivo == null
-                        || nomeDispositivo.isBlank()
-                        ? "Android"
-                        : nomeDispositivo.trim();
+        String nome = (nomeDispositivo == null || nomeDispositivo.isBlank())
+                ? "Android"
+                : nomeDispositivo.trim();
 
         return registrar(
                 usuarioId,
@@ -85,12 +83,14 @@ public class SessaoService {
             String nome,
             Sessao.Tipo tipo) {
 
-        LocalDateTime agora =
-                LocalDateTime.now();
+        LocalDateTime agora = LocalDateTime.now();
 
-        Sessao sessao =
-                repository.findBySessionId(sessionId)
-                        .orElseGet(Sessao::new);
+        Sessao sessao = repository.findBySessionId(sessionId)
+                .orElseGet(() -> {
+                    Sessao nova = new Sessao();
+                    nova.setCriadoEm(agora);
+                    return nova;
+                });
 
         sessao.setUsuarioId(usuarioId);
         sessao.setSessionId(sessionId);
@@ -111,78 +111,54 @@ public class SessaoService {
             String sessionId,
             String usuarioId) {
 
-        Optional<Sessao> sessaoOpt =
-                repository.findBySessionId(sessionId);
+        Optional<Sessao> sessaoOpt = repository.findBySessionId(sessionId);
 
         if (sessaoOpt.isEmpty()) {
             return false;
         }
 
-        Sessao sessao =
-                sessaoOpt.get();
+        Sessao sessao = sessaoOpt.get();
 
         if (!sessao.isAtiva()) {
             return false;
         }
 
-        if (!Objects.equals(
-                sessao.getUsuarioId(),
-                usuarioId)) {
-
+        if (!Objects.equals(sessao.getUsuarioId(), usuarioId)) {
             return false;
         }
 
-        sessao.setUltimoAcesso(
-                LocalDateTime.now()
-        );
-
+        sessao.setUltimoAcesso(LocalDateTime.now());
         repository.save(sessao);
 
         return true;
     }
 
-    public Optional<Sessao> buscarPorId(
-            String id) {
-
+    public Optional<Sessao> buscarPorId(String id) {
         return repository.findById(id);
     }
 
-    public void encerrarPorSessionId(
-            String sessionId) {
-
-        if (sessionId == null
-                || sessionId.isBlank()) {
-
+    public void encerrarPorSessionId(String sessionId) {
+        if (sessionId == null || sessionId.isBlank()) {
             return;
         }
 
         repository.findBySessionId(sessionId)
                 .ifPresent(sessao -> {
-
                     if (sessao.isAtiva()) {
-
                         sessao.setAtiva(false);
-                        sessao.setUltimoAcesso(
-                                LocalDateTime.now()
-                        );
-
+                        sessao.setUltimoAcesso(LocalDateTime.now());
                         repository.save(sessao);
                     }
                 });
     }
 
-    public void desativar(
-            Sessao sessao) {
-
+    public void desativar(Sessao sessao) {
         if (sessao == null) {
             return;
         }
 
         sessao.setAtiva(false);
-        sessao.setUltimoAcesso(
-                LocalDateTime.now()
-        );
-
+        sessao.setUltimoAcesso(LocalDateTime.now());
         repository.save(sessao);
     }
 
@@ -191,28 +167,21 @@ public class SessaoService {
             String sessionIdAtual) {
 
         return repository
-                .findByUsuarioIdAndAtivaTrueOrderByCriadoEmDesc(
-                        usuarioId
-                )
+                .findByUsuarioIdAndAtivaTrueOrderByCriadoEmDesc(usuarioId)
                 .stream()
                 .map(sessao -> {
+                    boolean atual = Objects.equals(
+                            sessao.getSessionId(),
+                            sessionIdAtual
+                    );
 
-                    boolean atual =
-                            Objects.equals(
-                                    sessao.getSessionId(),
-                                    sessionIdAtual
-                            );
+                    String conectadoEm = sessao.getCriadoEm() == null
+                            ? "Horário de conexão não disponível"
+                            : "Conectado em " + sessao.getCriadoEm().format(FORMATO_DATA);
 
-                    String conectadoEm =
-                            sessao.getCriadoEm() == null
-                                    ? "Horário de conexão não disponível"
-                                    : "Conectado em "
-                                    + sessao.getCriadoEm().format(FORMATO_DATA);
-
-                    String tipo =
-                            sessao.getTipo() == null
-                                    ? Sessao.Tipo.WEB.name()
-                                    : sessao.getTipo().name();
+                    String tipo = sessao.getTipo() == null
+                            ? Sessao.Tipo.WEB.name()
+                            : sessao.getTipo().name();
 
                     return new SessaoDTO(
                             sessao.getId(),
@@ -225,91 +194,45 @@ public class SessaoService {
                 .toList();
     }
 
-    public void excluirPorUsuario(
-            String usuarioId) {
-
-        repository.deleteByUsuarioId(
-                usuarioId
-        );
+    public void excluirPorUsuario(String usuarioId) {
+        repository.deleteByUsuarioId(usuarioId);
     }
 
-    private String montarNomeWeb(
-            String userAgent) {
-
-        if (userAgent == null
-                || userAgent.isBlank()) {
-
+    private String montarNomeWeb(String userAgent) {
+        if (userAgent == null || userAgent.isBlank()) {
             return "Navegador";
         }
 
         String navegador;
-
         if (userAgent.contains("Edg/")) {
-
             navegador = "Edge";
-
-        } else if (
-                userAgent.contains("OPR/")
-                        || userAgent.contains("Opera")) {
-
+        } else if (userAgent.contains("OPR/") || userAgent.contains("Opera")) {
             navegador = "Opera";
-
-        } else if (
-                userAgent.contains("Firefox/")) {
-
+        } else if (userAgent.contains("Firefox/")) {
             navegador = "Firefox";
-
-        } else if (
-                userAgent.contains("Chrome/")) {
-
+        } else if (userAgent.contains("Chrome/")) {
             navegador = "Chrome";
-
-        } else if (
-                userAgent.contains("Safari/")) {
-
+        } else if (userAgent.contains("Safari/")) {
             navegador = "Safari";
-
         } else {
-
             navegador = "Navegador";
         }
 
         String sistema;
-
         if (userAgent.contains("Windows")) {
-
             sistema = "Windows";
-
-        } else if (
-                userAgent.contains("Android")) {
-
+        } else if (userAgent.contains("Android")) {
             sistema = "Android";
-
-        } else if (
-                userAgent.contains("iPhone")
-                        || userAgent.contains("iPad")) {
-
+        } else if (userAgent.contains("iPhone") || userAgent.contains("iPad")) {
             sistema = "iOS";
-
-        } else if (
-                userAgent.contains("Mac OS X")
-                        || userAgent.contains("Macintosh")) {
-
+        } else if (userAgent.contains("Mac OS X") || userAgent.contains("Macintosh")) {
             sistema = "macOS";
-
-        } else if (
-                userAgent.contains("Linux")) {
-
+        } else if (userAgent.contains("Linux")) {
             sistema = "Linux";
-
         } else {
-
             sistema = "Sistema desconhecido";
         }
 
-        return navegador
-                + " ("
-                + sistema
-                + ")";
+        return navegador + " (" + sistema + ")";
     }
 }
