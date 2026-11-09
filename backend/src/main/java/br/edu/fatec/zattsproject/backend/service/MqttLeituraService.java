@@ -30,13 +30,8 @@ public class MqttLeituraService {
     private final SseService sseService;
     private final AlertaDisparoService alertaDisparoService;
 
-    // Acumulador da hora fechada para gravar no histórico permanente do MongoDB Atlas
     private final Map<String, AcumuladorHora> bufferAcumulado = new ConcurrentHashMap<>();
-
-    // Acumulador do MINUTO CORRENTE para salvar 1 registro por minuto no consumo_realtime
     private final Map<String, AcumuladorMinuto> bufferMinutoRealtime = new ConcurrentHashMap<>();
-
-    // Buffer dos pontos em memória para consulta instantânea do gráfico
     private final Map<String, List<DashboardDTO.PontoGraficoMinuto>> bufferPontosGrafico = new ConcurrentHashMap<>();
 
     public static class AcumuladorHora {
@@ -87,18 +82,13 @@ public class MqttLeituraService {
             String horaMinutoAtualStr = consumoInstantaneo.getDataHora().format(DateTimeFormatter.ofPattern("HH:mm"));
             double valKwh = valorPositivoOuZero(consumoInstantaneo.getConsumoKwh());
 
-            // 1. CONSOLIDAÇÃO E SALVAMENTO NO BANCO MINUTO A MINUTO (consumo_realtime)
+            // 1. GRAVAÇÃO MINUTO A MINUTO (Apenas na coleção consumo_realtime)
             LocalDateTime minutoAtualTruncado = consumoInstantaneo.getDataHora().truncatedTo(ChronoUnit.MINUTES);
 
             bufferMinutoRealtime.compute(usuarioId, (id, acMinuto) -> {
                 if (acMinuto != null && !acMinuto.minutoChave.equals(minutoAtualTruncado)) {
-                    // Mudou de minuto: grava o acumulado completo do minuto anterior no MongoDB
-                    Consumo consumoMinutoFechado = new Consumo();
-                    consumoMinutoFechado.setUsuarioId(id);
-                    consumoMinutoFechado.setConsumoKwh(Math.round(acMinuto.somaKwh * 100000.0) / 100000.0);
-                    consumoMinutoFechado.setDataHora(acMinuto.minutoChave);
-
-                    consumoService.salvar(consumoMinutoFechado);
+                    double consumoMinuto = Math.round(acMinuto.somaKwh * 100000.0) / 100000.0;
+                    consumoService.salvarRealtimeMinuto(id, consumoMinuto, acMinuto.minutoChave);
                     acMinuto = null;
                 }
 
@@ -110,7 +100,7 @@ public class MqttLeituraService {
                 return acMinuto;
             });
 
-            // 2. ATUALIZA GRÁFICO EM MEMÓRIA COM O MINUTO ATUAL
+            // 2. ATUALIZA GRÁFICO EM MEMÓRIA
             List<DashboardDTO.PontoGraficoMinuto> listaPontos = bufferPontosGrafico.computeIfAbsent(usuarioId, k -> new CopyOnWriteArrayList<>());
 
             if (!listaPontos.isEmpty()) {
@@ -125,13 +115,13 @@ public class MqttLeituraService {
                 adicionarNovoPonto(listaPontos, horaMinutoAtualStr, valKwh);
             }
 
-            // 3. TRANSMISSÃO EM TEMPO REAL VIA SSE PARA O FRONTEND
+            // 3. ENVIO SSE PARA O FRONTEND
             sseService.sendConsumoToAll(consumoInstantaneo);
 
             double potenciaWatts = valorPositivoOuZero(consumoInstantaneo.getPotenciaWatts());
             double correnteAmperes = valorPositivoOuZero(consumoInstantaneo.getCorrenteAmperes());
 
-            // 4. AGREGAÇÃO DA HORA FECHADA (Para histórico permanente "consumo")
+            // 4. GRAVAÇÃO DE HORA EM HORA (Apenas na coleção consumo permanente)
             LocalDateTime horaAtualTruncada = consumoInstantaneo.getDataHora().truncatedTo(ChronoUnit.HOURS);
 
             AcumuladorHora acumuladorAtual = bufferAcumulado.compute(usuarioId, (id, acumulador) -> {
@@ -152,7 +142,6 @@ public class MqttLeituraService {
                 return acumulador;
             });
 
-            // Alertas
             if (acumuladorAtual != null) {
                 double potenciaMediaAtual = acumuladorAtual.quantidadeLeituras > 0
                         ? (acumuladorAtual.somaPotenciaWatts / acumuladorAtual.quantidadeLeituras)
@@ -238,7 +227,6 @@ public class MqttLeituraService {
     public List<DashboardDTO.PontoGraficoMinuto> obterPontosGraficoTempoReal(String usuarioId) {
         if (usuarioId == null) return new ArrayList<>();
 
-        // BUSCA HISTÓRICO DOS ÚLTIMOS MINUTOS PERSISTIDOS NO BANCO (consumo_realtime)
         LocalDateTime agora = LocalDateTime.now();
         List<DashboardDTO.PontoGraficoMinuto> pontos = new ArrayList<>();
 
@@ -253,7 +241,6 @@ public class MqttLeituraService {
                     .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
                     .sum();
 
-            // Se for o minuto ATUAL que ainda está acumulando em memória, soma o parcial do buffer
             AcumuladorMinuto acMinuto = bufferMinutoRealtime.get(usuarioId);
             if (acMinuto != null && acMinuto.minutoChave.equals(minutoAlvo.truncatedTo(ChronoUnit.MINUTES))) {
                 consumoMinuto += acMinuto.somaKwh;
