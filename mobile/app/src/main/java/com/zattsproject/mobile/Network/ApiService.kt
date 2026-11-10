@@ -7,6 +7,9 @@ import com.zattsproject.mobile.Model.MensagemResponse
 import com.zattsproject.mobile.Model.Questionario
 import com.zattsproject.mobile.Model.Conta
 import com.zattsproject.mobile.Model.ConsumoDiario
+import com.zattsproject.mobile.Model.Notificacao
+import com.zattsproject.mobile.Model.Alerta
+import retrofit2.http.Path
 
 import retrofit2.Response
 import retrofit2.http.Body
@@ -17,7 +20,6 @@ import retrofit2.http.PUT
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Query
-import com.zattsproject.mobile.Model.Notificacao
 
 interface ApiService {
 
@@ -78,4 +80,30 @@ interface ApiService {
         @Query("pagina") pagina: Int = 0,
         @Query("tamanho") tamanho: Int = 50
     ): Response<List<Notificacao>>
+
+    // ALERTAS
+    @GET("api/mobile/alertas")
+    suspend fun buscarAlertas(): Response<List<Alerta>>
+
+    @POST("api/mobile/alertas/{id}/ativar")
+    suspend fun ativarAlerta(
+        @Path("id") id: String,
+        @Query("ativo") ativo: Boolean
+    ): Response<Unit>
+
+    @DELETE("api/mobile/alertas/{id}")
+    suspend fun excluirAlerta(
+        @Path("id") id: String
+    ): Response<Unit>
+
+    @POST("api/mobile/alertas")
+    suspend fun criarAlerta(
+        @Body alerta: Alerta
+    ): Response<Unit>
+
+    @PUT("api/mobile/alertas/{id}")
+    suspend fun editarAlerta(
+        @Path("id") id: String,
+        @Body alerta: Alerta
+    ): Response<Unit>
 }
