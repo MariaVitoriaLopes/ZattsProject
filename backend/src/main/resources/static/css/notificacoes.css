@@ -817,8 +817,8 @@ html[data-tema="escuro"] .btn-salvar {
     width: 100%;
     padding: 6px;
     margin-bottom: 20px;
-    background: var(--fundo-100);
-    border: 1px solid var(--fundo-200);
+    background: var(--fundo-700);
+    border: 1px solid var(--fundo-900);
     border-radius: 14px;
     overflow: visible;
     box-sizing: border-box;
@@ -842,7 +842,7 @@ html[data-tema="escuro"] .btn-salvar {
 }
 
 .abas-config .aba:hover {
-    background: var(--fundo-200);
+    background: var(--fundo-700);
 }
 
 .abas-config .aba.ativo {
