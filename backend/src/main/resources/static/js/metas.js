@@ -11,125 +11,136 @@ document.addEventListener("DOMContentLoaded", function () {
     const valor = document.getElementById("valorMetaFormulario");
     const labelValor = document.getElementById("labelValorMeta");
 
-    const btnCriar = document.getElementById("btnCriarMeta");
     const btnSalvar = document.getElementById("btnSalvarMeta");
 
     const urlCriar = form.dataset.urlCriar;
     const urlEditar = form.dataset.urlEditar;
 
+    if (!tipo || !valor || !tituloModal || !labelValor || !btnSalvar) return;
+
+    // =====================================================
     // ATUALIZAR TIPO DE META
+    // =====================================================
 
     function atualizarTipo() {
 
         if (tipo.value === "CONSUMO") {
 
             labelValor.textContent = "Meta mensal de consumo (kWh)";
-            valor.placeholder = "Ex.: 200";
-
-        } else if (tipo.value === "VALOR") {
-
-            labelValor.textContent = "Meta mensal de gastos (R$)";
             valor.placeholder = "Ex.: 250";
 
         } else {
 
             labelValor.textContent = "Valor da meta";
             valor.placeholder = "Ex.: 250";
-
         }
-
     }
 
+    // =====================================================
     // ABRIR E FECHAR MODAL
+    // =====================================================
 
     function abrirModal() {
+
         modal.hidden = false;
-        tipo.focus();
+        valor.focus();
     }
 
     function fecharModal() {
+
         modal.hidden = true;
         form.reset();
     }
 
-    // CONFIGURAR TIPOS DISPONIVEIS
+    // =====================================================
+    // CADASTRAR META
+    // =====================================================
 
-    function configurarOpcoes(tipoAtual) {
-
-        tipo.querySelectorAll("option").forEach(opcao => {
-
-            if (!opcao.value) return;
-
-            const permitida = tipoAtual
-                ? opcao.value === tipoAtual
-                : opcao.dataset.disponivel === "true";
-
-            opcao.disabled = !permitida;
-            opcao.hidden = !permitida;
-
-        });
-
-    }
-
-    // CRIAR META
-
-    btnCriar?.addEventListener("click", function () {
+    function prepararCriacao() {
 
         form.reset();
         form.action = urlCriar;
 
-        tituloModal.textContent = "Criar meta";
-        btnSalvar.textContent = "Criar meta";
+        tituloModal.textContent = "Cadastrar meta";
 
-        configurarOpcoes(null);
+        btnSalvar.querySelector("span:last-child").textContent =
+            "Cadastrar meta";
 
-        tipo.value = "";
+        tipo.value = "CONSUMO";
         valor.value = "";
 
         atualizarTipo();
         abrirModal();
+    }
 
-    });
-
+    // =====================================================
     // EDITAR META
+    // =====================================================
 
-    document.querySelectorAll("#aba-metas .btn-editar-meta").forEach(botao => {
+    function prepararEdicao(valorAtual) {
 
-        botao.addEventListener("click", function () {
+        form.reset();
+        form.action = urlEditar;
 
-            form.reset();
-            form.action = urlEditar;
+        tituloModal.textContent = "Editar meta";
 
-            tituloModal.textContent = "Editar meta";
-            btnSalvar.textContent = "Salvar alterações";
+        btnSalvar.querySelector("span:last-child").textContent =
+            "Salvar alterações";
 
-            configurarOpcoes(botao.dataset.tipo);
+        tipo.value = "CONSUMO";
+        valor.value = valorAtual;
 
-            tipo.value = botao.dataset.tipo;
-            valor.value = botao.dataset.valor || "";
+        atualizarTipo();
+        abrirModal();
+    }
 
-            atualizarTipo();
-            abrirModal();
+    // =====================================================
+    // BOTÃO DE EDITAR META
+    // =====================================================
 
-        });
+    window.abrirModalMeta = function () {
 
-    });
+        const textoMeta = document.getElementById("valorMeta")
+            ?.textContent || "";
 
-    // ALTERAR TIPO
+        const valorAtual = textoMeta
+            .replace("kWh", "")
+            .trim()
+            .replace(/\./g, "")
+            .replace(",", ".");
 
-    tipo.addEventListener("change", atualizarTipo);
+        const numeroAtual = Number(valorAtual);
 
-    // FECHAR MODAL DE META
+        const existeMeta =
+            valorAtual !== "" &&
+            Number.isFinite(numeroAtual) &&
+            numeroAtual > 0;
 
-    document.getElementById("btnFecharModalMeta")?.addEventListener("click", fecharModal);
-    document.getElementById("btnCancelarMeta")?.addEventListener("click", fecharModal);
+        if (existeMeta) {
+
+            prepararEdicao(String(numeroAtual));
+
+        } else {
+
+            prepararCriacao();
+        }
+    };
+
+    // =====================================================
+    // FECHAR MODAL
+    // =====================================================
+
+    document.getElementById("btnFecharModalMeta")
+        ?.addEventListener("click", fecharModal);
+
+    document.getElementById("btnCancelarMeta")
+        ?.addEventListener("click", fecharModal);
 
     modal.addEventListener("click", function (event) {
 
         if (event.target === modal) {
             fecharModal();
         }
-
     });
 
     document.addEventListener("keydown", function (event) {
@@ -137,23 +148,28 @@ document.addEventListener("DOMContentLoaded", function () {
         if (event.key === "Escape" && !modal.hidden) {
             fecharModal();
         }
-
     });
 
+    // =====================================================
+    // ATUALIZAR TIPO
+    // =====================================================
+
+    tipo.addEventListener("change", atualizarTipo);
+
+    // =====================================================
     // VALIDAR META
+    // =====================================================
 
     form.addEventListener("submit", function (event) {
 
         const numero = Number(valor.value.replace(",", "."));
 
-        if (!tipo.value || !Number.isFinite(numero) || numero <= 0) {
+        if (!Number.isFinite(numero) || numero <= 0) {
 
             event.preventDefault();
 
-            alert("Selecione um tipo e informe uma meta maior que zero.");
-
+            alert("Informe uma meta maior que zero.");
         }
-
     });
 
 });

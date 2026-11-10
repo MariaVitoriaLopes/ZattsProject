@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 
@@ -8,12 +9,13 @@
 
         <div>
             <h2>Meta de consumo mensal</h2>
-            <p>Acompanhe sua meta para economizar</p>
+            <p>Acompanhe a sua meta para economizar</p>
         </div>
 
         <button class="btn-editar-meta"
                 type="button"
-                aria-label="Editar meta">
+                onclick="abrirModalMeta()"
+                aria-label="Editar ou cadastrar meta">
 
             <span class="material-symbols-outlined">edit</span>
 
@@ -25,7 +27,7 @@
 
         <div class="progresso-meta"
              id="progressoMeta"
-             th:style="'width: ' + (${dash != null ? (dash.percentualMetaAtingida > 100 ? 100 : dash.percentualMetaAtingida) : 0}) + '%'">
+             th:style="'width: ' + (${dash != null && dash.percentualMetaAtingida != null ? (dash.percentualMetaAtingida > 100 ? 100 : dash.percentualMetaAtingida) : 0}) + '%'">
         </div>
 
     </div>
@@ -33,12 +35,12 @@
     <div class="meta-info">
 
         <span id="consumoAtualTexto"
-              th:text="${dash != null ? dash.consumoTotalDiarioKwh + ' kWh' : '0 kWh'}">
-            0 kWh
+              th:text="${dash != null && dash.consumoTotalDiarioKwh != null ? #numbers.formatDecimal(dash.consumoTotalDiarioKwh, 1, 'POINT', 2, 'COMMA') + ' kWh' : '0,00 kWh'}">
+            0,00 kWh
         </span>
 
         <span id="limiteMeta"
-              th:text="${dash != null ? 'Meta: ' + dash.metaGastoKwh + ' kWh' : 'Meta não definida'}">
+              th:text="${dash != null && dash.metaGastoKwh != null && dash.metaGastoKwh > 0 ? 'Meta: ' + #numbers.formatDecimal(dash.metaGastoKwh, 1, 'POINT', 2, 'COMMA') + ' kWh' : 'Meta não definida'}">
             Meta não definida
         </span>
 
@@ -50,11 +52,11 @@
 
             <span class="bolinha-verde"></span>
 
-            Consumo atual:
+            Consumo mensal:
 
             <strong id="consumoMensal"
-                    th:text="${dash != null ? dash.metaConsumoMensalAtualKwh + ' kWh' : '-- kWh'}">
-                -- kWh
+                    th:text="${dash != null && dash.metaConsumoMensalAtualKwh != null ? #numbers.formatDecimal(dash.metaConsumoMensalAtualKwh, 1, 'POINT', 2, 'COMMA') + ' kWh' : '0,00 kWh'}">
+                0,00 kWh
             </strong>
 
         </div>
@@ -66,7 +68,7 @@
             Meta:
 
             <strong id="valorMeta"
-                    th:text="${dash != null ? dash.metaGastoKwh + ' kWh' : '-- kWh'}">
+                    th:text="${dash != null && dash.metaGastoKwh != null && dash.metaGastoKwh > 0 ? #numbers.formatDecimal(dash.metaGastoKwh, 1, 'POINT', 2, 'COMMA') + ' kWh' : '-- kWh'}">
                 -- kWh
             </strong>
 
@@ -74,6 +76,103 @@
 
     </div>
 
+    <!-- =====================================================
+     MODAL DE META
+===================================================== -->
+
+    <div th:fragment="modalMeta"
+         id="modalMeta"
+         class="modal-meta"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="tituloModalMeta"
+         hidden>
+
+        <div class="modal-meta-conteudo">
+
+            <div class="modal-meta-cabecalho">
+
+                <h2 id="tituloModalMeta">Editar meta</h2>
+
+                <button type="button"
+                        id="btnFecharModalMeta"
+                        class="modal-meta-fechar"
+                        aria-label="Fechar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+
+            </div>
+
+            <form id="formMeta"
+                  method="post"
+                  th:attr="data-url-criar=@{/metas/criar},
+                       data-url-editar=@{/metas/editar}">
+
+                <div class="modal-meta-campo">
+
+                    <label for="tipoMetaFormulario">Tipo de meta</label>
+
+                    <select id="tipoMetaFormulario"
+                            name="tipo"
+                            required>
+
+                        <option value="">Selecione o tipo</option>
+
+                        <option value="CONSUMO"
+                                data-disponivel="true">
+                            Consumo de energia (kWh)
+                        </option>
+
+                        <option value="VALOR"
+                                data-disponivel="false">
+                            Gastos de energia (R$)
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="modal-meta-campo">
+
+                    <label id="labelValorMeta"
+                           for="valorMetaFormulario">
+                        Meta mensal de consumo (kWh)
+                    </label>
+
+                    <input type="number"
+                           id="valorMetaFormulario"
+                           name="valor"
+                           min="0.01"
+                           step="0.01"
+                           placeholder="Ex.: 250"
+                           required>
+
+                </div>
+
+                <div class="modal-meta-acoes">
+
+                    <button type="button"
+                            id="btnCancelarMeta"
+                            class="btn-cancelar-meta">
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            id="btnSalvarMeta"
+                            class="btn-salvar-meta">
+
+                        <span class="material-symbols-outlined">check</span>
+                        <span>Salvar alterações</span>
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
 </section>
 
 </html>

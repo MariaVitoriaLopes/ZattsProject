@@ -15,15 +15,19 @@ import java.math.BigDecimal;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/notificacoes/metas")
+@RequestMapping("/metas")
 public class MetaController {
 
     private final ConfiguracaoService configuracaoService;
 
+    // =====================================================
+    // CRIAR META
+    // =====================================================
+
     @PostMapping("/criar")
     public String criar(
-            @RequestParam String tipoMeta,
-            @RequestParam String valorMeta,
+            @RequestParam("tipo") String tipoMeta,
+            @RequestParam("valor") String valorMeta,
             HttpSession session,
             RedirectAttributes atributos) {
 
@@ -34,6 +38,7 @@ public class MetaController {
         }
 
         try {
+
             configuracaoService.criarMeta(
                     usuario.getId(),
                     tipoMeta,
@@ -46,16 +51,24 @@ public class MetaController {
             );
 
         } catch (IllegalArgumentException | IllegalStateException e) {
-            atributos.addFlashAttribute("erro", e.getMessage());
+
+            atributos.addFlashAttribute(
+                    "erro",
+                    e.getMessage()
+            );
         }
 
-        return "redirect:/notificacoes?aba=metas";
+        return "redirect:/home";
     }
+
+    // =====================================================
+    // EDITAR META
+    // =====================================================
 
     @PostMapping("/editar")
     public String editar(
-            @RequestParam String tipoMeta,
-            @RequestParam String valorMeta,
+            @RequestParam("tipo") String tipoMeta,
+            @RequestParam("valor") String valorMeta,
             HttpSession session,
             RedirectAttributes atributos) {
 
@@ -66,6 +79,7 @@ public class MetaController {
         }
 
         try {
+
             configuracaoService.editarMeta(
                     usuario.getId(),
                     tipoMeta,
@@ -78,11 +92,19 @@ public class MetaController {
             );
 
         } catch (IllegalArgumentException | IllegalStateException e) {
-            atributos.addFlashAttribute("erro", e.getMessage());
+
+            atributos.addFlashAttribute(
+                    "erro",
+                    e.getMessage()
+            );
         }
 
-        return "redirect:/notificacoes?aba=metas";
+        return "redirect:/home";
     }
+
+    // =====================================================
+    // EXCLUIR META
+    // =====================================================
 
     @PostMapping("/excluir")
     public String excluir(
@@ -97,6 +119,7 @@ public class MetaController {
         }
 
         try {
+
             configuracaoService.excluirMeta(
                     usuario.getId(),
                     tipoMeta
@@ -108,16 +131,25 @@ public class MetaController {
             );
 
         } catch (IllegalArgumentException | IllegalStateException e) {
-            atributos.addFlashAttribute("erro", e.getMessage());
+
+            atributos.addFlashAttribute(
+                    "erro",
+                    e.getMessage()
+            );
         }
 
         return "redirect:/notificacoes?aba=metas";
     }
 
+    // =====================================================
+    // CONVERTER E VALIDAR VALOR
+    // =====================================================
+
     private BigDecimal converterValor(String valor) {
 
         if (valor == null ||
                 !valor.trim().matches("\\d+([.,]\\d{1,2})?")) {
+
             throw new IllegalArgumentException(
                     "Informe um valor válido."
             );
@@ -128,6 +160,7 @@ public class MetaController {
         );
 
         if (convertido.signum() <= 0) {
+
             throw new IllegalArgumentException(
                     "A meta deve ser maior que zero."
             );
