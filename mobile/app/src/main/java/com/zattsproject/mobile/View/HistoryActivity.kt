@@ -16,6 +16,14 @@ import com.google.android.material.card.MaterialCardView
 import java.util.Calendar
 import java.util.Locale
 import kotlin.math.max
+import android.util.Log
+import androidx.lifecycle.lifecycleScope
+import com.zattsproject.mobile.Model.ConsumoDiario
+import com.zattsproject.mobile.Repository.HistoricoRepository
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 class HistoryActivity : AppCompatActivity() {
 
@@ -57,12 +65,9 @@ class HistoryActivity : AppCompatActivity() {
     private var tipoAtual = TipoHistorico.SEMANAL
     private val calendario = Calendar.getInstance()
 
-    // DADOS DE DEMONSTRAÇÃO:
-    // Substituir pelos valores recebidos da API quando o endpoint estiver disponível.
-    private val consumoSemanal = listOf(23f, 20f, 19f, 23f, 26f, 29f, 30f)
-    private val consumoMensal = listOf(19f, 24f, 16f, 19f, 11f, 12f, 16f)
-    private val consumoOutubro = listOf(4f, 7f, 13f, 19f, 24f, 26f, 28f)
-    private val consumoSetembro = listOf(4f, 6f, 8f, 14f, 20f, 25f, 28f)
+    private val historicoRepository = HistoricoRepository()
+
+    private var historicoDiario: List<ConsumoDiario> = emptyList()
 
     private val verde = android.graphics.Color.rgb(220, 255, 0)
     private val laranja = android.graphics.Color.rgb(255, 88, 0)
@@ -80,6 +85,8 @@ class HistoryActivity : AppCompatActivity() {
         configurarPeriodo()
         configurarExportacao()
         atualizarTela(TipoHistorico.SEMANAL)
+
+        carregarHistorico()
     }
 
     private fun inicializarComponentes() {
@@ -176,108 +183,628 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     private fun mostrarSemanal() {
-        txvTituloHistorico.text = "Histórico Semanal"
-        btnSelecionarPeriodo.text = "18/Out - 24/Out de 2026"
+        val formatoApi = SimpleDateFormat(
+            "yyyy-MM-dd",
+            Locale.US
+        )
+        val formatoDiaMes = SimpleDateFormat(
+            "dd/MM",
+            Locale.getDefault()
+        )
+        // Segunda-feira da semana selecionada
+        val inicioSemana = calendario.clone() as Calendar
+        val diasDesdeSegunda =
+            (inicioSemana.get(Calendar.DAY_OF_WEEK) + 5) % 7
+        inicioSemana.add(
+            Calendar.DAY_OF_MONTH,
+            -diasDesdeSegunda
+        )
+        // Domingo da semana selecionada
+        val fimSemana = inicioSemana.clone() as Calendar
+        fimSemana.add(Calendar.DAY_OF_MONTH, 6)
+        // Semana anterior
+        val inicioSemanaAnterior =
+            inicioSemana.clone() as Calendar
+        inicioSemanaAnterior.add(
+            Calendar.DAY_OF_MONTH,
+            -7
+        )
+        val fimSemanaAnterior =
+            fimSemana.clone() as Calendar
 
+        fimSemanaAnterior.add(
+            Calendar.DAY_OF_MONTH,
+            -7
+        )
+        val inicioAtualApi =
+            formatoApi.format(inicioSemana.time)
+        val fimAtualApi =
+            formatoApi.format(fimSemana.time)
+        val inicioAnteriorApi =
+            formatoApi.format(inicioSemanaAnterior.time)
+        val fimAnteriorApi =
+            formatoApi.format(fimSemanaAnterior.time)
+        val dadosSemanaAtual =
+            historicoDiario.filter { consumo ->
+                consumo.dia >= inicioAtualApi &&
+                        consumo.dia <= fimAtualApi
+            }
+        val dadosSemanaAnterior =
+            historicoDiario.filter { consumo ->
+                consumo.dia >= inicioAnteriorApi &&
+                        consumo.dia <= fimAnteriorApi
+            }
+        val totalKwh =
+            dadosSemanaAtual.sumOf { it.kwh }
+        val totalReais =
+            dadosSemanaAtual.sumOf { it.reais }
+        val totalReaisSemanaAnterior =
+            dadosSemanaAnterior.sumOf { it.reais }
+        val valoresGrafico = (0..6).map { indice ->
+            val dia =
+                inicioSemana.clone() as Calendar
+            dia.add(
+                Calendar.DAY_OF_MONTH,
+                indice
+            )
+            val chaveDia =
+                formatoApi.format(dia.time)
+            historicoDiario
+                .filter { it.dia == chaveDia }
+                .sumOf { it.kwh }
+                .toFloat()
+        }
+        val nomesDias = listOf(
+            "Segunda",
+            "Terça",
+            "Quarta",
+            "Quinta",
+            "Sexta",
+            "Sábado",
+            "Domingo"
+        )
+        val rotulosGrafico = (0..6).map { indice ->
+            val dia =
+                inicioSemana.clone() as Calendar
+            dia.add(
+                Calendar.DAY_OF_MONTH,
+                indice
+            )
+            "${nomesDias[indice]}\n${formatoDiaMes.format(dia.time)}"
+        }
+        txvTituloHistorico.text =
+            "Histórico Semanal"
+        btnSelecionarPeriodo.text =
+            "${formatoDiaMes.format(inicioSemana.time)} - " +
+                    "${formatoDiaMes.format(fimSemana.time)} de " +
+                    "${fimSemana.get(Calendar.YEAR)}"
         layoutIndicadores.visibility = View.VISIBLE
         cardComparacaoValores.visibility = View.VISIBLE
-
-        txvTituloIndicador1.text = "Consumo de energia"
-        txvValorIndicador1.text = "68,3 kWh"
-        txvDescricaoIndicador1.text = "Total de energia consumida na semana"
-
-        txvTituloIndicador2.text = "Custo estimado"
-        txvValorIndicador2.text = "45,00 Reais"
-        txvDescricaoIndicador2.text = "Valor estimado na semana com base na tarifa"
-
-        txvTituloComparacao.text = "Valor total por semana"
-        txvRotuloAtual.text = "Semana de 18 de Out. - 24 de Out. 2026"
-        txvValorAtual.text = "R$ 45,00"
-        txvRotuloAnterior.text = "Semana anterior"
-        txvValorAnterior.text = "R$ 43,50"
-
-        txvTituloGrafico.text = "Consumo de energia semanal"
+        txvTituloIndicador1.text =
+            "Consumo de energia"
+        txvValorIndicador1.text =
+            String.format(
+                Locale.getDefault(),
+                "%.1f kWh",
+                totalKwh
+            )
+        txvDescricaoIndicador1.text =
+            "Total de energia consumida na semana"
+        txvTituloIndicador2.text =
+            "Custo estimado"
+        txvValorIndicador2.text =
+            String.format(
+                Locale.getDefault(),
+                "%.2f Reais",
+                totalReais
+            )
+        txvDescricaoIndicador2.text =
+            "Valor estimado na semana com base na tarifa"
+        txvTituloComparacao.text =
+            "Valor total por semana"
+        txvRotuloAtual.text =
+            "Semana de ${formatoDiaMes.format(inicioSemana.time)} - " +
+                    formatoDiaMes.format(fimSemana.time)
+        txvValorAtual.text =
+            String.format(
+                Locale.getDefault(),
+                "R$ %.2f",
+                totalReais
+            )
+        txvRotuloAnterior.text =
+            "Semana anterior"
+        txvValorAnterior.text =
+            String.format(
+                Locale.getDefault(),
+                "R$ %.2f",
+                totalReaisSemanaAnterior
+            )
+        txvTituloGrafico.text =
+            "Consumo de energia semanal"
         txvDescricaoGrafico.text =
             "Veja o consumo de energia (kWh) de cada dia da semana"
-
-        configurarLegenda("Consumo diário", null)
+        configurarLegenda(
+            "Consumo diário",
+            null
+        )
         graficoHistorico.configurar(
             modo = GraficoHistoricoView.Modo.LINHA_AREA,
-            valores = consumoSemanal,
-            rotulos = listOf("Segunda\n18/10", "Terça\n19/10", "Quarta\n20/10",
-                "Quinta\n21/10", "Sexta\n22/10", "Sábado\n23/10", "Domingo\n24/10"),
+            valores = valoresGrafico,
+            rotulos = rotulosGrafico,
             corPrincipal = verde
         )
-        indicadorRolagemGrafico.visibility = View.GONE
-        txvObservacaoGrafico.visibility = View.GONE
+        indicadorRolagemGrafico.visibility =
+            View.GONE
+        txvObservacaoGrafico.visibility =
+            View.GONE
+    }
+
+    private fun carregarHistorico() {
+        val formatoData = SimpleDateFormat(
+            "yyyy-MM-dd",
+            Locale.US
+        )
+        val hoje = Calendar.getInstance()
+        val inicio = Calendar.getInstance().apply {
+            set(
+                hoje.get(Calendar.YEAR) - 1,
+                Calendar.JANUARY,
+                1
+            )
+        }
+        val inicioFormatado = formatoData.format(inicio.time)
+        val fimFormatado = formatoData.format(hoje.time)
+        lifecycleScope.launch {
+            try {
+                val resposta =
+                    historicoRepository.buscarTotaisDiarios(
+                        inicio = inicioFormatado,
+                        fim = fimFormatado
+                    )
+
+                if (resposta.isSuccessful) {
+                    historicoDiario = resposta.body().orEmpty()
+                    atualizarTela(tipoAtual)
+                    Log.d(
+                        "ZATTS_HISTORICO",
+                        "Histórico carregado: ${historicoDiario.size} dias"
+                    )
+                    Log.d(
+                        "ZATTS_HISTORICO",
+                        historicoDiario.toString()
+                    )
+                } else {
+                    Log.e(
+                        "ZATTS_HISTORICO",
+                        "Erro HTTP: ${resposta.code()}"
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e(
+                    "ZATTS_HISTORICO",
+                    "Erro ao carregar histórico",
+                    e
+                )
+            }
+        }
     }
 
     private fun mostrarMensal() {
-        txvTituloHistorico.text = "Histórico Mensal"
-        btnSelecionarPeriodo.text = "Outubro de 2026"
-
-        layoutIndicadores.visibility = View.VISIBLE
-        cardComparacaoValores.visibility = View.VISIBLE
-
-        txvTituloIndicador1.text = "Consumo de energia"
-        txvValorIndicador1.text = "160 kWh"
-        txvDescricaoIndicador1.text = "Total de energia consumida no mês"
-
-        txvTituloIndicador2.text = "Custo estimado"
-        txvValorIndicador2.text = "138,00 Reais"
-        txvDescricaoIndicador2.text = "Valor estimado no mês com base na tarifa"
-
-        txvTituloComparacao.text = "Valor total por mês"
-        txvRotuloAtual.text = "Mês de Outubro"
-        txvValorAtual.text = "R$ 138,00"
-        txvRotuloAnterior.text = "Mês anterior"
-        txvValorAnterior.text = "R$ 142,10"
-
-        txvTituloGrafico.text = "Consumo de energia mensal"
+        val formatoApi = SimpleDateFormat(
+            "yyyy-MM-dd",
+            Locale.US
+        )
+        val localePtBr =
+            Locale.forLanguageTag("pt-BR")
+        // Primeiro dia do mês selecionado
+        val inicioMes =
+            calendario.clone() as Calendar
+        inicioMes.set(
+            Calendar.DAY_OF_MONTH,
+            1
+        )
+        // Último dia do mês selecionado
+        val fimMes =
+            calendario.clone() as Calendar
+        fimMes.set(
+            Calendar.DAY_OF_MONTH,
+            fimMes.getActualMaximum(
+                Calendar.DAY_OF_MONTH
+            )
+        )
+        // Mês anterior
+        val inicioMesAnterior =
+            inicioMes.clone() as Calendar
+        inicioMesAnterior.add(
+            Calendar.MONTH,
+            -1
+        )
+        val fimMesAnterior =
+            inicioMesAnterior.clone() as Calendar
+        fimMesAnterior.set(
+            Calendar.DAY_OF_MONTH,
+            fimMesAnterior.getActualMaximum(
+                Calendar.DAY_OF_MONTH
+            )
+        )
+        val inicioAtualApi =
+            formatoApi.format(inicioMes.time)
+        val fimAtualApi =
+            formatoApi.format(fimMes.time)
+        val inicioAnteriorApi =
+            formatoApi.format(inicioMesAnterior.time)
+        val fimAnteriorApi =
+            formatoApi.format(fimMesAnterior.time)
+        // Dados reais do mês atual
+        val dadosMesAtual =
+            historicoDiario.filter { consumo ->
+                consumo.dia >= inicioAtualApi &&
+                        consumo.dia <= fimAtualApi
+            }
+        // Dados reais do mês anterior
+        val dadosMesAnterior =
+            historicoDiario.filter { consumo ->
+                consumo.dia >= inicioAnteriorApi &&
+                        consumo.dia <= fimAnteriorApi
+            }
+        val totalKwh =
+            dadosMesAtual.sumOf { it.kwh }
+        val totalReais =
+            dadosMesAtual.sumOf { it.reais }
+        val totalReaisMesAnterior =
+            dadosMesAnterior.sumOf { it.reais }
+        val quantidadeDias =
+            fimMes.get(Calendar.DAY_OF_MONTH)
+        val valoresGrafico =
+            (1..quantidadeDias).map { diaMes ->
+                val dia =
+                    inicioMes.clone() as Calendar
+                dia.set(
+                    Calendar.DAY_OF_MONTH,
+                    diaMes
+                )
+                val chaveDia =
+                    formatoApi.format(dia.time)
+                historicoDiario
+                    .filter { it.dia == chaveDia }
+                    .sumOf { it.kwh }
+                    .toFloat()
+            }
+        val rotulosGrafico =
+            (1..quantidadeDias).map { diaMes ->
+                if (
+                    diaMes == 1 ||
+                    diaMes % 5 == 0 ||
+                    diaMes == quantidadeDias
+                ) {
+                    diaMes
+                        .toString()
+                        .padStart(2, '0')
+                } else {
+                    ""
+                }
+            }
+        val nomeMes =
+            SimpleDateFormat(
+                "MMMM",
+                localePtBr
+            ).format(inicioMes.time)
+                .replaceFirstChar {
+                    if (it.isLowerCase()) {
+                        it.titlecase(localePtBr)
+                    } else {
+                        it.toString()
+                    }
+                }
+        val nomeMesAnterior =
+            SimpleDateFormat(
+                "MMMM",
+                localePtBr
+            ).format(inicioMesAnterior.time)
+                .replaceFirstChar {
+                    if (it.isLowerCase()) {
+                        it.titlecase(localePtBr)
+                    } else {
+                        it.toString()
+                    }
+                }
+        txvTituloHistorico.text =
+            "Histórico Mensal"
+        btnSelecionarPeriodo.text =
+            "$nomeMes de ${inicioMes.get(Calendar.YEAR)}"
+        layoutIndicadores.visibility =
+            View.VISIBLE
+        cardComparacaoValores.visibility =
+            View.VISIBLE
+        // Consumo
+        txvTituloIndicador1.text =
+            "Consumo de energia"
+        txvValorIndicador1.text =
+            String.format(
+                localePtBr,
+                "%.1f kWh",
+                totalKwh
+            )
+        txvDescricaoIndicador1.text =
+            "Total de energia consumida no mês"
+        // Custo
+        txvTituloIndicador2.text =
+            "Custo estimado"
+        txvValorIndicador2.text =
+            String.format(
+                localePtBr,
+                "%.2f Reais",
+                totalReais
+            )
+        txvDescricaoIndicador2.text =
+            "Valor estimado no mês com base na tarifa"
+        // Comparação
+        txvTituloComparacao.text =
+            "Valor total por mês"
+        txvRotuloAtual.text =
+            "Mês de $nomeMes"
+        txvValorAtual.text =
+            String.format(
+                localePtBr,
+                "R$ %.2f",
+                totalReais
+            )
+        txvRotuloAnterior.text =
+            "Mês de $nomeMesAnterior"
+        txvValorAnterior.text =
+            String.format(
+                localePtBr,
+                "R$ %.2f",
+                totalReaisMesAnterior
+            )
+        // Gráfico
+        txvTituloGrafico.text =
+            "Consumo de energia mensal"
         txvDescricaoGrafico.text =
-            "Veja o consumo de energia (kWh) de cada semana do mês"
-
-        configurarLegenda("Consumo diário", null)
+            "Veja o consumo de energia (kWh) de cada dia do mês"
+        configurarLegenda(
+            "Consumo diário",
+            null
+        )
         graficoHistorico.configurar(
             modo = GraficoHistoricoView.Modo.BARRAS,
-            valores = consumoMensal,
-            rotulos = listOf("01/10", "02/10", "03/10", "04/10", "05/10", "06/10", "07/10"),
+            valores = valoresGrafico,
+            rotulos = rotulosGrafico,
             corPrincipal = verde
         )
-        indicadorRolagemGrafico.visibility = View.VISIBLE
-        txvObservacaoGrafico.visibility = View.VISIBLE
+        indicadorRolagemGrafico.visibility =
+            View.VISIBLE
+        txvObservacaoGrafico.visibility =
+            View.VISIBLE
     }
 
     private fun mostrarComparativo() {
-        txvTituloHistorico.text = "Histórico Comparativo"
-        btnSelecionarPeriodo.text = "Out. e Set. de 2026"
-
-        layoutIndicadores.visibility = View.GONE
-        cardComparacaoValores.visibility = View.VISIBLE
-
-        // O comparativo utiliza cards de resumo de consumo e custo.
-        // Os valores serão alimentados pela API quando o endpoint estiver disponível.
-        txvTituloComparacao.text = "Valor total por mês"
-        txvRotuloAtual.text = "Mês de Outubro"
-        txvValorAtual.text = "R$ 138,00"
-        txvRotuloAnterior.text = "Mês anterior"
-        txvValorAnterior.text = "R$ 142,10"
-
-        txvTituloGrafico.text = "Comparativo entre meses"
+        val formatoApi = SimpleDateFormat(
+            "yyyy-MM-dd",
+            Locale.US
+        )
+        val localePtBr =
+            Locale.forLanguageTag("pt-BR")
+        // Mês selecionado
+        val inicioMesAtual =
+            calendario.clone() as Calendar
+        inicioMesAtual.set(
+            Calendar.DAY_OF_MONTH,
+            1
+        )
+        val fimMesAtual =
+            inicioMesAtual.clone() as Calendar
+        fimMesAtual.set(
+            Calendar.DAY_OF_MONTH,
+            fimMesAtual.getActualMaximum(
+                Calendar.DAY_OF_MONTH
+            )
+        )
+        // Mês anterior
+        val inicioMesAnterior =
+            inicioMesAtual.clone() as Calendar
+        inicioMesAnterior.add(
+            Calendar.MONTH,
+            -1
+        )
+        val fimMesAnterior =
+            inicioMesAnterior.clone() as Calendar
+        fimMesAnterior.set(
+            Calendar.DAY_OF_MONTH,
+            fimMesAnterior.getActualMaximum(
+                Calendar.DAY_OF_MONTH
+            )
+        )
+        val inicioAtualApi =
+            formatoApi.format(inicioMesAtual.time)
+        val fimAtualApi =
+            formatoApi.format(fimMesAtual.time)
+        val inicioAnteriorApi =
+            formatoApi.format(inicioMesAnterior.time)
+        val fimAnteriorApi =
+            formatoApi.format(fimMesAnterior.time)
+        val dadosMesAtual =
+            historicoDiario.filter { consumo ->
+                consumo.dia >= inicioAtualApi &&
+                        consumo.dia <= fimAtualApi
+            }
+        val dadosMesAnterior =
+            historicoDiario.filter { consumo ->
+                consumo.dia >= inicioAnteriorApi &&
+                        consumo.dia <= fimAnteriorApi
+            }
+        val totalReaisAtual =
+            dadosMesAtual.sumOf { it.reais }
+        val totalReaisAnterior =
+            dadosMesAnterior.sumOf { it.reais }
+        val diasMesAtual =
+            fimMesAtual.get(Calendar.DAY_OF_MONTH)
+        val diasMesAnterior =
+            fimMesAnterior.get(Calendar.DAY_OF_MONTH)
+        val quantidadeDias =
+            max(
+                diasMesAtual,
+                diasMesAnterior
+            )
+        // Consumo diário do mês atual
+        val valoresMesAtual =
+            (1..quantidadeDias).map { diaMes ->
+                if (diaMes <= diasMesAtual) {
+                    val dia =
+                        inicioMesAtual.clone() as Calendar
+                    dia.set(
+                        Calendar.DAY_OF_MONTH,
+                        diaMes
+                    )
+                    val chaveDia =
+                        formatoApi.format(dia.time)
+                    historicoDiario
+                        .filter { it.dia == chaveDia }
+                        .sumOf { it.kwh }
+                        .toFloat()
+                } else {
+                    0f
+                }
+            }
+        // Consumo diário do mês anterior
+        val valoresMesAnterior =
+            (1..quantidadeDias).map { diaMes ->
+                if (diaMes <= diasMesAnterior) {
+                    val dia =
+                        inicioMesAnterior.clone() as Calendar
+                    dia.set(
+                        Calendar.DAY_OF_MONTH,
+                        diaMes
+                    )
+                    val chaveDia =
+                        formatoApi.format(dia.time)
+                    historicoDiario
+                        .filter { it.dia == chaveDia }
+                        .sumOf { it.kwh }
+                        .toFloat()
+                } else {
+                    0f
+                }
+            }
+        val rotulosGrafico =
+            (1..quantidadeDias).map { diaMes ->
+                if (
+                    diaMes == 1 ||
+                    diaMes % 5 == 0 ||
+                    diaMes == quantidadeDias
+                ) {
+                    diaMes
+                        .toString()
+                        .padStart(2, '0')
+                } else {
+                    ""
+                }
+            }
+        val nomeMesAtual =
+            SimpleDateFormat(
+                "MMMM",
+                localePtBr
+            ).format(inicioMesAtual.time)
+                .replaceFirstChar {
+                    if (it.isLowerCase()) {
+                        it.titlecase(localePtBr)
+                    } else {
+                        it.toString()
+                    }
+                }
+        val nomeMesAnterior =
+            SimpleDateFormat(
+                "MMMM",
+                localePtBr
+            ).format(inicioMesAnterior.time)
+                .replaceFirstChar {
+                    if (it.isLowerCase()) {
+                        it.titlecase(localePtBr)
+                    } else {
+                        it.toString()
+                    }
+                }
+        val mesCurtoAtual =
+            SimpleDateFormat(
+                "MMM",
+                localePtBr
+            ).format(inicioMesAtual.time)
+                .removeSuffix(".")
+                .replaceFirstChar {
+                    if (it.isLowerCase()) {
+                        it.titlecase(localePtBr)
+                    } else {
+                        it.toString()
+                    }
+                }
+        val mesCurtoAnterior =
+            SimpleDateFormat(
+                "MMM",
+                localePtBr
+            ).format(inicioMesAnterior.time)
+                .removeSuffix(".")
+                .replaceFirstChar {
+                    if (it.isLowerCase()) {
+                        it.titlecase(localePtBr)
+                    } else {
+                        it.toString()
+                    }
+                }
+        txvTituloHistorico.text =
+            "Histórico Comparativo"
+        val anoAtual =
+            inicioMesAtual.get(Calendar.YEAR)
+        val anoAnterior =
+            inicioMesAnterior.get(Calendar.YEAR)
+        btnSelecionarPeriodo.text =
+            if (anoAtual == anoAnterior) {
+                "$mesCurtoAtual. e $mesCurtoAnterior. de $anoAtual"
+            } else {
+                "$mesCurtoAtual. de $anoAtual e " +
+                        "$mesCurtoAnterior. de $anoAnterior"
+            }
+        layoutIndicadores.visibility =
+            View.GONE
+        cardComparacaoValores.visibility =
+            View.VISIBLE
+        txvTituloComparacao.text =
+            "Valor total por mês"
+        txvRotuloAtual.text =
+            "Mês de $nomeMesAtual"
+        txvValorAtual.text =
+            String.format(
+                localePtBr,
+                "R$ %.2f",
+                totalReaisAtual
+            )
+        txvRotuloAnterior.text =
+            "Mês de $nomeMesAnterior"
+        txvValorAnterior.text =
+            String.format(
+                localePtBr,
+                "R$ %.2f",
+                totalReaisAnterior
+            )
+        txvTituloGrafico.text =
+            "Comparativo entre meses"
         txvDescricaoGrafico.text =
             "Veja o consumo de energia (kWh) comparativo entre os meses"
-
-        configurarLegenda("Consumo em Outubro", "Consumo em Setembro")
+        configurarLegenda(
+            "Consumo em $nomeMesAtual",
+            "Consumo em $nomeMesAnterior"
+        )
         graficoHistorico.configurar(
             modo = GraficoHistoricoView.Modo.COMPARATIVO,
-            valores = consumoOutubro,
-            valoresSecundarios = consumoSetembro,
-            rotulos = listOf("01/10", "02/10", "03/10", "04/10", "05/10", "06/10", "07/10"),
+            valores = valoresMesAtual,
+            valoresSecundarios = valoresMesAnterior,
+            rotulos = rotulosGrafico,
             corPrincipal = verde,
             corSecundaria = laranja
         )
-        indicadorRolagemGrafico.visibility = View.VISIBLE
-        txvObservacaoGrafico.visibility = View.VISIBLE
+        indicadorRolagemGrafico.visibility =
+            View.VISIBLE
+        txvObservacaoGrafico.visibility =
+            View.VISIBLE
     }
 
     private fun configurarLegenda(principal: String, secundaria: String?) {
@@ -429,10 +956,32 @@ class GraficoHistoricoView @JvmOverloads constructor(
         val base = height - dp(42f)
         val altura = base - topo
         val largura = direita - esquerda
-        val maximo = max(50f, max(valores.maxOrNull() ?: 0f,
-            valoresSecundarios.maxOrNull() ?: 0f) + 5f)
-
-        desenharGrade(canvas, esquerda, direita, topo, base, altura, maximo)
+        val maiorValor = max(
+            valores.maxOrNull() ?: 0f,
+            valoresSecundarios.maxOrNull() ?: 0f
+        )
+        val passoEixo = calcularPassoEixo(maiorValor)
+        val maximo = if (maiorValor <= 0f) {
+            passoEixo
+        } else {
+            ceil(
+                (maiorValor / passoEixo).toDouble()
+            ).toFloat() * passoEixo
+        }
+        val quantidadeIntervalos =
+            (maximo / passoEixo)
+                .roundToInt()
+                .coerceAtLeast(1)
+        desenharGrade(
+            canvas,
+            esquerda,
+            direita,
+            topo,
+            base,
+            altura,
+            maximo,
+            quantidadeIntervalos
+        )
 
         when (modo) {
             Modo.BARRAS -> desenharBarras(canvas, esquerda, direita, topo, base, altura, maximo)
@@ -455,6 +1004,33 @@ class GraficoHistoricoView @JvmOverloads constructor(
         desenharRotulos(canvas, esquerda, direita, base, largura)
     }
 
+    private fun calcularPassoEixo(maiorValor: Float): Float {
+        if (maiorValor <= 0f) {
+            return 0.2f
+        }
+        val passoDesejado = maiorValor / 7f
+        val passos = listOf(
+            0.01f,
+            0.02f,
+            0.05f,
+            0.1f,
+            0.2f,
+            0.5f,
+            1f,
+            2f,
+            5f,
+            10f,
+            20f,
+            50f,
+            100f,
+            200f,
+            500f,
+            1000f
+        )
+        return passos.firstOrNull {
+            it >= passoDesejado
+        } ?: 1000f
+    }
     private fun desenharGrade(
         canvas: Canvas,
         esquerda: Float,
@@ -462,22 +1038,50 @@ class GraficoHistoricoView @JvmOverloads constructor(
         topo: Float,
         base: Float,
         altura: Float,
-        maximo: Float
+        maximo: Float,
+        quantidadeIntervalos: Int
     ) {
         tinta.color = corGrade
         tinta.strokeWidth = dp(0.7f)
         tinta.style = Paint.Style.STROKE
-
-        for (i in 0..5) {
-            val y = base - (altura * i / 5f)
-            canvas.drawLine(esquerda, y, direita, y, tinta)
-
+        for (i in 0..quantidadeIntervalos) {
+            val y =
+                base - (
+                        altura * i /
+                                quantidadeIntervalos.toFloat()
+                        )
+            canvas.drawLine(
+                esquerda,
+                y,
+                direita,
+                y,
+                tinta
+            )
+            val valorEixo =
+                maximo * i /
+                        quantidadeIntervalos.toFloat()
+            val rotuloEixo =
+                if (valorEixo == 0f) {
+                    "0"
+                } else if (valorEixo < 10f) {
+                    String.format(
+                        Locale.forLanguageTag("pt-BR"),
+                        "%.1f",
+                        valorEixo
+                    )
+                } else {
+                    String.format(
+                        Locale.forLanguageTag("pt-BR"),
+                        "%.0f",
+                        valorEixo
+                    )
+                }
             tinta.style = Paint.Style.FILL
             tinta.textSize = dp(11f)
             tinta.color = corTexto
             tinta.textAlign = Paint.Align.RIGHT
             canvas.drawText(
-                ((maximo * i / 5f).toInt()).toString(),
+                rotuloEixo,
                 esquerda - dp(7f),
                 y + dp(4f),
                 tinta

@@ -6,6 +6,7 @@ import com.zattsproject.mobile.Model.AutenticacaoResponse
 import com.zattsproject.mobile.Model.MensagemResponse
 import com.zattsproject.mobile.Model.Questionario
 import com.zattsproject.mobile.Model.Conta
+import com.zattsproject.mobile.Model.ConsumoDiario
 
 import retrofit2.Response
 import retrofit2.http.Body
@@ -15,6 +16,7 @@ import retrofit2.http.GET
 import retrofit2.http.PUT
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -61,4 +63,11 @@ interface ApiService {
     suspend fun atualizarConta(
         @Body conta: Conta
     ): Response<Conta>
+
+    // HISTÓRICO
+    @GET("api/consumos/diario")
+    suspend fun buscarHistoricoDiario(
+        @Query("inicio") inicio: String,
+        @Query("fim") fim: String
+    ): Response<List<ConsumoDiario>>
 }
