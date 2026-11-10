@@ -8,11 +8,13 @@ import br.edu.fatec.zattsproject.backend.repository.ConsumoRepository;
 import br.edu.fatec.zattsproject.backend.repository.ConsumoRealtimeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -43,8 +45,10 @@ public class ConsumoService {
 
     // Salva EXCLUSIVAMENTE na coleção temporária "consumo_realtime" (Minuto a minuto)
     public void salvarRealtimeMinuto(String usuarioId, double somaKwh, LocalDateTime minutoChave) {
-        LocalDateTime meiaNoiteProximoDia = minutoChave.toLocalDate().plusDays(1).atStartOfDay();
-        Date dataExpiracaoMeiaNoite = Date.from(meiaNoiteProximoDia.atZone(ZoneId.systemDefault()).toInstant());
+        // Define o limite exato da meia-noite no fuso de São Paulo / Brasil
+        ZoneId zoneIdBrasil = ZoneId.of("America/Sao_Paulo");
+        ZonedDateTime meiaNoiteProximoDia = minutoChave.toLocalDate().plusDays(1).atStartOfDay(zoneIdBrasil);
+        Date dataExpiracaoMeiaNoite = Date.from(meiaNoiteProximoDia.toInstant());
 
         ConsumoRealtime rt = new ConsumoRealtime();
         rt.setUsuarioId(usuarioId);
@@ -53,6 +57,17 @@ public class ConsumoService {
         rt.setDataExpiracao(dataExpiracaoMeiaNoite);
 
         realtimeRepository.save(rt);
+    }
+
+    // TAREFA AGENDADA: Garante a limpeza total do consumo_realtime todos os dias à 00:00:05
+    @Scheduled(cron = "5 0 0 * * *", zone = "America/Sao_Paulo")
+    public void limparRealtimeMeiaNoite() {
+        try {
+            realtimeRepository.deleteAll();
+            log.info(">>> COLEÇÃO CONSUMO_REALTIME LIMPA COM SUCESSO À MEIA-NOITE <<<");
+        } catch (Exception e) {
+            log.error("Erro ao limpar consumo_realtime à meia-noite:", e);
+        }
     }
 
     public DashboardDTO obterDadosDashboard(String usuarioId) {
