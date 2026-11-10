@@ -27,12 +27,33 @@
     <h1 class="titulo-pagina">Configurações</h1>
 
     <div class="abas-config">
-        <a th:href="@{/configuracoes}" class="aba">Conta</a>
-        <a th:href="@{/configuracoes/notificacoes}" class="aba">Notificações</a>
-        <a th:href="@{/configuracoes/preferencias}" class="aba">Preferências</a>
-        <a th:href="@{/configuracoes/dispositivos}" class="aba">Dispositivos</a>
-        <a th:href="@{/configuracoes/privacidade}" class="aba ativa">Privacidade e Dados</a>
-        <a th:href="@{/configuracoes/ajuda}" class="aba">Ajuda e Suporte</a>
+        <a th:href="@{/configuracoes}" class="aba">
+            <span class="material-symbols-outlined">person</span>
+            <span class="aba-texto">Conta</span>
+        </a>
+
+        <a th:href="@{/configuracoes/notificacoes}" class="aba">
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="aba-texto">Notificações</span>
+        </a>
+
+        <a th:href="@{/configuracoes/preferencias}" class="aba">
+            <span class="material-symbols-outlined">tune</span>
+            <span class="aba-texto">Preferências</span>
+        </a>
+
+        <a th:href="@{/configuracoes/dispositivos}" class="aba">
+            <span class="material-symbols-outlined">devices</span>
+            <span class="aba-texto">Dispositivos</span>
+        </a>
+        <a th:href="@{/configuracoes/privacidade}" class="aba ativa">
+            <span class="material-symbols-outlined">shield</span>
+            <span class="aba-texto">Privacidade e Dados</span>
+        </a>
+        <a th:href="@{/configuracoes/ajuda}" class="aba">
+            <span class="material-symbols-outlined">help</span>
+            <span class="aba-texto">Ajuda e Suporte</span>
+        </a>
     </div>
 
     <section class="card-privacidade">

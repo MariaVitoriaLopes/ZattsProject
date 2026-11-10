@@ -586,6 +586,7 @@ html[data-tema="escuro"] .hist-valor.hist-variacao-aumento {
     }
 }
 
+
 @media (max-width: 700px) {
     .hist-pagina {
         padding: 16px 16px 32px;
@@ -629,6 +630,223 @@ html[data-tema="escuro"] .hist-valor.hist-variacao-aumento {
     .hist-btn-exportar {
         width: 100%;
         justify-content: center;
+    }
+}
+@media (max-width: 1100px) {
+    .hist-topo {
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    .hist-titulo-linha {
+        gap: 14px;
+    }
+
+    .hist-cards {
+        gap: 14px;
+    }
+
+    .hist-card {
+        min-width: 0;
+    }
+
+    .hist-grafico-card {
+        min-width: 0;
+    }
+
+    .hist-grafico-cabecalho {
+        gap: 16px;
+    }
+
+    .hist-legenda-grupo {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .hist-grafico canvas {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 700px) {
+    .hist-topo {
+        align-items: stretch;
+    }
+
+    .hist-abas {
+        display: flex;
+        width: 100%;
+        max-width: 100%;
+        gap: 4px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .hist-abas::-webkit-scrollbar {
+        display: none;
+    }
+
+    .hist-aba {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    .hist-titulo-linha {
+        width: 100%;
+        gap: 12px;
+    }
+
+    .hist-titulo-linha h1 {
+        font-size: 25px;
+    }
+
+    .hist-seletor {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .hist-seletor select {
+        width: 100%;
+    }
+
+    .hist-card {
+        padding: 18px;
+    }
+
+    .hist-card-corpo {
+        min-width: 0;
+    }
+
+    .hist-valor {
+        font-size: 27px;
+        overflow-wrap: anywhere;
+    }
+
+    .hist-card p {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .hist-grafico-cabecalho h2 {
+        font-size: 19px;
+    }
+
+    .hist-grafico-cabecalho p {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .hist-legenda {
+        flex-wrap: wrap;
+        gap: 8px 14px;
+    }
+
+    .hist-nota {
+        line-height: 1.5;
+    }
+}
+
+@media (max-width: 480px) {
+    .hist-pagina {
+        padding: 14px 12px 26px;
+    }
+
+    .hist-abas {
+        padding: 4px;
+    }
+
+    .hist-aba {
+        padding: 9px 13px;
+        font-size: 12px;
+    }
+
+    .hist-titulo-linha h1 {
+        font-size: 22px;
+    }
+
+    .hist-btn-exportar {
+        min-height: 42px;
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    .hist-seletor select {
+        min-height: 42px;
+        font-size: 13px;
+    }
+
+    .hist-cards {
+        gap: 12px;
+    }
+
+    .hist-card {
+        padding: 15px;
+        border-radius: 14px;
+    }
+
+    .hist-card-icone {
+        width: 38px;
+        height: 38px;
+    }
+
+    .hist-card-icone .material-symbols-outlined {
+        font-size: 21px;
+    }
+
+    .hist-card h2 {
+        font-size: 14px;
+    }
+
+    .hist-valor {
+        font-size: 24px;
+    }
+
+    .hist-valor small {
+        font-size: 12px;
+    }
+
+    .hist-card p {
+        font-size: 12px;
+    }
+
+    .hist-card-variacao {
+        flex-wrap: wrap;
+        font-size: 12px;
+    }
+
+    .hist-caixa {
+        padding: 12px;
+    }
+
+    .hist-caixa strong {
+        font-size: 16px;
+    }
+
+    .hist-grafico-card {
+        padding: 18px 12px;
+        border-radius: 14px;
+    }
+
+    .hist-grafico-cabecalho h2 {
+        font-size: 17px;
+    }
+
+    .hist-grafico-cabecalho p {
+        font-size: 12px;
+    }
+
+    .hist-grafico {
+        height: 260px;
+    }
+
+    .hist-legenda {
+        gap: 8px 10px;
+        font-size: 11px;
+    }
+
+    .hist-nota {
+        font-size: 11px;
     }
 }
 

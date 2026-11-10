@@ -237,12 +237,12 @@
 }
 
 .switch input:checked + span {
-    background: #c9d661;
+    background: var(--cor-primaria-400);
 }
 
 .switch input:checked + span:before {
     transform: translateX(17px);
-    background: #525b00;
+    background: var(--cor-primaria-950) ;
 }
 
 /* =====================================================
@@ -848,5 +848,221 @@ html[data-tema="escuro"] .opcao-icone:has(input:checked) .material-symbols-outli
     html[data-tema="escuro"] .alerta-ativacao,
     html[data-tema="escuro"] .alerta-acoes {
         border-top-color: #333333;
+    }
+}
+@media (max-width: 1100px) {
+    .pagina-alertas {
+        padding: 24px 3% 40px;
+    }
+
+    .alerta-linha {
+        grid-template-columns: 1.5fr 1.2fr 1fr 0.8fr 75px;
+    }
+
+    .alerta-linha > div {
+        padding: 14px 12px;
+    }
+
+    .chip {
+        padding: 5px 8px;
+        font-size: 10px;
+    }
+
+    .modal-conteudo {
+        max-width: 850px;
+        padding: 32px;
+    }
+
+    .modal-grade {
+        column-gap: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .pagina-alertas {
+        padding: 22px 16px 32px;
+    }
+
+    .alertas-cabecalho {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .alertas-cabecalho h1 {
+        font-size: 25px;
+    }
+
+    .alertas-barra {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .alertas-tabela {
+        min-height: auto;
+        border: 0;
+        background: transparent;
+        overflow: visible;
+    }
+
+    .alerta-linha {
+        grid-template-columns: 1fr 1fr;
+        border: 1px solid #ddd;
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 14px;
+        min-height: auto;
+    }
+
+    .alerta-linha > div {
+        padding: 14px;
+        border-right: 0;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .alerta-descricao {
+        grid-column: 1 / -1;
+    }
+
+    .alerta-ativacao {
+        border-bottom: 0 !important;
+    }
+
+    .alerta-acoes {
+        border-bottom: 0 !important;
+    }
+
+    .alertas-fim,
+    .alertas-vazio {
+        padding: 80px 16px 30px;
+    }
+
+    .fundo-modal {
+        padding: 12px;
+    }
+
+    .modal-conteudo {
+        max-width: 600px;
+        max-height: 92vh;
+        padding: 26px 22px;
+        border-radius: 18px;
+    }
+
+    .modal-topo {
+        margin-bottom: 24px;
+    }
+
+    .modal-topo h2 {
+        font-size: 25px;
+    }
+
+    .modal-grade {
+        grid-template-columns: 1fr;
+        gap: 22px;
+    }
+
+    .modal-coluna {
+        gap: 18px;
+    }
+
+    .modal-duplo {
+        gap: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pagina-alertas {
+        padding: 18px 12px 28px;
+    }
+
+    .alertas-cabecalho h1 {
+        font-size: 22px;
+    }
+
+    .alertas-cabecalho p {
+        font-size: 13px;
+    }
+
+    .alertas-barra {
+        gap: 12px;
+    }
+
+    .alertas-barra h2 {
+        font-size: 16px;
+    }
+
+    .botao-criar {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    .alerta-linha {
+        grid-template-columns: 1fr;
+    }
+
+    .alerta-descricao {
+        grid-column: auto;
+    }
+
+    .alerta-linha > div {
+        padding: 12px;
+    }
+
+    .alerta-acoes {
+        justify-content: flex-start;
+    }
+
+    .chips {
+        gap: 5px;
+    }
+
+    .chip {
+        white-space: normal;
+        font-size: 10px;
+    }
+
+    .modal-conteudo {
+        padding: 22px 16px;
+        border-radius: 15px;
+    }
+
+    .modal-topo {
+        margin-bottom: 20px;
+    }
+
+    .modal-topo h2 {
+        font-size: 21px;
+    }
+
+    .modal-duplo {
+        grid-template-columns: 1fr;
+    }
+
+    .campo input:not([type=checkbox]),
+    .campo select {
+        font-size: 14px;
+    }
+
+    .grupo-canais {
+        gap: 12px;
+    }
+
+    .modal-botoes {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .modal-botoes button {
+        flex: 1;
+    }
+}
+@media (max-width: 768px) {
+    html[data-tema="escuro"] .alerta-linha {
+        background: #1A1A1A !important;
+        border: 1px solid #333333 !important;
+    }
+
+    html[data-tema="escuro"] .alerta-linha > div {
+        border-bottom-color: #333333;
     }
 }

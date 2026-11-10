@@ -164,3 +164,104 @@ html[data-tema="escuro"] .cfg-notif-coluna + .cfg-notif-coluna {
         padding: 28px 0;
     }
 }
+@media (max-width: 768px) {
+    .cfg-notif-card {
+        border-radius: 20px;
+    }
+
+    .cfg-notif-lateral {
+        padding: 26px 20px 10px;
+    }
+
+    .configuracoes-container .cfg-notif-lateral .secao-titulo {
+        margin-bottom: 20px;
+        font-size: 21px;
+    }
+
+    .cfg-notif-todas {
+        justify-content: space-between;
+        gap: 14px;
+        font-size: 15px;
+    }
+
+    .cfg-notif-conteudo {
+        padding: 12px 20px 24px;
+    }
+
+    .cfg-notif-coluna + .cfg-notif-coluna {
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .cfg-notif-secao {
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: 20px;
+        padding: 24px 0;
+    }
+
+    .cfg-notif-secao h3 {
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+
+    .cfg-notif-secao p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .cfg-notif-secao .interruptor {
+        align-self: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .cfg-notif-card {
+        border-radius: 16px;
+    }
+
+    .cfg-notif-lateral {
+        padding: 22px 16px 8px;
+    }
+
+    .configuracoes-container .cfg-notif-lateral .secao-titulo {
+        margin-bottom: 18px;
+        font-size: 19px;
+    }
+
+    .cfg-notif-todas {
+        font-size: 14px;
+        gap: 10px;
+    }
+
+    .cfg-notif-conteudo {
+        padding: 8px 16px 18px;
+    }
+
+    .cfg-notif-secao {
+        column-gap: 12px;
+        padding: 22px 0;
+    }
+
+    .cfg-notif-secao h3 {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .cfg-notif-secao p {
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    .interruptor {
+        width: 46px;
+        height: 25px;
+    }
+
+    .interruptor::before {
+        width: 19px;
+        height: 19px;
+    }
+
+    .interruptor:checked::before {
+        left: 24px;
+    }
+}

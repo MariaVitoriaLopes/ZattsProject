@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR"
       xmlns:th="http://www.thymeleaf.org">
@@ -28,12 +27,33 @@
     <h1 class="titulo-pagina">Configurações</h1>
 
     <div class="abas-config">
-        <a th:href="@{/configuracoes}" class="aba">Conta</a>
-        <a th:href="@{/configuracoes/notificacoes}" class="aba">Notificações</a>
-        <a th:href="@{/configuracoes/preferencias}" class="aba">Preferências</a>
-        <a th:href="@{/configuracoes/dispositivos}" class="aba">Dispositivos</a>
-        <a th:href="@{/configuracoes/privacidade}" class="aba">Privacidade e Dados</a>
-        <a th:href="@{/configuracoes/ajuda}" class="aba">Ajuda e Suporte</a>
+        <a th:href="@{/configuracoes}" class="aba ativa">
+            <span class="material-symbols-outlined">person</span>
+            <span class="aba-texto">Conta</span>
+        </a>
+
+        <a th:href="@{/configuracoes/notificacoes}" class="aba">
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="aba-texto">Notificações</span>
+        </a>
+
+        <a th:href="@{/configuracoes/preferencias}" class="aba">
+            <span class="material-symbols-outlined">tune</span>
+            <span class="aba-texto">Preferências</span>
+        </a>
+
+        <a th:href="@{/configuracoes/dispositivos}" class="aba">
+            <span class="material-symbols-outlined">devices</span>
+            <span class="aba-texto">Dispositivos</span>
+        </a>
+        <a th:href="@{/configuracoes/privacidade}" class="aba">
+            <span class="material-symbols-outlined">shield</span>
+            <span class="aba-texto">Privacidade e Dados</span>
+        </a>
+        <a th:href="@{/configuracoes/ajuda}" class="aba">
+            <span class="material-symbols-outlined">help</span>
+            <span class="aba-texto">Ajuda e Suporte</span>
+        </a>
     </div>
 
     <div th:if="${mensagem}" class="mensagem-sucesso" th:text="${mensagem}"></div>
@@ -46,13 +66,6 @@
 
         <!-- CONTROLES GERAIS -->
         <div class="acoes-edicao">
-            <button type="button"
-                    id="btnEditarTudo"
-                    class="btn-editar-tudo">
-                <span class="material-symbols-outlined">edit</span>
-                Editar informações
-            </button>
-
             <div id="botoesEdicao" hidden>
                 <button type="submit"
                         id="btnSalvarTudo"
@@ -83,6 +96,9 @@
                            placeholder="Ex.: Maria Silva"
                            required
                            readonly>
+                    <button type="button" class="btn-lapis" data-editar="nomeCompleto" aria-label="Editar nome completo">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
                 </div>
             </div>
 
@@ -96,6 +112,9 @@
                            placeholder="Ex.: maria@gmail.com"
                            required
                            readonly>
+                    <button type="button" class="btn-lapis" data-editar="email" aria-label="Editar e-mail">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
                 </div>
             </div>
 
@@ -108,6 +127,9 @@
                            th:value="${usuario.telefone}"
                            placeholder="Ex.: (13) 99999-9999"
                            readonly>
+                    <button type="button" class="btn-lapis" data-editar="telefone" aria-label="Editar telefone">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
                 </div>
             </div>
 
@@ -116,8 +138,7 @@
                 <div class="campo-input">
 
                     <select id="fusoHorario"
-                            name="fusoHorario"
-                            disabled>
+                            name="fusoHorario">
 
                         <option value="UTC-3"
                                 th:selected="${configuracao != null and configuracao.fusoHorario == 'UTC-3'}">
@@ -154,7 +175,7 @@
 
             <div class="campo">
                 <label for="cep">CEP</label>
-                <div class="campo-input largura-30">
+                <div class="campo-input">
                     <input type="text"
                            id="cep"
                            name="cep"
@@ -162,79 +183,104 @@
                            placeholder="Ex.: 11000-000"
                            maxlength="9"
                            readonly>
+                    <button type="button" class="btn-lapis" data-editar="cep" aria-label="Editar CEP">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
                 </div>
             </div>
 
             <div class="campo">
-                <label for="logradouro">Logradouro</label>
-                <div class="campo-input largura-66">
+                <label for="logradouro">Logradouro <span class="obrigatorio">*</span></label>
+                <div class="campo-input">
                     <input type="text"
                            id="logradouro"
                            name="logradouro"
                            th:value="${configuracao != null ? configuracao.logradouro : ''}"
                            placeholder="Ex.: Rua das Flores"
                            readonly>
+                    <button type="button" class="btn-lapis" data-editar="logradouro" aria-label="Editar logradouro">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="numero">Número <span class="obrigatorio">*</span></label>
+                    <div class="campo-input">
+                        <input type="text"
+                               id="numero"
+                               name="numero"
+                               th:value="${configuracao != null ? configuracao.numero : ''}"
+                               placeholder="Ex.: 123"
+                               readonly>
+                        <button type="button" class="btn-lapis" data-editar="numero" aria-label="Editar número">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label for="complemento">Complemento <span class="obrigatorio">*</span></label>
+                    <div class="campo-input">
+                        <input type="text"
+                               id="complemento"
+                               name="complemento"
+                               th:value="${configuracao != null ? configuracao.complemento : ''}"
+                               placeholder="Ex.: Apartamento 10"
+                               readonly>
+                        <button type="button" class="btn-lapis" data-editar="complemento" aria-label="Editar complemento">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <div class="campo">
-                <label for="numero">Número</label>
-                <div class="campo-input largura-23">
-                    <input type="text"
-                           id="numero"
-                           name="numero"
-                           th:value="${configuracao != null ? configuracao.numero : ''}"
-                           placeholder="Ex.: 123"
-                           readonly>
-                </div>
-            </div>
-
-            <div class="campo">
-                <label for="complemento">Complemento</label>
-                <div class="campo-input largura-27">
-                    <input type="text"
-                           id="complemento"
-                           name="complemento"
-                           th:value="${configuracao != null ? configuracao.complemento : ''}"
-                           placeholder="Ex.: Apartamento 10"
-                           readonly>
-                </div>
-            </div>
-
-            <div class="campo">
-                <label for="bairro">Bairro</label>
-                <div class="campo-input largura-43">
+                <label for="bairro">Bairro <span class="obrigatorio">*</span></label>
+                <div class="campo-input">
                     <input type="text"
                            id="bairro"
                            name="bairro"
                            th:value="${configuracao != null ? configuracao.bairro : ''}"
                            placeholder="Ex.: Centro"
                            readonly>
+                    <button type="button" class="btn-lapis" data-editar="bairro" aria-label="Editar bairro">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
                 </div>
             </div>
 
-            <div class="campo">
-                <label for="cidade">Cidade</label>
-                <div class="campo-input largura-45">
-                    <input type="text"
-                           id="cidade"
-                           name="cidade"
-                           th:value="${configuracao != null ? configuracao.cidade : ''}"
-                           placeholder="Ex.: Santos"
-                           readonly>
+            <div class="linha-campos">
+                <div class="campo campo-cidade">
+                    <label for="cidade">Cidade <span class="obrigatorio">*</span></label>
+                    <div class="campo-input">
+                        <input type="text"
+                               id="cidade"
+                               name="cidade"
+                               th:value="${configuracao != null ? configuracao.cidade : ''}"
+                               placeholder="Ex.: Santos"
+                               readonly>
+                        <button type="button" class="btn-lapis" data-editar="cidade" aria-label="Editar cidade">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="campo">
-                <label for="uf">UF</label>
-                <div class="campo-input largura-25">
-                    <input type="text"
-                           id="uf"
-                           name="uf"
-                           maxlength="2"
-                           th:value="${configuracao != null ? configuracao.uf : ''}"
-                           placeholder="Ex.: SP"
-                           readonly>
+                <div class="campo">
+                    <label for="uf">UF <span class="obrigatorio">*</span></label>
+                    <div class="campo-input">
+                        <input type="text"
+                               id="uf"
+                               name="uf"
+                               maxlength="2"
+                               th:value="${configuracao != null ? configuracao.uf : ''}"
+                               placeholder="Ex.: SP"
+                               readonly>
+                        <button type="button" class="btn-lapis" data-editar="uf" aria-label="Editar UF">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -246,26 +292,32 @@
             <h2 class="secao-titulo">Gerenciar minha conta</h2>
 
             <div class="campo">
-                <label for="senha">Nova senha</label>
-                <div class="campo-input largura-80">
+                <label for="senha">Senha</label>
+                <div class="campo-input">
                     <input type="password"
                            id="senha"
                            name="senha"
-                           placeholder="Digite sua nova senha"
+                           placeholder="**********"
                            autocomplete="new-password"
                            readonly>
+                    <button type="button" class="btn-lapis" data-editar="senha" aria-label="Editar senha">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
                 </div>
             </div>
 
             <div class="campo">
-                <label for="confirmarSenha">Confirmação de senha</label>
-                <div class="campo-input largura-80">
+                <label for="confirmarSenha">Confirmação de senha <span class="dica-campo" id="dicaSenha"></span></label>
+                <div class="campo-input">
                     <input type="password"
                            id="confirmarSenha"
                            name="confirmarSenha"
-                           placeholder="Confirme sua nova senha"
+                           placeholder="**********"
                            autocomplete="new-password"
                            readonly>
+                    <button type="button" class="btn-lapis" data-editar="confirmarSenha" aria-label="Editar confirmação de senha">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
                 </div>
             </div>
 

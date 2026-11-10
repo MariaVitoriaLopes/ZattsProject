@@ -298,3 +298,106 @@ hr {
 
 
 }
+@media (max-width: 600px) {
+    .manutencao {
+        width: 94%;
+        min-height: auto;
+        padding: 32px 20px;
+        gap: 20px;
+        border-radius: 12px;
+    }
+
+    .manutencao::before {
+        width: 220px;
+        height: 220px;
+        right: -50px;
+        top: 100px;
+    }
+
+    .textosManutencao {
+        width: 100%;
+    }
+
+    .textosManutencao h1 {
+        font-size: clamp(42px, 12vw, 58px);
+        line-height: 1;
+    }
+
+    .textosManutencao h1::after {
+        height: 7px;
+        bottom: 4px;
+    }
+
+    .textosManutencao h2 {
+        font-size: 22px;
+        margin-top: 12px;
+    }
+
+    .textosManutencao p {
+        max-width: 100%;
+        margin-top: 18px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .textosManutencao button {
+        margin-top: 24px;
+        padding: 13px 25px;
+        font-size: 13px;
+    }
+
+    .manutencao img {
+        width: 100%;
+        max-width: 280px;
+        margin-top: 10px;
+    }
+
+    .rodapé {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 20px 12px;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    hr {
+        max-width: 100px;
+    }
+
+    body > p {
+        position: static;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin: 24px 12px;
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-align: center;
+    }
+
+    body > p hr {
+        width: 35px;
+    }
+}
+
+@media (max-width: 360px) {
+    .manutencao {
+        padding: 26px 14px;
+    }
+
+    .textosManutencao h1 {
+        font-size: 40px;
+    }
+
+    .textosManutencao h2 {
+        font-size: 19px;
+    }
+
+    .textosManutencao p {
+        font-size: 13px;
+    }
+
+    .manutencao img {
+        max-width: 230px;
+    }
+}

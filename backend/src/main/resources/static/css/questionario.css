@@ -375,17 +375,15 @@ p.quest-aviso {
     max-width: 420px;
     text-align: left;
     display: flex;
-    gap: 10px;
-    flex-direction: column;
+    gap: 20px;
 }
 
 .quest-ajuda-conta img {
     display: block;
-    width: 100%;
+    width: 30%;
     height: auto;
     border-radius: 12px;
     border: 1px solid #E3E3E3;
-    height: 125px;
 }
 
 .quest-ajuda-conta figcaption {
@@ -535,4 +533,284 @@ html[data-tema="escuro"] .quest-ajuda-conta img {
 
 .quest-navegacao .quest-btn-primario:hover {
     box-shadow: 0 0 10px var(--cor-primaria-400);
+}
+
+@media (max-width: 768px) {
+    .quest-topo {
+        padding: 0 20px;
+        gap: 12px;
+    }
+
+    .quest-logo {
+        max-width: 110px;
+    }
+
+    .quest-conteudo {
+        padding: 30px 20px 0;
+    }
+
+    .quest-conteudo h1 {
+        font-size: 30px;
+        letter-spacing: -0.8px;
+        margin-bottom: 16px;
+    }
+
+    .quest-conteudo p {
+        font-size: 16px;
+        margin-bottom: 34px;
+    }
+
+    .quest-privacidade {
+        padding: 0 20px;
+        font-size: 14px;
+    }
+
+    .quest-progresso {
+        height: 10px;
+        margin: 20px;
+    }
+
+    .quest-pergunta {
+        padding: 42px 24px 0;
+    }
+
+    .quest-numero {
+        margin-bottom: 24px;
+        font-size: 16px;
+    }
+
+    .quest-enunciado {
+        margin-bottom: 30px;
+        font-size: 23px;
+        line-height: 1.35;
+    }
+
+    .ajusteImgExplicacao {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .quest-opcao {
+        width: 100%;
+        font-size: 15px;
+        line-height: 1.5;
+    }
+
+    .quest-campo {
+        max-width: 100%;
+    }
+
+    .quest-ajuda-conta {
+        max-width: 100%;
+    }
+
+    .quest-ajuda-conta img {
+        height: auto;
+        max-height: 220px;
+        object-fit: contain;
+    }
+
+    .quest-condicional {
+        margin: 24px 0;
+    }
+
+    .quest-navegacao {
+        padding: 0 24px 20px;
+        gap: 10px;
+    }
+
+    .quest-btn-secundario,
+    .quest-navegacao .quest-btn-primario {
+        height: 52px;
+        padding: 0 20px;
+        font-size: 15px;
+        border-radius: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .quest-topo {
+        padding: 0 14px;
+    }
+
+    .quest-logo {
+        max-width: 90px;
+    }
+
+    .quest-voltar {
+        font-size: 13px;
+    }
+
+    .quest-conteudo {
+        padding: 24px 16px 0;
+    }
+
+    .quest-conteudo h1 {
+        font-size: 25px;
+        line-height: 1.2;
+        letter-spacing: -0.5px;
+        margin-bottom: 14px;
+    }
+
+    .quest-conteudo p {
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 26px;
+    }
+
+    .quest-conteudo .quest-btn-primario {
+        width: 100%;
+        max-width: 300px;
+        height: 52px;
+        padding: 0 16px;
+        font-size: 15px;
+        gap: 8px;
+    }
+
+    .quest-privacidade {
+        align-items: flex-start;
+        padding: 0 16px;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .quest-privacidade .material-symbols-outlined {
+        font-size: 19px;
+    }
+
+    .quest-progresso {
+        height: 8px;
+        margin: 18px 16px;
+    }
+
+    .quest-pergunta {
+        padding: 28px 16px 0;
+    }
+
+    .quest-numero {
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .quest-enunciado {
+        margin-bottom: 24px;
+        font-size: 20px;
+        line-height: 1.35;
+        letter-spacing: 0;
+    }
+
+    .quest-opcoes {
+        gap: 12px;
+    }
+
+    .quest-opcao {
+        gap: 10px;
+        font-size: 14px;
+        line-height: 1.45;
+    }
+
+    .quest-opcao input {
+        width: 16px;
+        height: 16px;
+    }
+
+    .quest-campo input,
+    .quest-campo select {
+        height: 46px;
+        padding: 0 12px;
+        font-size: 14px;
+    }
+
+    .quest-campo-select select {
+        padding-right: 40px;
+    }
+
+    .quest-moeda span {
+        left: 12px;
+        font-size: 14px;
+    }
+
+    .quest-moeda input {
+        padding-left: 48px;
+    }
+
+    .quest-consumo .quest-unidade {
+        right: 12px;
+        font-size: 13px;
+    }
+
+    .quest-consumo input {
+        padding-right: 55px;
+    }
+
+    .quest-rotulo {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .quest-rotulo-campo {
+        margin: 15px 0 8px;
+    }
+
+    .quest-aviso {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .quest-ajuda-conta {
+        gap: 8px;
+    }
+
+    .quest-ajuda-conta img {
+        max-height: 180px;
+        object-fit: contain;
+    }
+
+    .quest-ajuda-conta figcaption {
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
+    .quest-navegacao {
+        padding: 0 16px 18px;
+        gap: 8px;
+    }
+
+    .quest-btn-secundario,
+    .quest-navegacao .quest-btn-primario {
+        flex: 1;
+        min-width: 0;
+        height: 46px;
+        padding: 0 10px;
+        gap: 6px;
+        font-size: 13px;
+        border-radius: 10px;
+    }
+
+    .quest-btn-secundario .material-symbols-outlined,
+    .quest-navegacao .quest-btn-primario .material-symbols-outlined {
+        font-size: 19px;
+    }
+}
+
+@media (max-width: 360px) {
+    .quest-conteudo h1 {
+        font-size: 22px;
+    }
+
+    .quest-enunciado {
+        font-size: 18px;
+    }
+
+    .quest-navegacao {
+        gap: 6px;
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .quest-btn-secundario,
+    .quest-navegacao .quest-btn-primario {
+        padding: 0 7px;
+        font-size: 12px;
+    }
 }

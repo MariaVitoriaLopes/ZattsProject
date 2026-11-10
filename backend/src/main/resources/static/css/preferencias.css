@@ -219,3 +219,152 @@
         gap: 14px;
     }
 }
+@media (max-width: 768px) {
+    .card-preferencias {
+        padding: 26px 20px 32px;
+        border-radius: 20px;
+    }
+
+    .configuracoes-container .card-preferencias .secao-titulo {
+        margin-bottom: 32px;
+        font-size: 23px;
+    }
+
+    .bloco-pref {
+        row-gap: 20px;
+    }
+
+    .bloco-pref-info h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .bloco-pref-info p {
+        max-width: 100%;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .bloco-pref-opcoes {
+        gap: 30px;
+    }
+
+    .grade-modo {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .opcao-modo {
+        min-height: 120px;
+        padding: 14px;
+        gap: 10px;
+    }
+
+    .opcao-modo strong {
+        font-size: 14px;
+    }
+
+    .opcao-modo small {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .grade-cores {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .opcao-cor {
+        height: 76px;
+        font-size: 13px;
+    }
+
+    .divisor-pref {
+        margin: 30px 0;
+    }
+
+    .select-idioma {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-preferencias {
+        padding: 22px 16px 28px;
+        border-radius: 16px;
+    }
+
+    .configuracoes-container .card-preferencias .secao-titulo {
+        margin-bottom: 26px;
+        font-size: 21px;
+    }
+
+    .bloco-pref {
+        row-gap: 16px;
+    }
+
+    .bloco-pref-info h3 {
+        font-size: 18px;
+    }
+
+    .bloco-pref-info p {
+        font-size: 13px;
+    }
+
+    .bloco-pref-opcoes {
+        gap: 24px;
+    }
+
+    .grupo-pref {
+        gap: 10px;
+    }
+
+    .grupo-rotulo {
+        font-size: 14px;
+    }
+
+    .grade-modo {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .opcao-modo {
+        min-height: 0;
+        padding: 16px;
+        gap: 9px;
+    }
+
+    .opcao-modo .material-symbols-outlined {
+        font-size: 22px;
+    }
+
+    .opcao-modo strong {
+        font-size: 14px;
+    }
+
+    .opcao-modo small {
+        font-size: 12px;
+    }
+
+    .grade-cores {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .opcao-cor {
+        height: 70px;
+        border-radius: 12px;
+        font-size: 12px;
+        gap: 6px;
+    }
+
+    .bolinha-cor {
+        width: 24px;
+        height: 24px;
+    }
+
+    .divisor-pref {
+        margin: 26px 0;
+    }
+}

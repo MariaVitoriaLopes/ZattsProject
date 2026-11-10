@@ -626,3 +626,252 @@ html[data-tema="escuro"] .btn-salvar {
     background-color: var(--cor-primaria-400);
     color: var(--cor-primaria-950);
 }
+@media (max-width: 768px) {
+    .topo-pagina {
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+
+    .contador-notificacoes {
+        padding-bottom: 0;
+        font-size: 14px;
+    }
+
+    .card-notificacoes {
+        min-height: 400px;
+        padding: 14px;
+        border-radius: 20px;
+    }
+
+    .lista-notificacoes .notificacao {
+        gap: 12px;
+        min-height: 78px;
+        padding: 12px;
+    }
+
+    .notificacao-icone {
+        width: 42px;
+        height: 42px;
+    }
+
+    .notificacao-texto {
+        max-width: none;
+        min-width: 0;
+        flex: 1;
+    }
+
+    .notificacao-titulo {
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+
+    .notificacao-tempo {
+        font-size: 12px;
+    }
+
+    .alertas-topo {
+        align-items: flex-start;
+        padding: 12px 4px 20px;
+    }
+
+    .alertas-topo h2 {
+        font-size: 18px;
+    }
+
+    .alertas-subtitulo {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .modal-alerta {
+        padding: 16px;
+    }
+
+    .modal-conteudo {
+        max-height: 92vh;
+        padding: 24px;
+    }
+
+    .modal-acoes {
+        flex-wrap: wrap;
+    }
+
+    .modal-acoes button {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-notificacoes {
+        min-height: 350px;
+        padding: 10px;
+        border-radius: 16px;
+    }
+
+    .lista-notificacoes .notificacao {
+        gap: 9px;
+        min-height: 70px;
+        padding: 10px 6px;
+    }
+
+    .notificacao-icone {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+    }
+
+    .notificacao-icone .material-symbols-outlined {
+        font-size: 20px;
+    }
+
+    .notificacao-titulo {
+        font-size: 13px;
+    }
+
+    .notificacao-tempo {
+        font-size: 11px;
+    }
+
+    .notificacao-excluir .material-symbols-outlined,
+    .notificacao-editar .material-symbols-outlined {
+        font-size: 21px;
+    }
+
+    .alertas-topo {
+        gap: 12px;
+        padding: 10px 2px 18px;
+    }
+
+    .alertas-topo h2 {
+        font-size: 17px;
+    }
+
+    .alertas-subtitulo {
+        font-size: 12px;
+    }
+
+    .btn-criar-alerta,
+    .btn-salvar {
+        min-height: 44px;
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    .modal-alerta {
+        padding: 10px;
+    }
+
+    .modal-conteudo {
+        padding: 20px 16px;
+        border-radius: 16px;
+    }
+
+    .modal-topo {
+        margin-bottom: 20px;
+    }
+
+    .modal-topo h2 {
+        font-size: 19px;
+    }
+
+    .campo-alerta {
+        margin-bottom: 15px;
+    }
+
+    .campo-alerta label {
+        font-size: 13px;
+    }
+
+    .campo-alerta input,
+    .campo-alerta select {
+        min-height: 43px;
+        padding: 10px 12px;
+        font-size: 13px;
+        box-sizing: border-box;
+    }
+
+    .modal-acoes {
+        flex-direction: column-reverse;
+        gap: 9px;
+        margin-top: 20px;
+    }
+
+    .modal-acoes button {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .alerta-acoes {
+        gap: 8px;
+    }
+
+    .alertas-vazio {
+        padding: 32px 12px;
+    }
+}
+.abas-config {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 20px;
+    background: var(--fundo-100);
+    border: 1px solid var(--fundo-200);
+    border-radius: 14px;
+    overflow: visible;
+    box-sizing: border-box;
+}
+
+.abas-config .aba {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 11px 16px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--textos-pretos);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    white-space: normal;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+}
+
+.abas-config .aba:hover {
+    background: var(--fundo-200);
+}
+
+.abas-config .aba.ativo {
+    background: var(--fundo-0);
+    color: var(--textos-pretos);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+    font-weight: 600;
+}
+
+html[data-tema="escuro"] .abas-config {
+    background: #1A1A1A;
+    border-color: #333;
+}
+
+html[data-tema="escuro"] .abas-config .aba.ativo {
+    background: #303030;
+    color: #F2F2F2;
+}
+
+@media (max-width: 480px) {
+    .abas-config {
+        gap: 5px;
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    .abas-config .aba {
+        flex: 1 1 100px;
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+}
