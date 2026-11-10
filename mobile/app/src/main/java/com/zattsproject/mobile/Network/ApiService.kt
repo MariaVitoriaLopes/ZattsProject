@@ -17,6 +17,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Query
+import com.zattsproject.mobile.Model.Notificacao
 
 interface ApiService {
 
@@ -70,4 +71,11 @@ interface ApiService {
         @Query("inicio") inicio: String,
         @Query("fim") fim: String
     ): Response<List<ConsumoDiario>>
+
+    // NOTIFICAÇÕES
+    @GET("notificacoes/api")
+    suspend fun buscarNotificacoes(
+        @Query("pagina") pagina: Int = 0,
+        @Query("tamanho") tamanho: Int = 50
+    ): Response<List<Notificacao>>
 }

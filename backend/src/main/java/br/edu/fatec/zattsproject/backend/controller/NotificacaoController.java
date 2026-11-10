@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import br.edu.fatec.zattsproject.backend.model.Notificacao;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Map;
 
@@ -16,6 +18,35 @@ import java.util.Map;
 public class NotificacaoController {
 
     private final NotificacaoService notificacaoService;
+
+    @GetMapping("/api")
+    public ResponseEntity<?> listarNotificacoes(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "50") int tamanho,
+            HttpSession session) {
+
+        Usuario usuario =
+                (Usuario) session.getAttribute("usuarioLogado");
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "erro",
+                            "Sua sessão expirou. Faça login novamente."
+                    ));
+        }
+        int paginaSegura = Math.max(pagina, 0);
+        int tamanhoSeguro =
+                Math.min(Math.max(tamanho, 1), 100);
+        return ResponseEntity.ok(
+                notificacaoService.listar(
+                        usuario.getId(),
+                        PageRequest.of(
+                                paginaSegura,
+                                tamanhoSeguro
+                        )
+                ).getContent()
+        );
+    }
 
     @PostMapping("/{id}/lida")
     public ResponseEntity<?> marcarComoLida(
