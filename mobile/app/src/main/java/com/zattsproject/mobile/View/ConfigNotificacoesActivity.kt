@@ -8,15 +8,21 @@ import com.zattsproject.mobile.AparenciaManager
 import com.zattsproject.mobile.AppNavBar
 import com.zattsproject.mobile.NavTab
 import com.zattsproject.mobile.R
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import com.zattsproject.mobile.Model.ConfiguracaoNotificacoes
+import com.zattsproject.mobile.Network.RetrofitClient
+import kotlinx.coroutines.launch
 
 class ConfigNotificacoesActivity : AppCompatActivity() {
 
-    private val preferencias by lazy {
-        getSharedPreferences(
-            "preferencias_notificacoes",
-            MODE_PRIVATE
-        )
-    }
+    private lateinit var switchGerais: SwitchCompat
+    private lateinit var switchConta: SwitchCompat
+    private lateinit var switchConsumo: SwitchCompat
+    private lateinit var switchMeta: SwitchCompat
+    private lateinit var switchAlerta: SwitchCompat
+
+    private var carregandoConfiguracao = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AparenciaManager.aplicarCor(this)
@@ -29,6 +35,7 @@ class ConfigNotificacoesActivity : AppCompatActivity() {
 
         configurarVoltar()
         configurarNotificacoes()
+        carregarConfiguracao()
     }
 
     private fun configurarVoltar() {
@@ -42,51 +49,144 @@ class ConfigNotificacoesActivity : AppCompatActivity() {
 
     private fun configurarNotificacoes() {
 
-        configurarSwitch(
-            R.id.switchNotificacoesGerais,
-            "notificacoes_gerais"
-        )
+        switchGerais =
+            findViewById(
+                R.id.switchNotificacoesGerais
+            )
 
-        configurarSwitch(
-            R.id.switchNotificacoesConta,
-            "notificacoes_conta"
-        )
+        switchConta =
+            findViewById(
+                R.id.switchNotificacoesConta
+            )
 
-        configurarSwitch(
-            R.id.switchNotificacoesConsumo,
-            "notificacoes_consumo"
-        )
+        switchConsumo =
+            findViewById(
+                R.id.switchNotificacoesConsumo
+            )
 
-        configurarSwitch(
-            R.id.switchNotificacoesMeta,
-            "notificacoes_meta"
-        )
+        switchMeta =
+            findViewById(
+                R.id.switchNotificacoesMeta
+            )
 
-        configurarSwitch(
-            R.id.switchNotificacoesAlerta,
-            "notificacoes_alerta"
-        )
+        switchAlerta =
+            findViewById(
+                R.id.switchNotificacoesAlerta
+            )
+
+        val listener =
+            android.widget.CompoundButton
+                .OnCheckedChangeListener { _, _ ->
+
+                    if (!carregandoConfiguracao) {
+                        salvarConfiguracao()
+                    }
+                }
+
+        switchGerais
+            .setOnCheckedChangeListener(listener)
+
+        switchConta
+            .setOnCheckedChangeListener(listener)
+
+        switchConsumo
+            .setOnCheckedChangeListener(listener)
+
+        switchMeta
+            .setOnCheckedChangeListener(listener)
+
+        switchAlerta
+            .setOnCheckedChangeListener(listener)
+    }
+    private fun carregarConfiguracao() {
+        lifecycleScope.launch {
+            try {
+                val resposta =
+                    RetrofitClient.apiService
+                        .buscarConfiguracaoNotificacoes()
+                if (resposta.isSuccessful) {
+                    val configuracao =
+                        resposta.body()
+                            ?: return@launch
+
+                    carregandoConfiguracao = true
+
+                    switchGerais.isChecked =
+                        configuracao.notifGerais
+
+                    switchConta.isChecked =
+                        configuracao.notifConta
+
+                    switchConsumo.isChecked =
+                        configuracao.notifConsumo
+
+                    switchMeta.isChecked =
+                        configuracao.notifMeta
+
+                    switchAlerta.isChecked =
+                        configuracao.notifAlerta
+
+                    carregandoConfiguracao = false
+                } else {
+                    Toast.makeText(
+                        this@ConfigNotificacoesActivity,
+                        if (resposta.code() == 401) {
+                            "Sua sessão expirou. Entre novamente."
+                        } else {
+                            "Não foi possível carregar as configurações."
+                        },
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } catch (e: Exception) {
+                carregandoConfiguracao = false
+                Toast.makeText(
+                    this@ConfigNotificacoesActivity,
+                    "Não foi possível conectar ao servidor.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
-    private fun configurarSwitch(
-        id: Int,
-        chave: String
-    ) {
+    private fun salvarConfiguracao() {
 
-        val switch = findViewById<SwitchCompat>(id)
-
-        // Recupera o estado salvo.
-        switch.isChecked = preferencias.getBoolean(
-            chave,
-            true
-        )
-
-        // Salva sempre que o usuário alterar.
-        switch.setOnCheckedChangeListener { _, ativado ->
-
-            preferencias.edit()
-                .putBoolean(chave, ativado)
-                .apply()
+        val configuracao =
+            ConfiguracaoNotificacoes(
+                notifGerais =
+                    switchGerais.isChecked,
+                notifConta =
+                    switchConta.isChecked,
+                notifConsumo =
+                    switchConsumo.isChecked,
+                notifMeta =
+                    switchMeta.isChecked,
+                notifAlerta =
+                    switchAlerta.isChecked
+            )
+        lifecycleScope.launch {
+            try {
+                val resposta =
+                    RetrofitClient.apiService
+                        .salvarConfiguracaoNotificacoes(
+                            configuracao
+                        )
+                if (!resposta.isSuccessful) {
+                    Toast.makeText(
+                        this@ConfigNotificacoesActivity,
+                        "Não foi possível salvar a configuração.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    carregarConfiguracao()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this@ConfigNotificacoesActivity,
+                    "Não foi possível salvar a configuração.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                carregarConfiguracao()
+            }
         }
     }
 }

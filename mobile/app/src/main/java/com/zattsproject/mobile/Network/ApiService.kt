@@ -9,6 +9,15 @@ import com.zattsproject.mobile.Model.Conta
 import com.zattsproject.mobile.Model.ConsumoDiario
 import com.zattsproject.mobile.Model.Notificacao
 import com.zattsproject.mobile.Model.Alerta
+import com.zattsproject.mobile.Model.ConfiguracaoNotificacoes
+import com.zattsproject.mobile.Model.SessaoDispositivo
+import com.zattsproject.mobile.Model.DesconectarSessaoResponse
+import com.zattsproject.mobile.Model.PrivacidadeConfiguracao
+import com.zattsproject.mobile.Model.ApagarHistoricoResponse
+import com.zattsproject.mobile.Model.AjudaContatoRequest
+import com.zattsproject.mobile.Model.AjudaContatoResponse
+import okhttp3.ResponseBody
+import retrofit2.http.Streaming
 import retrofit2.http.Path
 
 import retrofit2.Response
@@ -106,4 +115,49 @@ interface ApiService {
         @Path("id") id: String,
         @Body alerta: Alerta
     ): Response<Unit>
+
+    // CONFIGURAÇÕES - NOTIFICAÇÕES
+    @GET("api/mobile/configuracoes/notificacoes")
+    suspend fun buscarConfiguracaoNotificacoes():
+            Response<ConfiguracaoNotificacoes>
+
+    @PUT("api/mobile/configuracoes/notificacoes")
+    suspend fun salvarConfiguracaoNotificacoes(
+        @Body configuracao: ConfiguracaoNotificacoes
+    ): Response<ConfiguracaoNotificacoes>
+
+    // CONFIGURAÇÕES - DISPOSITIVOS
+    @GET("api/mobile/configuracoes/dispositivos")
+    suspend fun buscarDispositivos():
+            Response<List<SessaoDispositivo>>
+
+    @POST("api/mobile/configuracoes/dispositivos/{id}/desconectar")
+    suspend fun desconectarDispositivo(
+        @Path("id") id: String
+    ): Response<DesconectarSessaoResponse>
+
+    // CONFIGURAÇÕES - PRIVACIDADE
+    @GET("api/mobile/configuracoes/privacidade")
+    suspend fun buscarPrivacidade():
+            Response<PrivacidadeConfiguracao>
+
+    @PUT("api/mobile/configuracoes/privacidade")
+    suspend fun salvarPrivacidade(
+        @Body configuracao: PrivacidadeConfiguracao
+    ): Response<PrivacidadeConfiguracao>
+
+    @Streaming
+    @GET("api/mobile/configuracoes/privacidade/exportar")
+    suspend fun exportarDados():
+            Response<ResponseBody>
+
+    @POST("api/mobile/configuracoes/privacidade/apagar-historico")
+    suspend fun apagarHistorico():
+            Response<ApagarHistoricoResponse>
+
+    // CONFIGURAÇÕES - AJUDA E SUPORTE
+    @POST("api/mobile/configuracoes/ajuda/contato")
+    suspend fun enviarContatoSuporte(
+        @Body dados: AjudaContatoRequest
+    ): Response<AjudaContatoResponse>
 }

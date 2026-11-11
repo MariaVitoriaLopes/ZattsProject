@@ -16,6 +16,10 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputLayout
 import com.zattsproject.mobile.R
+import androidx.lifecycle.lifecycleScope
+import com.zattsproject.mobile.Model.AjudaContatoRequest
+import com.zattsproject.mobile.Network.RetrofitClient
+import kotlinx.coroutines.launch
 
 class AjudaSuporteActivity : AppCompatActivity() {
 
@@ -31,6 +35,38 @@ class AjudaSuporteActivity : AppCompatActivity() {
         val resposta: TextView,
         val icone: ImageView
     )
+
+    private fun chaveAssunto(
+        assunto: String
+    ): String {
+
+        return when (assunto) {
+
+            "Conta e acesso" ->
+                "conta"
+
+            "Dispositivo" ->
+                "dispositivo"
+
+            "Consumo de energia" ->
+                "consumo"
+
+            "Metas de consumo" ->
+                "meta"
+
+            "Alertas e notificações" ->
+                "meta"
+
+            "Configurações do aplicativo" ->
+                "outro"
+
+            "Outro assunto" ->
+                "outro"
+
+            else ->
+                "outro"
+        }
+    }
 
     private val perguntasFaq = mutableListOf<PerguntaFaq>()
 
@@ -188,35 +224,129 @@ class AjudaSuporteActivity : AppCompatActivity() {
             edtAssunto.showDropDown()
         }
     }
-
     private fun configurarEnvioMensagem() {
+
         btnEnviarMensagem.setOnClickListener {
-            val assunto = edtAssunto.text.toString().trim()
-            val mensagem = edtMensagem.text.toString().trim()
+
+            val assunto =
+                edtAssunto.text
+                    .toString()
+                    .trim()
+
+            val mensagem =
+                edtMensagem.text
+                    .toString()
+                    .trim()
 
             if (assunto.isEmpty()) {
-                edtAssunto.error = "Selecione um assunto."
+
+                edtAssunto.error =
+                    "Selecione um assunto."
+
                 return@setOnClickListener
             }
 
             if (mensagem.isEmpty()) {
-                layoutMensagem.error = "Digite sua mensagem."
+
+                layoutMensagem.error =
+                    "Digite sua mensagem."
+
                 edtMensagem.requestFocus()
+
+                return@setOnClickListener
+            }
+
+            if (mensagem.length > 1000) {
+
+                layoutMensagem.error =
+                    "A mensagem deve ter no máximo 1000 caracteres."
+
+                edtMensagem.requestFocus()
+
                 return@setOnClickListener
             }
 
             layoutMensagem.error = null
 
-            // BACK-END:
-            // Colocar caminho aqui (endpoint da API responsável pelo envio da mensagem).
-            // Exemplo: POST /api/suporte/mensagem
-            // Enviar assunto e mensagem junto com a identificação do usuário.
+            enviarMensagem(
+                assunto,
+                mensagem
+            )
+        }
+    }
+    private fun enviarMensagem(
+        assunto: String,
+        mensagem: String
+    ) {
 
-            Toast.makeText(
-                this,
-                "Envio ainda não conectado ao servidor.",
-                Toast.LENGTH_SHORT
-            ).show()
+        btnEnviarMensagem.isEnabled = false
+
+        lifecycleScope.launch {
+
+            try {
+
+                val resposta =
+                    RetrofitClient.apiService
+                        .enviarContatoSuporte(
+                            AjudaContatoRequest(
+                                assunto =
+                                    chaveAssunto(
+                                        assunto
+                                    ),
+                                mensagem = mensagem
+                            )
+                        )
+
+                if (resposta.isSuccessful) {
+
+                    Toast.makeText(
+                        this@AjudaSuporteActivity,
+                        resposta.body()
+                            ?.mensagem
+                            ?: "Mensagem enviada com sucesso.",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    edtMensagem.setText("")
+                    edtAssunto.setText(
+                        "",
+                        false
+                    )
+
+                } else {
+
+                    val texto =
+                        when (resposta.code()) {
+
+                            400 ->
+                                "Verifique o assunto e a mensagem."
+
+                            401 ->
+                                "Sua sessão expirou. Entre novamente."
+
+                            else ->
+                                "Não foi possível enviar sua mensagem."
+                        }
+
+                    Toast.makeText(
+                        this@AjudaSuporteActivity,
+                        texto,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+            } catch (e: Exception) {
+
+                Toast.makeText(
+                    this@AjudaSuporteActivity,
+                    "Não foi possível conectar ao servidor.",
+                    Toast.LENGTH_LONG
+                ).show()
+
+            } finally {
+
+                btnEnviarMensagem.isEnabled = true
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.mail.MailException;
 
 import java.io.UnsupportedEncodingException;
 
@@ -132,7 +133,11 @@ public class EmailService {
 
             mailSender.send(mensagem);
 
-        } catch (MessagingException | UnsupportedEncodingException e) {
+        } catch (
+                MessagingException
+                | UnsupportedEncodingException
+                | MailException e
+        ) {
             throw new IllegalStateException(
                     "Erro ao enviar solicitação de suporte.",
                     e
