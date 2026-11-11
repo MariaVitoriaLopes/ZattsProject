@@ -21,6 +21,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 class HomeActivity : AppCompatActivity() {
 
@@ -39,13 +40,13 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var cardMetaMensal: View
     private lateinit var grafico: GraficoConsumoView
 
-    // Clientes e dados da Dashboard
+    // Gerenciadores de Dados da Dashboard
     private var sseClient: SseClient? = null
     private var dashboardDados: DashboardDTO? = null
 
-    // Acumulador em tempo real para os cards
+    // Acumulador e tarifa estimada para atualização instantânea via SSE
     private var consumoDiarioAtualKwh: Double = 0.0
-    private val tarifaKwhEstimada: Double = 0.85 // Tarifa estimada (CPFL Piratininga)
+    private val tarifaKwhEstimada: Double = 0.85
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -75,24 +76,51 @@ class HomeActivity : AppCompatActivity() {
         grafico = findViewById(R.id.graficoConsumo)
 
         configurarBotoes()
+
+        // Carga inicial dos dados via REST e escuta em tempo real via SSE
         carregarDadosDashboardBackend()
         iniciarConexaoSse()
     }
 
     override fun onResume() {
         super.onResume()
+
         val corAtual = AparenciaManager.obterCor(this)
+
         if (corAplicada.isNotEmpty() && corAtual != corAplicada) {
             recreate()
             return
         }
+
         corAplicada = corAtual
+    }
+
+    private fun atualizarDataHora() {
+        val agora = Date()
+        val idioma = Locale("pt", "BR")
+        val fusoSP = TimeZone.getTimeZone("America/Sao_Paulo")
+
+        val formatoHora = SimpleDateFormat("HH:mm:ss", idioma).apply {
+            timeZone = fusoSP
+        }
+
+        val formatoData = SimpleDateFormat("EEEE, dd 'de' MMMM 'de' yyyy", idioma).apply {
+            timeZone = fusoSP
+        }
+
+        txvHorario.text = formatoHora.format(agora)
+
+        val dataFormatada = formatoData.format(agora)
+
+        txvData.text = dataFormatada.replaceFirstChar {
+            it.titlecase(idioma)
+        }
     }
 
     private fun carregarDadosDashboardBackend() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // ID do utilizador logado no sistema
+                // ID do usuário para o cabeçalho @Header("usuarioId")
                 val usuarioIdLogado = "6ae2afdbe3f4de30aa7d8f38"
 
                 val resposta = RetrofitClient.apiService.obterDadosDashboard(usuarioIdLogado)
@@ -102,14 +130,14 @@ class HomeActivity : AppCompatActivity() {
                     consumoDiarioAtualKwh = dto.consumoTotalDiarioKwh
 
                     withContext(Dispatchers.Main) {
-                        atualizarCards(dto)
-                        mostrarTempoReal()
+                        atualizarIndicadoresComDadosReais(dto)
+                        mostrarTempoReal() // Exibe a aba inicial com dados preenchidos
                     }
                 } else {
-                    Log.e("HOME_API", "Erro ao carregar dashboard mobile: ${resposta.code()}")
+                    Log.e("HOME_API", "Erro ao carregar dados: ${resposta.code()}")
                 }
             } catch (e: Exception) {
-                Log.e("HOME_API", "Falha de conexão na dashboard: ${e.message}")
+                Log.e("HOME_API", "Falha de conexão na API: ${e.message}")
             }
         }
     }
@@ -136,25 +164,25 @@ class HomeActivity : AppCompatActivity() {
         txvCustoDiario.text = String.format(Locale("pt", "BR"), "R$ %.2f", custoEstimadoDiario)
     }
 
-    private fun atualizarCards(dto: DashboardDTO) {
+    private fun atualizarIndicadoresComDadosReais(dto: DashboardDTO) {
         val consumoMensal = dto.metaConsumoMensalAtualKwh
         val metaMensal = if (dto.metaConsumoMensalLimiteKwh > 0) dto.metaConsumoMensalLimiteKwh else 250.0
+
         val porcentagem = dto.percentualMetaAtingida.toInt()
 
-        // 1. Consumo de Energia Hoje e Custo Diário do Backend
+        // 1. Consumo Diário e Custo vindo do Backend
         findViewById<TextView>(R.id.txv_consumoDiario).text =
             String.format(Locale("pt", "BR"), "%.2f kWh", dto.consumoTotalDiarioKwh)
 
         findViewById<TextView>(R.id.txv_custoDiario).text =
             String.format(Locale("pt", "BR"), "R$ %.2f", dto.custoDiarioReais)
 
-        // 2. Estimativa de Conta de Luz Mensal (Acumulada) vinda do Backend
-        findViewById<TextView>(R.id.txv_economia).text =
-            String.format(Locale("pt", "BR"), "R$ %.2f", dto.valorContaEstimadoMesReais)
-
-        // 3. Meta de Gasto
+        // 2. Meta de Gasto e Estimativa Mensal da Conta (CPFL)
         findViewById<TextView>(R.id.txv_metaGasto).text =
             String.format(Locale("pt", "BR"), "%.0f kWh", metaMensal)
+
+        findViewById<TextView>(R.id.txv_economia).text =
+            String.format(Locale("pt", "BR"), "R$ %.2f", dto.valorContaEstimadoMesReais)
 
         findViewById<TextView>(R.id.txv_metaDescricao).text = "↗ $porcentagem% da meta atingida"
 
@@ -164,12 +192,12 @@ class HomeActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.txv_metaMensal).text =
             String.format(Locale("pt", "BR"), "%.0f kWh", metaMensal)
 
-        // 4. Mensagens de Status da Meta
+        // 3. Card de Status da Meta
         val txvStatusMeta = findViewById<TextView>(R.id.txv_statusMeta)
         val txvStatusDescricao = findViewById<TextView>(R.id.txv_statusDescricao)
 
         txvStatusMeta.text = dto.mensagemStatusMeta ?: "Você está dentro da sua meta!"
-        txvStatusDescricao.text = "O consumo está em $porcentagem% da sua meta estipulada."
+        txvStatusDescricao.text = "O consumo está em $porcentagem% da sua meta."
 
         val progressoMeta = findViewById<ProgressBar>(R.id.progressoMeta)
         val corSelecionada = AparenciaManager.corHex(this)
@@ -178,39 +206,39 @@ class HomeActivity : AppCompatActivity() {
         progressoMeta.progress = porcentagem.coerceIn(0, 100)
     }
 
-    private fun atualizarDataHora() {
-        val agora = Date()
-        val idioma = Locale("pt", "BR")
-        val fusoSaoPaulo = java.util.TimeZone.getTimeZone("America/Sao_Paulo")
-
-        val formatoHora = SimpleDateFormat("HH:mm:ss", idioma).apply {
-            timeZone = fusoSaoPaulo
-        }
-
-        val formatoData = SimpleDateFormat("EEEE, dd 'de' MMMM 'de' yyyy", idioma).apply {
-            timeZone = fusoSaoPaulo
-        }
-
-        txvHorario.text = formatoHora.format(agora)
-
-        val dataFormatada = formatoData.format(agora)
-        txvData.text = dataFormatada.replaceFirstChar { it.titlecase(idioma) }
-    }
-
     private fun configurarBotoes() {
-        btnTempoReal.setOnClickListener { mostrarTempoReal() }
-        btnConsumo.setOnClickListener { mostrarConsumo() }
-        btnValorConta.setOnClickListener { mostrarValorConta() }
+        btnTempoReal.setOnClickListener {
+            mostrarTempoReal()
+        }
+
+        btnConsumo.setOnClickListener {
+            mostrarConsumo()
+        }
+
+        btnValorConta.setOnClickListener {
+            mostrarValorConta()
+        }
     }
 
     private fun selecionarBotao(selecionado: TextView) {
-        val botoes = listOf(btnTempoReal, btnConsumo, btnValorConta)
-        botoes.forEach { it.background = null }
-        selecionado.setBackgroundResource(R.drawable.bg_tab_selecionada)
+        val botoes = listOf(
+            btnTempoReal,
+            btnConsumo,
+            btnValorConta
+        )
+
+        botoes.forEach { botao ->
+            botao.background = null
+        }
+
+        selecionado.setBackgroundResource(
+            R.drawable.bg_tab_selecionada
+        )
     }
 
     private fun mostrarTempoReal() {
         selecionarBotao(btnTempoReal)
+
         cardMetaMensal.visibility = View.GONE
         txvTituloGrafico.text = "Consumo de energia atual"
         txvSubtituloGrafico.text = "Veja o consumo de energia em tempo real"
@@ -219,11 +247,14 @@ class HomeActivity : AppCompatActivity() {
         val valores = pontos.map { it.consumoKwh.toFloat() }
         val horas = pontos.map { it.hora }
 
-        grafico.atualizarGraficoLinha(valores, horas)
+        if (valores.isNotEmpty()) {
+            grafico.atualizarGraficoLinha(valores, horas)
+        }
     }
 
     private fun mostrarConsumo() {
         selecionarBotao(btnConsumo)
+
         cardMetaMensal.visibility = View.VISIBLE
         txvTituloGrafico.text = "Consumo de energia"
         txvSubtituloGrafico.text = "Veja o consumo de energia (kWh) por hora"
@@ -232,11 +263,14 @@ class HomeActivity : AppCompatActivity() {
         val valores = pontos.map { it.consumoKwh.toFloat() }
         val horas = pontos.map { it.hora }
 
-        grafico.atualizarGrafico(valores, horas)
+        if (valores.isNotEmpty()) {
+            grafico.atualizarGrafico(valores, horas)
+        }
     }
 
     private fun mostrarValorConta() {
         selecionarBotao(btnValorConta)
+
         cardMetaMensal.visibility = View.GONE
         txvTituloGrafico.text = "Valor da conta (estimado)"
         txvSubtituloGrafico.text = "Comparativo dos últimos meses"
@@ -245,7 +279,9 @@ class HomeActivity : AppCompatActivity() {
         val valores = pontos.map { it.valor.toFloat() }
         val meses = pontos.map { it.mes }
 
-        grafico.atualizarGrafico(valores, meses)
+        if (valores.isNotEmpty()) {
+            grafico.atualizarGrafico(valores, meses)
+        }
     }
 
     override fun onStart() {
