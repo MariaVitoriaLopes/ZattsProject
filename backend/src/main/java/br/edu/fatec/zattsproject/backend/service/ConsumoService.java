@@ -2,6 +2,7 @@ package br.edu.fatec.zattsproject.backend.service;
 
 import br.edu.fatec.zattsproject.backend.dto.ConsumoDiarioDTO;
 import br.edu.fatec.zattsproject.backend.dto.DashboardDTO;
+import br.edu.fatec.zattsproject.backend.model.Configuracao;
 import br.edu.fatec.zattsproject.backend.model.Consumo;
 import br.edu.fatec.zattsproject.backend.model.ConsumoRealtime;
 import br.edu.fatec.zattsproject.backend.repository.ConsumoRepository;
@@ -91,7 +92,19 @@ public class ConsumoService {
         LocalDate hoje = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
         double tarifaKwh = configuracaoService.obterTarifaKwh(usuarioId);
 
-        double limiteMeta = 250.0;
+// Busca a meta atual cadastrada pelo usuário no MongoDB
+        Configuracao configuracao = configuracaoService.buscarPorUsuario(usuarioId);
+
+        double limiteMeta = 0.0;
+
+        if (configuracao != null && configuracao.getMetaConsumoKwh() != null) {
+            limiteMeta = configuracao.getMetaConsumoKwh();
+        }
+
+        log.info("===== META DO DASHBOARD =====");
+        log.info("Usuário: {}", usuarioId);
+        log.info("Meta recuperada do MongoDB: {}", limiteMeta);
+        log.info("=============================");
 
         // 1. ACUMULADO DIÁRIO (BANCO PERMANENTE + REALTIME DO DIA)
         LocalDateTime inicioHoje = hoje.atStartOfDay();

@@ -50,6 +50,12 @@ public class HomeController {
         // 1. Pega dados consolidados salvos no Banco
         DashboardDTO dashboardData = consumoService.obterDadosDashboard(usuarioId);
 
+        System.out.println("===== DASHBOARD HOME =====");
+        System.out.println("Usuário: " + usuarioId);
+        System.out.println("Meta recebida: " + dashboardData.getMetaGastoKwh());
+        System.out.println("Limite mensal: " + dashboardData.getMetaConsumoMensalLimiteKwh());
+        System.out.println("==========================");
+
         // 2. Soma o acumulado em memória da hora atual aos totais
         double emMemoria = mqttLeituraService.obterConsumoAcumuladoHoraAtual(usuarioId);
         double totalDiario = dashboardData.getConsumoTotalDiarioKwh() + emMemoria;

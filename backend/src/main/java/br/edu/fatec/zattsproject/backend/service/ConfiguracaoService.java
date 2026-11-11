@@ -52,16 +52,16 @@ public class ConfiguracaoService {
             String tipoMeta,
             BigDecimal valorMeta) {
 
-        return definirMeta(usuarioId, tipoMeta, valorMeta, false);
+        return definirMeta(usuarioId, tipoMeta, valorMeta, false, true);
     }
 
-    // Cria uma nova meta, desde que não exista outra do mesmo tipo
+    // Cria uma nova meta, desde que não exista outra
     public Configuracao criarMeta(
             String usuarioId,
             String tipoMeta,
             BigDecimal valorMeta) {
 
-        return definirMeta(usuarioId, tipoMeta, valorMeta, false);
+        return definirMeta(usuarioId, tipoMeta, valorMeta, false, false);
     }
 
     // Atualiza uma meta existente
@@ -70,14 +70,15 @@ public class ConfiguracaoService {
             String tipoMeta,
             BigDecimal valorMeta) {
 
-        return definirMeta(usuarioId, tipoMeta, valorMeta, true);
+        return definirMeta(usuarioId, tipoMeta, valorMeta, true, false);
     }
 
     private Configuracao definirMeta(
             String usuarioId,
             String tipoMeta,
             BigDecimal valorMeta,
-            boolean edicao) {
+            boolean edicao,
+            boolean questionario) {
 
         if (valorMeta == null || valorMeta.signum() <= 0) {
             throw new IllegalArgumentException(
@@ -94,6 +95,7 @@ public class ConfiguracaoService {
         Configuracao configuracao = buscarPorUsuario(usuarioId);
 
         if (configuracao == null) {
+
             if (edicao) {
                 throw new IllegalStateException(
                         "A meta não existe para ser editada."
@@ -105,37 +107,49 @@ public class ConfiguracaoService {
                     .build();
         }
 
-        if ("CONSUMO".equals(tipoMeta)) {
+        boolean possuiMetaConsumo =
+                configuracao.getMetaConsumoKwh() != null
+                        && configuracao.getMetaConsumoKwh() > 0;
 
-            if (!edicao && configuracao.getMetaConsumoKwh() != null) {
-                throw new IllegalStateException(
-                        "Você já possui uma meta de consumo."
-                );
-            }
+        boolean possuiMetaValor =
+                configuracao.getMetaGastoReais() != null
+                        && configuracao.getMetaGastoReais() > 0;
 
-            if (edicao && configuracao.getMetaConsumoKwh() == null) {
+        // Impede cadastrar uma segunda meta
+        if (!edicao && !questionario &&
+                (possuiMetaConsumo || possuiMetaValor)) {
+
+            throw new IllegalStateException(
+                    "Você já possui uma meta cadastrada. Edite a meta existente."
+            );
+        }
+
+        // Verifica se a meta que será editada realmente existe
+        if (edicao) {
+
+            if ("CONSUMO".equals(tipoMeta) && !possuiMetaConsumo) {
                 throw new IllegalStateException(
                         "Não existe uma meta de consumo para editar."
                 );
             }
 
-            configuracao.setMetaConsumoKwh(valorMeta.doubleValue());
-
-        } else {
-
-            if (!edicao && configuracao.getMetaGastoReais() != null) {
-                throw new IllegalStateException(
-                        "Você já possui uma meta de valor."
-                );
-            }
-
-            if (edicao && configuracao.getMetaGastoReais() == null) {
+            if ("VALOR".equals(tipoMeta) && !possuiMetaValor) {
                 throw new IllegalStateException(
                         "Não existe uma meta de valor para editar."
                 );
             }
+        }
+
+        // Mantém somente uma meta ativa por usuário
+        if ("CONSUMO".equals(tipoMeta)) {
+
+            configuracao.setMetaConsumoKwh(valorMeta.doubleValue());
+            configuracao.setMetaGastoReais(null);
+
+        } else {
 
             configuracao.setMetaGastoReais(valorMeta.doubleValue());
+            configuracao.setMetaConsumoKwh(null);
         }
 
         return repository.save(configuracao);
@@ -206,6 +220,7 @@ public class ConfiguracaoService {
 
         return configuracao.getCipReais();
     }
+
     public Configuracao buscarPrivacidade(String usuarioId) {
 
         Configuracao configuracao = buscarPorUsuario(usuarioId);
@@ -241,6 +256,7 @@ public class ConfiguracaoService {
 
         return configuracao;
     }
+
     public Configuracao salvarPrivacidade(
             String usuarioId,
             boolean compartilharDadosUso,
@@ -261,6 +277,7 @@ public class ConfiguracaoService {
 
         return repository.save(configuracao);
     }
+
     public Configuracao salvarNotificacoes(
             String usuarioId,
             boolean notifGerais,
