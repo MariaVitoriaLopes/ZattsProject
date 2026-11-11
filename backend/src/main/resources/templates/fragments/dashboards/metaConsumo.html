@@ -40,9 +40,11 @@
         </span>
 
         <span id="limiteMeta"
-              th:text="${dash != null && dash.metaGastoKwh != null && dash.metaGastoKwh > 0 ? 'Meta: ' + #numbers.formatDecimal(dash.metaGastoKwh, 1, 'POINT', 2, 'COMMA') + ' kWh' : 'Meta não definida'}">
-            Meta não definida
-        </span>
+              th:text="${dash != null && dash.metaConsumoMensalLimiteKwh != null && dash.metaConsumoMensalLimiteKwh > 0
+        ? 'Meta: ' + #numbers.formatDecimal(dash.metaConsumoMensalLimiteKwh, 1, 'POINT', 2, 'COMMA') + ' kWh'
+        : 'Meta não definida'}">
+    Meta não definida
+</span>
 
     </div>
 
@@ -68,7 +70,9 @@
             Meta:
 
             <strong id="valorMeta"
-                    th:text="${dash != null && dash.metaGastoKwh != null && dash.metaGastoKwh > 0 ? #numbers.formatDecimal(dash.metaGastoKwh, 1, 'POINT', 2, 'COMMA') + ' kWh' : '-- kWh'}">
+                    th:text="${dash != null && dash.metaConsumoMensalLimiteKwh != null && dash.metaConsumoMensalLimiteKwh > 0
+            ? #numbers.formatDecimal(dash.metaConsumoMensalLimiteKwh, 1, 'POINT', 2, 'COMMA') + ' kWh'
+            : '-- kWh'}">
                 -- kWh
             </strong>
 

@@ -45,8 +45,6 @@ public class DashboardService {
         // 1. Configuração do usuário
         Configuracao config = configuracaoRepository.findByUsuarioId(usuarioId)
                 .orElse(Configuracao.builder()
-                        .metaConsumoKwh(250.0)
-                        .metaGastoReais(300.0)
                         .bandeiraAtual(BandeiraTarifaria.VERDE)
                         .build());
 
@@ -141,8 +139,13 @@ public class DashboardService {
             historicoContasReais.add(new DashboardDTO.PontoGraficoMes(nomeMes, Math.round(valorContaMes * 100.0) / 100.0));
         }
 
-        double metaLimiteKwh = config.getMetaConsumoKwh() != null ? config.getMetaConsumoKwh() : 250.0;
+        double metaLimiteKwh = config.getMetaConsumoKwh() != null
+                ? config.getMetaConsumoKwh()
+                : 0.0;
         double percentualMeta = metaLimiteKwh > 0 ? (consumoAcumuladoMesKwh / metaLimiteKwh) * 100 : 0.0;
+
+        System.out.println("Meta limite calculada: " + metaLimiteKwh);
+        System.out.println("Consumo acumulado: " + consumoAcumuladoMesKwh);
 
         return DashboardDTO.builder()
                 .consumoTotalDiarioKwh(Math.round(consumoTotalHojeKwh * 100.0) / 100.0)
