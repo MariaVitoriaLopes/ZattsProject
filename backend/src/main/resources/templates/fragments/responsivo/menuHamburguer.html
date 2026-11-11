@@ -1,12 +1,19 @@
 <div class="pos-f-t" th:fragment="menuHamburguer">
     <div class="collapse" id="navbarToggleExternalContent">
         <div class="bg-dark p-4">
-            <h5 class="text-white h4">Collapsed content</h5>
-            <span class="text-muted">Toggleable via the navbar brand.</span>
+            <ul class="list-unstyled m-0 d-flex flex-column gap-3">
+                <li><a class="text-white" href="#aplicativo" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent">Baixe o app</a></li>
+                <li><a class="text-white" href="#beneficios" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent">Benefícios</a></li>
+                <li><a class="text-white" href="#instalacaoResidencial" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent">Instalação residencial</a></li>
+                <li><a class="text-white" href="#perguntasFreq" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent">Perguntas frequentes</a></li>
+                <li><a class="text-white" href="#contato" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent">Contato</a></li>
+                <li><a class="text-white" href="/cadastro">Cadastre-se</a></li>
+                <li><a class="text-white" href="/login">Login</a></li>
+            </ul>
         </div>
     </div>
     <nav class="navbar navbar-dark bg-dark">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Abrir menu">
             <span class="navbar-toggler-icon"></span>
         </button>
     </nav>
