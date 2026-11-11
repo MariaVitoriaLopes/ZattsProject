@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 
@@ -11,6 +12,7 @@
     <link rel="stylesheet" th:href="@{/css/headerTelas.css}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <link rel="stylesheet" th:href="@{/css/dashboards.css}">
+    <link rel="stylesheet" th:href="@{/css/modais.css}">
 
     <th:block th:replace="~{fragments/headTema :: tema}"></th:block>
 
@@ -62,6 +64,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
 <script th:src="@{/js/script.js}"></script>
+<script th:src="@{/js/metas.js}"></script>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
@@ -86,10 +89,12 @@
             return Number.isFinite(convertido) ? convertido : 0;
         };
 
-        const formatarKwh = valor => numero(valor).toLocaleString("pt-BR", {
-            minimumFractionDigits: 3,
-            maximumFractionDigits: 5
-        }) + " kWh";
+        const formatarNumero = valor => numero(valor).toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+        const formatarKwh = valor => formatarNumero(valor) + " kWh";
 
         const formatarReais = valor => numero(valor).toLocaleString("pt-BR", {
             style: "currency",
@@ -152,6 +157,36 @@
         }
 
         // =====================================================
+        // META DE CONSUMO MENSAL
+        // =====================================================
+
+        function obterDadosMeta(dash) {
+
+            // Limite definido pelo usuário.
+            // Não utiliza o consumo acumulado como meta.
+            const limite = numero(
+                dash.metaConsumoMensalLimiteKwh ??
+                dash.metaGastoKwh
+            );
+
+            // Consumo acumulado durante o mês.
+            const consumoMensal = numero(
+                dash.metaConsumoMensalAtualKwh
+            );
+
+            // Somente o percentual varia com o consumo.
+            const percentual = limite > 0
+                ? consumoMensal / limite * 100
+                : 0;
+
+            return {
+                limite,
+                consumoMensal,
+                percentual
+            };
+        }
+
+        // =====================================================
         // STATUS DA META
         // =====================================================
 
@@ -164,13 +199,7 @@
 
             if (!card || !titulo || !descricao || !icone) return;
 
-            const limite = numero(dash.metaGastoKwh || dash.metaConsumoMensalLimiteKwh);
-
-            const acumulado = numero(dash.metaConsumoMensalAtualKwh);
-
-            const percentual = dash.percentualMetaAtingida !== undefined
-                ? numero(dash.percentualMetaAtingida)
-                : (limite > 0 ? acumulado / limite * 100 : 0);
+            const { limite, percentual } = obterDadosMeta(dash);
 
             card.classList.remove(
                 "status-verde",
@@ -226,11 +255,12 @@
             if (!dash) return;
 
             const consumoDiario = numero(dash.consumoTotalDiarioKwh);
-            const consumoMensal = numero(dash.metaConsumoMensalAtualKwh);
 
-            const limite = numero(
-                dash.metaGastoKwh || dash.metaConsumoMensalLimiteKwh
-            );
+            const {
+                limite,
+                consumoMensal,
+                percentual
+            } = obterDadosMeta(dash);
 
             const elConsumo = document.getElementById("cardConsumoTotalDiario");
             const elCusto = document.getElementById("cardCustoDiario");
@@ -239,7 +269,7 @@
             const elConta = document.getElementById("cardValorContaEstimado");
 
             if (elConsumo) {
-                elConsumo.textContent = formatarKwh(consumoDiario).replace(" kWh", "");
+                elConsumo.textContent = formatarNumero(consumoDiario);
             }
 
             if (elCusto) {
@@ -249,15 +279,14 @@
             }
 
             if (elMeta) {
-                elMeta.textContent = limite > 0 ? Math.round(limite) : "--";
+                elMeta.textContent = limite > 0
+                    ? formatarNumero(limite)
+                    : "--";
             }
 
-            const percentual = dash.percentualMetaAtingida !== undefined
-                ? numero(dash.percentualMetaAtingida)
-                : (limite > 0 ? consumoMensal / limite * 100 : 0);
-
             if (elPercentual) {
-                elPercentual.textContent = `${Math.round(percentual)}% da meta atingida`;
+                elPercentual.textContent =
+                    `${formatarNumero(percentual)}% da meta atingida`;
             }
 
             const meses = Array.isArray(dash.valorContaEstimadoReais)
@@ -307,6 +336,7 @@
                     : 0;
 
                 progresso.style.width = `${porcentagemBarra}%`;
+                progresso.style.backgroundColor = obterCoresTema().linha;
             }
 
             atualizarStatusMeta(dash);
@@ -580,9 +610,9 @@
 
                     datasets: [{
 
-                        label: "Consumo (kWh)",
+                        label: "Energia consumida (Wh)",
 
-                        data: pontos.map(p => numero(p.consumoKwh ?? p.valor)),
+                        data: pontos.map(p => numero(p.consumoKwh ?? p.valor) * 1000),
 
                         backgroundColor: cores.linha,
 
@@ -741,7 +771,7 @@
             chartComparativo.data.labels = pontos.map(p => p.hora || "");
 
             chartComparativo.data.datasets[0].data =
-                pontos.map(p => numero(p.consumoKwh ?? p.valor));
+                pontos.map(p => numero(p.consumoKwh ?? p.valor) * 1000);
 
             chartComparativo.data.datasets[0].backgroundColor = cores.linha;
 

@@ -9,9 +9,11 @@ import br.edu.fatec.zattsproject.backend.repository.DispositivoRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -29,7 +31,9 @@ public class MqttLeituraService {
     private final ObjectMapper objectMapper;
     private final SseService sseService;
     private final AlertaDisparoService alertaDisparoService;
+    private final CalculadoraTarifaService calculadoraTarifaService;
 
+    // Buffer da hora utiliza chave composta: "usuarioId_horaISO"
     private final Map<String, AcumuladorHora> bufferAcumulado = new ConcurrentHashMap<>();
     private final Map<String, AcumuladorMinuto> bufferMinutoRealtime = new ConcurrentHashMap<>();
     private final Map<String, List<DashboardDTO.PontoGraficoMinuto>> bufferPontosGrafico = new ConcurrentHashMap<>();
@@ -66,8 +70,9 @@ public class MqttLeituraService {
         try {
             Consumo consumoInstantaneo = objectMapper.readValue(payloadJson, Consumo.class);
 
+            // Garante o fuso horário correto de Brasília (America/Sao_Paulo)
             if (consumoInstantaneo.getDataHora() == null) {
-                consumoInstantaneo.setDataHora(LocalDateTime.now());
+                consumoInstantaneo.setDataHora(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
             }
 
             String usuarioId = resolverUsuario(consumoInstantaneo);
@@ -82,7 +87,7 @@ public class MqttLeituraService {
             String horaMinutoAtualStr = consumoInstantaneo.getDataHora().format(DateTimeFormatter.ofPattern("HH:mm"));
             double valKwh = valorPositivoOuZero(consumoInstantaneo.getConsumoKwh());
 
-            // 1. GRAVAÇÃO MINUTO A MINUTO (Apenas na coleção consumo_realtime)
+            // 1. GRAVAÇÃO MINUTO A MINUTO (Salva em consumo_realtime na troca de minuto)
             LocalDateTime minutoAtualTruncado = consumoInstantaneo.getDataHora().truncatedTo(ChronoUnit.MINUTES);
 
             bufferMinutoRealtime.compute(usuarioId, (id, acMinuto) -> {
@@ -115,21 +120,23 @@ public class MqttLeituraService {
                 adicionarNovoPonto(listaPontos, horaMinutoAtualStr, valKwh);
             }
 
-            // 3. ENVIO SSE PARA O FRONTEND
+            // 3. CÁLCULO E ENVIO DO VALOR ACUMULADO DA CONTA VIA SSE
+            double totalKwhMes = consumoService.obterConsumoAcumuladoMesAtual(usuarioId);
+            double estimativaContaReais = calculadoraTarifaService.calcularEstimativaOficialContaMensal(
+                    totalKwhMes, CalculadoraTarifaService.BandeiraTarifaria.VERDE
+            );
+            consumoInstantaneo.setValorEstimadoReais(Math.round(estimativaContaReais * 100.0) / 100.0);
+
             sseService.sendConsumoToAll(consumoInstantaneo);
 
             double potenciaWatts = valorPositivoOuZero(consumoInstantaneo.getPotenciaWatts());
             double correnteAmperes = valorPositivoOuZero(consumoInstantaneo.getCorrenteAmperes());
 
-            // 4. GRAVAÇÃO DE HORA EM HORA (Apenas na coleção consumo permanente)
+            // 4. ACUMULADOR DA HORA EM MEMÓRIA (Com chave composta única por Usuário + Hora)
             LocalDateTime horaAtualTruncada = consumoInstantaneo.getDataHora().truncatedTo(ChronoUnit.HOURS);
+            String chaveBufferHora = usuarioId + "_" + horaAtualTruncada.toString();
 
-            AcumuladorHora acumuladorAtual = bufferAcumulado.compute(usuarioId, (id, acumulador) -> {
-                if (acumulador != null && !acumulador.horaChave.equals(horaAtualTruncada)) {
-                    salvarConsumoFechadoNoAtlas(id, acumulador);
-                    acumulador = null;
-                }
-
+            AcumuladorHora acumuladorAtual = bufferAcumulado.compute(chaveBufferHora, (chave, acumulador) -> {
                 if (acumulador == null) {
                     acumulador = new AcumuladorHora(horaAtualTruncada, consumoInstantaneo.getDispositivoId());
                 }
@@ -161,6 +168,26 @@ public class MqttLeituraService {
         } catch (Exception e) {
             log.error("Erro ao processar leitura do MQTT:", e);
         }
+    }
+
+    // 5. CONSOLIDAÇÃO E GRAVAÇÃO AGENDADA DE HORA EM HORA NO ATLAS
+    @Scheduled(cron = "0 0 * * * *", zone = "America/Sao_Paulo")
+    public void consolidarEGravarHorasFechadas() {
+        log.info(">>> FECHANDO E CONSOLIDANDO CONSUMO DA HORA NO ATLAS <<<");
+
+        if (bufferAcumulado.isEmpty()) {
+            return;
+        }
+
+        Map<String, AcumuladorHora> copiaParaProcessamento = new HashMap<>(bufferAcumulado);
+
+        copiaParaProcessamento.forEach((chave, acumulador) -> {
+            if (acumulador != null && acumulador.quantidadeLeituras > 0) {
+                String usuarioId = chave.split("_")[0];
+                salvarConsumoFechadoNoAtlas(usuarioId, acumulador);
+                bufferAcumulado.remove(chave);
+            }
+        });
     }
 
     private void adicionarNovoPonto(List<DashboardDTO.PontoGraficoMinuto> listaPontos, String horaMinuto, double valKwh) {
@@ -220,14 +247,17 @@ public class MqttLeituraService {
 
     public double obterConsumoAcumuladoHoraAtual(String usuarioId) {
         if (usuarioId == null) return 0.0;
-        AcumuladorHora acumulador = bufferAcumulado.get(usuarioId);
-        return acumulador != null ? acumulador.somaKwh : 0.0;
+
+        return bufferAcumulado.entrySet().stream()
+                .filter(e -> e.getKey().startsWith(usuarioId + "_"))
+                .mapToDouble(e -> e.getValue().somaKwh)
+                .sum();
     }
 
     public List<DashboardDTO.PontoGraficoMinuto> obterPontosGraficoTempoReal(String usuarioId) {
         if (usuarioId == null) return new ArrayList<>();
 
-        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime agora = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
         List<DashboardDTO.PontoGraficoMinuto> pontos = new ArrayList<>();
 
         for (int i = 9; i >= 0; i--) {

@@ -1,18 +1,27 @@
-
 package com.zattsproject.mobile
 
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.zattsproject.mobile.Model.Consumo
+import com.zattsproject.mobile.Model.DashboardDTO
+import com.zattsproject.mobile.Network.RetrofitClient
+import com.zattsproject.mobile.Network.SseClient
 import com.zattsproject.mobile.View.GraficoConsumoView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 class HomeActivity : AppCompatActivity() {
 
@@ -30,6 +39,14 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var cardMetaMensal: View
     private lateinit var grafico: GraficoConsumoView
+
+    // Gerenciadores de Dados da Dashboard
+    private var sseClient: SseClient? = null
+    private var dashboardDados: DashboardDTO? = null
+
+    // Acumulador e tarifa estimada para atualização instantânea via SSE
+    private var consumoDiarioAtualKwh: Double = 0.0
+    private val tarifaKwhEstimada: Double = 0.85
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -58,10 +75,11 @@ class HomeActivity : AppCompatActivity() {
         cardMetaMensal = findViewById(R.id.card_metaMensal)
         grafico = findViewById(R.id.graficoConsumo)
 
-        configurarIndicadores()
         configurarBotoes()
 
-        mostrarTempoReal()
+        // Carga inicial dos dados via REST e escuta em tempo real via SSE
+        carregarDadosDashboardBackend()
+        iniciarConexaoSse()
     }
 
     override fun onResume() {
@@ -80,14 +98,15 @@ class HomeActivity : AppCompatActivity() {
     private fun atualizarDataHora() {
         val agora = Date()
         val idioma = Locale("pt", "BR")
+        val fusoSP = TimeZone.getTimeZone("America/Sao_Paulo")
 
-        val formatoHora = SimpleDateFormat(
-            "HH:mm:ss", idioma
-        )
+        val formatoHora = SimpleDateFormat("HH:mm:ss", idioma).apply {
+            timeZone = fusoSP
+        }
 
-        val formatoData = SimpleDateFormat(
-            "EEEE, dd 'de' MMMM 'de' yyyy", idioma
-        )
+        val formatoData = SimpleDateFormat("EEEE, dd 'de' MMMM 'de' yyyy", idioma).apply {
+            timeZone = fusoSP
+        }
 
         txvHorario.text = formatoHora.format(agora)
 
@@ -98,79 +117,96 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun configurarIndicadores() {
+    private fun carregarDadosDashboardBackend() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                // ID do usuário para o cabeçalho @Header("usuarioId")
+                val usuarioIdLogado = "6ae2afdbe3f4de30aa7d8f38"
 
-        // Dados temporários para desenvolvimento
-        val consumoMensal = 90.0
-        val metaMensal = 250.0
+                val resposta = RetrofitClient.apiService.obterDadosDashboard(usuarioIdLogado)
+                if (resposta.isSuccessful && resposta.body() != null) {
+                    val dto = resposta.body()!!
+                    dashboardDados = dto
+                    consumoDiarioAtualKwh = dto.consumoTotalDiarioKwh
 
-        val porcentagem = if (metaMensal > 0) {
-            ((consumoMensal / metaMensal) * 100).toInt()
-        } else {
-            0
+                    withContext(Dispatchers.Main) {
+                        atualizarIndicadoresComDadosReais(dto)
+                        mostrarTempoReal() // Exibe a aba inicial com dados preenchidos
+                    }
+                } else {
+                    Log.e("HOME_API", "Erro ao carregar dados: ${resposta.code()}")
+                }
+            } catch (e: Exception) {
+                Log.e("HOME_API", "Falha de conexão na API: ${e.message}")
+            }
         }
+    }
 
-        findViewById<TextView>(
-            R.id.txv_consumoDiario
-        ).text = "32,8 kWh"
-
-        findViewById<TextView>(
-            R.id.txv_custoDiario
-        ).text = "R$ 3,57"
-
-        findViewById<TextView>(
-            R.id.txv_metaGasto
-        ).text = "250 kWh"
-
-        findViewById<TextView>(
-            R.id.txv_economia
-        ).text = "R$ 3,45"
-
-        findViewById<TextView>(
-            R.id.txv_metaDescricao
-        ).text = "↗ $porcentagem% da meta atingida"
-
-        findViewById<TextView>(
-            R.id.txv_consumoMensal
-        ).text = "90 kWh"
-
-        findViewById<TextView>(
-            R.id.txv_metaMensal
-        ).text = "250 kWh"
-
-        // Status da meta
-        val txvStatusMeta = findViewById<TextView>(
-            R.id.txv_statusMeta
-        )
-
-        val txvStatusDescricao = findViewById<TextView>(
-            R.id.txv_statusDescricao
-        )
-
-        if (consumoMensal <= metaMensal) {
-            txvStatusMeta.text = "Você está dentro da sua meta!"
-            txvStatusDescricao.text =
-                "O consumo está em $porcentagem% da sua meta."
-        } else {
-            txvStatusMeta.text = "Você ultrapassou sua meta!"
-            txvStatusDescricao.text =
-                "O consumo está em $porcentagem% da sua meta."
+    private fun iniciarConexaoSse() {
+        sseClient = SseClient { consumoRecebido ->
+            runOnUiThread {
+                processarNovaLeituraSse(consumoRecebido)
+            }
         }
+        val urlSse = "${BuildConfig.BASE_URL}api/v1/web/stream"
+        sseClient?.iniciarConexao(urlSse)
+    }
 
-        val progressoMeta = findViewById<ProgressBar>(
-            R.id.progressoMeta
-        )
+    private fun processarNovaLeituraSse(consumo: Consumo) {
+        val deltaKwh = if (consumo.consumoKwh > 0) consumo.consumoKwh else 0.0
+        consumoDiarioAtualKwh += deltaKwh
 
+        val txvConsumoDiario = findViewById<TextView>(R.id.txv_consumoDiario)
+        val txvCustoDiario = findViewById<TextView>(R.id.txv_custoDiario)
+
+        txvConsumoDiario.text = String.format(Locale("pt", "BR"), "%.2f kWh", consumoDiarioAtualKwh)
+        val custoEstimadoDiario = consumoDiarioAtualKwh * tarifaKwhEstimada
+        txvCustoDiario.text = String.format(Locale("pt", "BR"), "R$ %.2f", custoEstimadoDiario)
+    }
+
+    private fun atualizarIndicadoresComDadosReais(dto: DashboardDTO) {
+        val consumoMensal = dto.metaConsumoMensalAtualKwh
+        val metaMensal = if (dto.metaConsumoMensalLimiteKwh > 0) dto.metaConsumoMensalLimiteKwh else 250.0
+
+        val porcentagem = dto.percentualMetaAtingida.toInt()
+
+        // 1. Consumo Diário e Custo vindo do Backend
+        findViewById<TextView>(R.id.txv_consumoDiario).text =
+            String.format(Locale("pt", "BR"), "%.2f kWh", dto.consumoTotalDiarioKwh)
+
+        findViewById<TextView>(R.id.txv_custoDiario).text =
+            String.format(Locale("pt", "BR"), "R$ %.2f", dto.custoDiarioReais)
+
+        // 2. Meta de Gasto e Estimativa Mensal da Conta (CPFL)
+        findViewById<TextView>(R.id.txv_metaGasto).text =
+            String.format(Locale("pt", "BR"), "%.0f kWh", metaMensal)
+
+        findViewById<TextView>(R.id.txv_economia).text =
+            String.format(Locale("pt", "BR"), "R$ %.2f", dto.valorContaEstimadoMesReais)
+
+        findViewById<TextView>(R.id.txv_metaDescricao).text = "↗ $porcentagem% da meta atingida"
+
+        findViewById<TextView>(R.id.txv_consumoMensal).text =
+            String.format(Locale("pt", "BR"), "%.1f kWh", consumoMensal)
+
+        findViewById<TextView>(R.id.txv_metaMensal).text =
+            String.format(Locale("pt", "BR"), "%.0f kWh", metaMensal)
+
+        // 3. Card de Status da Meta
+        val txvStatusMeta = findViewById<TextView>(R.id.txv_statusMeta)
+        val txvStatusDescricao = findViewById<TextView>(R.id.txv_statusDescricao)
+
+        txvStatusMeta.text = dto.mensagemStatusMeta ?: "Você está dentro da sua meta!"
+        txvStatusDescricao.text = "O consumo está em $porcentagem% da sua meta."
+
+        val progressoMeta = findViewById<ProgressBar>(R.id.progressoMeta)
         val corSelecionada = AparenciaManager.corHex(this)
 
-        progressoMeta.progressTintList =
-            ColorStateList.valueOf(corSelecionada)
-
+        progressoMeta.progressTintList = ColorStateList.valueOf(corSelecionada)
         progressoMeta.progress = porcentagem.coerceIn(0, 100)
     }
 
     private fun configurarBotoes() {
-
         btnTempoReal.setOnClickListener {
             mostrarTempoReal()
         }
@@ -185,7 +221,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun selecionarBotao(selecionado: TextView) {
-
         val botoes = listOf(
             btnTempoReal,
             btnConsumo,
@@ -202,80 +237,51 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun mostrarTempoReal() {
-
         selecionarBotao(btnTempoReal)
 
         cardMetaMensal.visibility = View.GONE
-
         txvTituloGrafico.text = "Consumo de energia atual"
+        txvSubtituloGrafico.text = "Veja o consumo de energia em tempo real"
 
-        txvSubtituloGrafico.text =
-            "Veja o consumo de energia em tempo real"
+        val pontos = dashboardDados?.consumoTempoReal ?: emptyList()
+        val valores = pontos.map { it.consumoKwh.toFloat() }
+        val horas = pontos.map { it.hora }
 
-        // Dados temporários
-        // TODO: Substituir pelas medições da API
-
-        grafico.atualizarGraficoLinha(
-            listOf(
-                14f, 8f, 16f, 31f, 22f, 15f
-            ),
-            listOf(
-                "15:00", "15:01", "15:02",
-                "15:03", "15:04", "15:05"
-            )
-        )
+        if (valores.isNotEmpty()) {
+            grafico.atualizarGraficoLinha(valores, horas)
+        }
     }
 
     private fun mostrarConsumo() {
-
         selecionarBotao(btnConsumo)
 
         cardMetaMensal.visibility = View.VISIBLE
-
         txvTituloGrafico.text = "Consumo de energia"
+        txvSubtituloGrafico.text = "Veja o consumo de energia (kWh) por hora"
 
-        txvSubtituloGrafico.text =
-            "Veja o consumo de energia (kWh) em tempo real"
+        val pontos = dashboardDados?.consumoDiarioHoras ?: emptyList()
+        val valores = pontos.map { it.consumoKwh.toFloat() }
+        val horas = pontos.map { it.hora }
 
-        // Dados temporários
-        // TODO: Substituir pelos consumos da API
-
-        grafico.atualizarGrafico(
-            listOf(
-                5f, 7f, 11f, 16f, 23f,
-                29f, 19f, 23f, 13f, 15f
-            ),
-            listOf(
-                "5h", "6h", "7h", "8h", "9h",
-                "10h", "11h", "12h", "13h", "14h"
-            )
-        )
+        if (valores.isNotEmpty()) {
+            grafico.atualizarGrafico(valores, horas)
+        }
     }
 
     private fun mostrarValorConta() {
-
         selecionarBotao(btnValorConta)
 
         cardMetaMensal.visibility = View.GONE
-
         txvTituloGrafico.text = "Valor da conta (estimado)"
+        txvSubtituloGrafico.text = "Comparativo dos últimos meses"
 
-        txvSubtituloGrafico.text =
-            "Comparativo dos últimos meses"
+        val pontos = dashboardDados?.valorContaEstimadoReais ?: emptyList()
+        val valores = pontos.map { it.valor.toFloat() }
+        val meses = pontos.map { it.mes }
 
-        // Dados temporários
-        // TODO: Substituir pelos valores estimados da API
-
-        grafico.atualizarGrafico(
-            listOf(
-                160f, 190f, 140f,
-                160f, 110f, 120f
-            ),
-            listOf(
-                "Abr", "Mai", "Jun",
-                "Jul", "Ago", "Set"
-            )
-        )
+        if (valores.isNotEmpty()) {
+            grafico.atualizarGrafico(valores, meses)
+        }
     }
 
     override fun onStart() {
@@ -286,5 +292,10 @@ class HomeActivity : AppCompatActivity() {
     override fun onStop() {
         handler.removeCallbacks(atualizarRelogio)
         super.onStop()
+    }
+
+    override fun onDestroy() {
+        sseClient?.fecharConexao()
+        super.onDestroy()
     }
 }

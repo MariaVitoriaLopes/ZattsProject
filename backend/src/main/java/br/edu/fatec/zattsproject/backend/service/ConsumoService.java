@@ -8,11 +8,13 @@ import br.edu.fatec.zattsproject.backend.repository.ConsumoRepository;
 import br.edu.fatec.zattsproject.backend.repository.ConsumoRealtimeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -27,7 +29,6 @@ public class ConsumoService {
     private final AlertaDisparoService alertaDisparoService;
     private final CalculadoraTarifaService calculadoraTarifaService;
 
-    // Salva EXCLUSIVAMENTE na coleção permanente "consumo" (Hora fechada)
     public Consumo salvar(Consumo consumo) {
         Consumo salvo = repository.save(consumo);
 
@@ -41,10 +42,10 @@ public class ConsumoService {
         return salvo;
     }
 
-    // Salva EXCLUSIVAMENTE na coleção temporária "consumo_realtime" (Minuto a minuto)
     public void salvarRealtimeMinuto(String usuarioId, double somaKwh, LocalDateTime minutoChave) {
-        LocalDateTime meiaNoiteProximoDia = minutoChave.toLocalDate().plusDays(1).atStartOfDay();
-        Date dataExpiracaoMeiaNoite = Date.from(meiaNoiteProximoDia.atZone(ZoneId.systemDefault()).toInstant());
+        ZoneId zoneIdBrasil = ZoneId.of("America/Sao_Paulo");
+        ZonedDateTime meiaNoiteProximoDia = minutoChave.toLocalDate().plusDays(1).atStartOfDay(zoneIdBrasil);
+        Date dataExpiracaoMeiaNoite = Date.from(meiaNoiteProximoDia.toInstant());
 
         ConsumoRealtime rt = new ConsumoRealtime();
         rt.setUsuarioId(usuarioId);
@@ -55,8 +56,39 @@ public class ConsumoService {
         realtimeRepository.save(rt);
     }
 
+    // TAREFA AGENDADA: Garante a limpeza total do consumo_realtime todos os dias à 00:00:05
+    @Scheduled(cron = "5 0 0 * * *", zone = "America/Sao_Paulo")
+    public void limparRealtimeMeiaNoite() {
+        try {
+            realtimeRepository.deleteAll();
+            log.info(">>> COLEÇÃO CONSUMO_REALTIME LIMPA COM SUCESSO À MEIA-NOITE <<<");
+        } catch (Exception e) {
+            log.error("Erro ao limpar consumo_realtime à meia-noite:", e);
+        }
+    }
+
+    public double obterConsumoAcumuladoMesAtual(String usuarioId) {
+        LocalDate hoje = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
+        LocalDateTime inicioMes = hoje.withDayOfMonth(1).atStartOfDay();
+        LocalDateTime fimHoje = hoje.plusDays(1).atStartOfDay().minusNanos(1);
+
+        List<Consumo> leiturasMes = repository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioMes, fimHoje);
+        double acumuladoKwh = leiturasMes.stream()
+                .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
+                .sum();
+
+        List<ConsumoRealtime> realtimeHoje = realtimeRepository.findByUsuarioIdAndDataHoraBetween(
+                usuarioId, hoje.atStartOfDay(), fimHoje
+        );
+        acumuladoKwh += realtimeHoje.stream()
+                .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
+                .sum();
+
+        return acumuladoKwh;
+    }
+
     public DashboardDTO obterDadosDashboard(String usuarioId) {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
         double tarifaKwh = configuracaoService.obterTarifaKwh(usuarioId);
 
         double limiteMeta = 250.0;
@@ -73,13 +105,7 @@ public class ConsumoService {
                 .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0).sum();
 
         // 2. ACUMULADO MENSAL (BANCO PERMANENTE + REALTIME DO DIA)
-        LocalDateTime inicioMes = hoje.withDayOfMonth(1).atStartOfDay();
-        List<Consumo> leiturasMes = repository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioMes, fimHoje);
-        double acumuladoMesKwh = leiturasMes.stream()
-                .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0).sum();
-
-        acumuladoMesKwh += realtimeHoje.stream()
-                .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0).sum();
+        double acumuladoMesKwh = obterConsumoAcumuladoMesAtual(usuarioId);
 
         DashboardDTO dto = new DashboardDTO();
 
@@ -100,7 +126,7 @@ public class ConsumoService {
         }
 
         // 3. GRÁFICO 1: TEMPO REAL (ÚLTIMOS 10 MINUTOS)
-        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime agora = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
         List<DashboardDTO.PontoGraficoMinuto> pontosGrafico1 = new ArrayList<>();
         for (int i = 9; i >= 0; i--) {
             LocalDateTime minutoAlvo = agora.minusMinutes(i);
@@ -236,10 +262,7 @@ public class ConsumoService {
             );
         }
         double tarifaKwh =
-                configuracaoService
-                        .obterTarifaKwh(
-                                usuarioId
-                        );
+                configuracaoService.obterTarifaKwh(usuarioId);
         return consumoPorDia
                 .entrySet()
                 .stream()

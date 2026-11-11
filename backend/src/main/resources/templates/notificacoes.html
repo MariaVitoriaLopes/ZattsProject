@@ -134,155 +134,11 @@
                 </p>
             </div>
 
-            <button type="button"
-                    class="btn-criar-alerta"
-                    id="btnCriarMeta"
-                    th:if="${configuracao == null or configuracao.metaConsumoKwh == null or configuracao.metaGastoReais == null}">
-
-                <span class="material-symbols-outlined">add</span>
-                Criar meta
-
-            </button>
-
         </div>
-
-        <p class="mensagem-alerta"
-           th:if="${sucesso != null}"
-           th:text="${sucesso}">
-        </p>
-
-        <p class="mensagem-alerta mensagem-erro"
-           th:if="${erro != null}"
-           th:text="${erro}"
-           role="alert">
-        </p>
 
         <ul class="lista-notificacoes"
             th:if="${configuracao != null and (configuracao.metaConsumoKwh != null or configuracao.metaGastoReais != null)}">
 
-            <!-- META DE CONSUMO -->
-
-            <li class="notificacao"
-                th:if="${configuracao.metaConsumoKwh != null}">
-
-                <div class="notificacao-icone">
-                    <span class="material-symbols-outlined">electric_bolt</span>
-                </div>
-
-                <div class="notificacao-texto alerta-informacoes">
-
-                    <p class="notificacao-titulo">
-                        Meta mensal de consumo
-                    </p>
-
-                    <small class="notificacao-tempo"
-                           th:text="|${#numbers.formatDecimal(configuracao.metaConsumoKwh, 1, 2)} kWh por mês|">
-                        200 kWh por mês
-                    </small>
-
-                </div>
-
-                <div class="alerta-acoes">
-
-                    <button type="button"
-                            class="btn-editar-meta"
-                            aria-label="Editar meta de consumo"
-                            data-tipo="CONSUMO"
-                            th:attr="data-valor=${configuracao.metaConsumoKwh}">
-
-                        <span class="material-symbols-outlined">edit</span>
-
-                    </button>
-
-                    <form method="post"
-                          class="form-excluir-meta"
-                          th:action="@{/notificacoes/metas/excluir}"
-                          onsubmit="return confirm('Deseja excluir a meta de consumo?');">
-
-                        <input th:if="${_csrf != null}"
-                               type="hidden"
-                               th:name="${_csrf.parameterName}"
-                               th:value="${_csrf.token}">
-
-                        <input type="hidden"
-                               name="tipoMeta"
-                               value="CONSUMO">
-
-                        <button type="submit"
-                                class="notificacao-excluir"
-                                aria-label="Excluir meta de consumo">
-
-                            <span class="material-symbols-outlined">delete</span>
-
-                        </button>
-
-                    </form>
-
-                </div>
-
-            </li>
-
-            <!-- META DE GASTOS -->
-
-            <li class="notificacao"
-                th:if="${configuracao.metaGastoReais != null}">
-
-                <div class="notificacao-icone">
-                    <span class="material-symbols-outlined">payments</span>
-                </div>
-
-                <div class="notificacao-texto alerta-informacoes">
-
-                    <p class="notificacao-titulo">
-                        Meta mensal de gastos
-                    </p>
-
-                    <small class="notificacao-tempo"
-                           th:text="|R$ ${#numbers.formatDecimal(configuracao.metaGastoReais, 1, 2)} por mês|">
-                        R$ 250,00 por mês
-                    </small>
-
-                </div>
-
-                <div class="alerta-acoes">
-
-                    <button type="button"
-                            class="btn-editar-meta"
-                            aria-label="Editar meta de gastos"
-                            data-tipo="VALOR"
-                            th:attr="data-valor=${configuracao.metaGastoReais}">
-
-                        <span class="material-symbols-outlined">edit</span>
-
-                    </button>
-
-                    <form method="post"
-                          class="form-excluir-meta"
-                          th:action="@{/notificacoes/metas/excluir}"
-                          onsubmit="return confirm('Deseja excluir a meta de gastos?');">
-
-                        <input th:if="${_csrf != null}"
-                               type="hidden"
-                               th:name="${_csrf.parameterName}"
-                               th:value="${_csrf.token}">
-
-                        <input type="hidden"
-                               name="tipoMeta"
-                               value="VALOR">
-
-                        <button type="submit"
-                                class="notificacao-excluir"
-                                aria-label="Excluir meta de gastos">
-
-                            <span class="material-symbols-outlined">delete</span>
-
-                        </button>
-
-                    </form>
-
-                </div>
-
-            </li>
 
         </ul>
 
@@ -297,18 +153,10 @@
 
             <p>
                 Crie uma meta mensal de consumo ou de gastos
-                para acompanhar sua energia.
+                para acompanhar a sua energia.
             </p>
 
         </div>
-
-        <p class="alertas-subtitulo"
-           th:if="${configuracao != null and configuracao.metaConsumoKwh != null and configuracao.metaGastoReais != null}">
-
-            Você já possui as duas metas permitidas.
-            Pode editá-las ou excluí-las.
-
-        </p>
 
     </section>
 

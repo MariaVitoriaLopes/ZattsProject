@@ -48,3 +48,34 @@
     }
 
 }
+@media (max-width: 1100px) {
+    .toast-mensagem {
+        right: 20px;
+        max-width: 420px;
+        padding: 14px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .toast-mensagem {
+        top: 80px;
+        right: 16px;
+        left: 16px;
+        width: auto;
+        max-width: none;
+        padding: 13px 18px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 480px) {
+    .toast-mensagem {
+        top: 75px;
+        right: 12px;
+        left: 12px;
+        padding: 12px 15px;
+        font-size: 13px;
+        border-radius: 10px;
+    }
+}

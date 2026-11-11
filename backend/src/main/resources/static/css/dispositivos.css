@@ -281,3 +281,143 @@ html[data-tema="escuro"] .divisor-disp {
         padding: 8px 0;
     }
 }
+@media (max-width: 768px) {
+    .card-dispositivos {
+        padding: 28px 22px;
+        border-radius: 20px;
+    }
+
+    .disp-cabecalho {
+        margin-bottom: 28px;
+    }
+
+    .configuracoes-container .card-dispositivos .secao-titulo {
+        font-size: 24px;
+    }
+
+    .disp-contagem {
+        font-size: 16px;
+    }
+
+    .bloco-disp {
+        row-gap: 20px;
+    }
+
+    .bloco-disp-info h3 {
+        font-size: 20px;
+        margin-bottom: 12px;
+    }
+
+    .bloco-disp-info p {
+        font-size: 15px;
+        line-height: 1.5;
+    }
+
+    .disp-item {
+        gap: 14px;
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .disp-nome {
+        font-size: 16px;
+    }
+
+    .disp-detalhe {
+        font-size: 13px;
+    }
+
+    .disp-btn-desconectar {
+        font-size: 14px;
+    }
+
+    .disp-aviso {
+        margin-top: 26px;
+        font-size: 14px;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-dispositivos {
+        padding: 22px 16px;
+        border-radius: 16px;
+    }
+
+    .disp-cabecalho {
+        gap: 5px;
+        margin-bottom: 24px;
+    }
+
+    .configuracoes-container .card-dispositivos .secao-titulo {
+        font-size: 21px;
+    }
+
+    .disp-contagem {
+        font-size: 14px;
+    }
+
+    .bloco-disp-info h3 {
+        font-size: 18px;
+    }
+
+    .bloco-disp-info p {
+        font-size: 13px;
+    }
+
+    .disp-lista {
+        gap: 10px;
+    }
+
+    .disp-item {
+        grid-template-columns: 36px minmax(0, 1fr);
+        gap: 10px;
+        padding: 13px;
+        border-radius: 13px;
+    }
+
+    .disp-icone {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+    }
+
+    .disp-icone .material-symbols-outlined {
+        font-size: 21px;
+    }
+
+    .disp-info {
+        min-width: 0;
+    }
+
+    .disp-nome {
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+
+    .disp-detalhe {
+        font-size: 12px;
+        gap: 4px 6px;
+    }
+
+    .disp-btn-desconectar {
+        grid-column: 2;
+        font-size: 13px;
+        padding: 7px 0;
+    }
+
+    .disp-vazio {
+        padding: 28px 8px;
+        font-size: 14px;
+    }
+
+    .disp-aviso {
+        margin-top: 22px;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .disp-aviso .material-symbols-outlined {
+        font-size: 20px;
+    }
+}
