@@ -6,6 +6,7 @@ import com.zattsproject.mobile.Model.AutenticacaoResponse
 import com.zattsproject.mobile.Model.MensagemResponse
 import com.zattsproject.mobile.Model.Questionario
 import com.zattsproject.mobile.Model.Conta
+import com.zattsproject.mobile.Model.DashboardDTO
 
 import retrofit2.Response
 import retrofit2.http.Body
@@ -13,10 +14,17 @@ import retrofit2.http.DELETE
 import retrofit2.http.POST
 import retrofit2.http.GET
 import retrofit2.http.PUT
+import retrofit2.http.Header
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 
 interface ApiService {
+
+    // DASHBOARD MOBILE (Integração com DashboardMobileApiController)
+    @GET("api/v1/mobile/dashboard/resumo")
+    suspend fun obterDadosDashboard(
+        @Header("usuarioId") usuarioId: String
+    ): Response<DashboardDTO>
 
     // CADASTRO
     @POST("api/mobile/auth/cadastro")

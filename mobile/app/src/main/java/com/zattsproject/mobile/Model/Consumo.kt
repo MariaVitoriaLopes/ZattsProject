@@ -6,5 +6,6 @@ data class Consumo(
     val correnteAmperes: Double = 0.0,
     val voltagem: Double = 0.0,
     val potenciaWatts: Double = 0.0,
+    val consumoKwh: Double = 0.0,
     val dataHora: String? = null
 )
