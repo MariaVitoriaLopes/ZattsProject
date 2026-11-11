@@ -1,3 +1,4 @@
+
 package com.zattsproject.mobile.View
 
 import android.content.Context
@@ -11,6 +12,7 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
@@ -19,8 +21,9 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
-import kotlin.math.ceil
+import java.util.Locale
 import kotlin.math.max
+
 class GraficoConsumoView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
@@ -80,6 +83,7 @@ class GraficoConsumoView @JvmOverloads constructor(
     private val corGrade = Color.parseColor("#DDDDDD")
 
     init {
+
         addView(
             graficoBarras,
             LayoutParams(
@@ -102,23 +106,37 @@ class GraficoConsumoView @JvmOverloads constructor(
         graficoLinha.visibility = View.GONE
     }
 
-    private fun configurarGrafico(
-        grafico: Chart<*>
-    ) {
+    // =====================================================
+    // CONFIGURAÇÃO GERAL
+    // =====================================================
+
+    private fun configurarGrafico(grafico: Chart<*>) {
+
         grafico.description.isEnabled = false
         grafico.legend.isEnabled = false
-        grafico.setNoDataText("Nenhum dado disponível")
-        grafico.setBackgroundColor(Color.TRANSPARENT)
 
+        grafico.setNoDataText("Nenhum dado disponível")
+
+        grafico.setBackgroundColor(Color.TRANSPARENT)
         grafico.setTouchEnabled(false)
 
+        grafico.setExtraOffsets(
+            8f,
+            12f,
+            12f,
+            12f
+        )
+
         when (grafico) {
+
             is BarChart -> {
                 grafico.setScaleEnabled(false)
                 grafico.setPinchZoom(false)
                 grafico.setDrawGridBackground(false)
                 grafico.setDrawBarShadow(false)
                 grafico.setDrawBorders(false)
+                grafico.setFitBars(true)
+                grafico.axisRight.isEnabled = false
             }
 
             is LineChart -> {
@@ -126,6 +144,7 @@ class GraficoConsumoView @JvmOverloads constructor(
                 grafico.setPinchZoom(false)
                 grafico.setDrawGridBackground(false)
                 grafico.setDrawBorders(false)
+                grafico.axisRight.isEnabled = false
             }
         }
 
@@ -141,49 +160,53 @@ class GraficoConsumoView @JvmOverloads constructor(
             else -> return
         }
 
-        when (grafico) {
-            is BarChart -> grafico.axisRight.isEnabled = false
-            is LineChart -> grafico.axisRight.isEnabled = false
-        }
-
         xAxis.apply {
+
             position = XAxis.XAxisPosition.BOTTOM
+
             setDrawGridLines(false)
             setDrawAxisLine(false)
+
             textColor = corTexto
             textSize = 9f
+
             granularity = 1f
+            isGranularityEnabled = true
+
             labelRotationAngle = 0f
-            yOffset = 12f
+
+            yOffset = 10f
+
+            setAvoidFirstLastClipping(true)
         }
 
         axisLeft.apply {
+
             axisMinimum = 0f
+
             setDrawGridLines(true)
+
             gridColor = corGrade
             gridLineWidth = 0.7f
-            setDrawAxisLine(false)
-            textColor = corTexto
-            textSize = 10f
 
-            valueFormatter = object : ValueFormatter() {
-                override fun getAxisLabel(
-                    value: Float,
-                    axis: AxisBase?
-                ): String {
-                    return value.toInt().toString()
-                }
-            }
+            setDrawAxisLine(false)
+
+            textColor = corTexto
+            textSize = 9f
         }
 
-        grafico.setExtraOffsets(4f, 12f, 4f, 4f)
+        configurarFormatacaoEixoY(axisLeft, 0f)
     }
 
-    // GRÁFICO DE BARRAS: CONSUMO E VALOR DA CONTA
+    // =====================================================
+    // GRÁFICO DE BARRAS
+    // =====================================================
+
     fun atualizarGrafico(
         novosValores: List<Float>,
         novosRotulos: List<String>
     ) {
+
         require(novosValores.size == novosRotulos.size) {
             "Valores e rótulos devem ter o mesmo tamanho"
         }
@@ -193,19 +216,27 @@ class GraficoConsumoView @JvmOverloads constructor(
 
         if (novosValores.isEmpty()) {
             graficoBarras.clear()
+            graficoBarras.invalidate()
             return
         }
 
         val entradas = novosValores.mapIndexed { indice, valor ->
-            BarEntry(indice.toFloat(), valor.coerceAtLeast(0f))
+
+            BarEntry(
+                indice.toFloat(),
+                valor.coerceAtLeast(0f)
+            )
         }
 
         val conjunto = BarDataSet(
             entradas,
             "Consumo"
         ).apply {
+
             color = corPrimaria
+
             setDrawValues(false)
+
             highLightAlpha = 0
         }
 
@@ -227,11 +258,15 @@ class GraficoConsumoView @JvmOverloads constructor(
         graficoBarras.invalidate()
     }
 
-    // GRÁFICO DE LINHA: RESUMO DOS ÚLTIMOS 6 MESES
+    // =====================================================
+    // GRÁFICO DE LINHA - TEMPO REAL
+    // =====================================================
+
     fun atualizarGraficoLinha(
         novosValores: List<Float>,
         novosRotulos: List<String>
     ) {
+
         require(novosValores.size == novosRotulos.size) {
             "Valores e rótulos devem ter o mesmo tamanho"
         }
@@ -241,32 +276,43 @@ class GraficoConsumoView @JvmOverloads constructor(
 
         if (novosValores.isEmpty()) {
             graficoLinha.clear()
+            graficoLinha.invalidate()
             return
         }
 
         val entradas = novosValores.mapIndexed { indice, valor ->
-            Entry(indice.toFloat(), valor.coerceAtLeast(0f))
+
+            Entry(
+                indice.toFloat(),
+                valor.coerceAtLeast(0f)
+            )
         }
 
         val conjunto = LineDataSet(
             entradas,
-            "Consumo mensal"
+            "Consumo em tempo real"
         ).apply {
+
             color = corPrimaria
-            lineWidth = 1.5f
+
+            lineWidth = 2f
 
             setDrawCircles(true)
             setCircleColor(corPrimaria)
-            circleRadius = 4.5f
+
+            circleRadius = 4f
+
             setDrawCircleHole(false)
 
             setDrawValues(false)
+
             setDrawFilled(true)
 
             fillColor = corPrimaria
-            fillAlpha = 55
+            fillAlpha = 45
 
             mode = LineDataSet.Mode.LINEAR
+
             isHighlightEnabled = false
         }
 
@@ -282,19 +328,33 @@ class GraficoConsumoView @JvmOverloads constructor(
             novosValores
         )
 
+        graficoLinha.resetZoom()
         graficoLinha.notifyDataSetChanged()
         graficoLinha.invalidate()
+
     }
+
+    // =====================================================
+    // CONFIGURAÇÃO DO EIXO X
+    // =====================================================
 
     private fun configurarEixoX(
         eixo: XAxis,
         rotulos: List<String>
     ) {
+
         eixo.apply {
+
             valueFormatter = IndexAxisValueFormatter(rotulos)
 
             axisMinimum = 0f
-            axisMaximum = (rotulos.size - 1).toFloat()
+
+            axisMaximum =
+                if (rotulos.size > 1) {
+                    (rotulos.size - 1).toFloat()
+                } else {
+                    1f
+                }
 
             granularity = 1f
             isGranularityEnabled = true
@@ -304,6 +364,7 @@ class GraficoConsumoView @JvmOverloads constructor(
             setAvoidFirstLastClipping(true)
 
             position = XAxis.XAxisPosition.BOTTOM
+
             labelRotationAngle = 0f
 
             textColor = corTexto
@@ -311,29 +372,91 @@ class GraficoConsumoView @JvmOverloads constructor(
         }
     }
 
+    // =====================================================
+    // ESCALA DINÂMICA DO EIXO Y
+    // =====================================================
+
+
+
     private fun configurarEscala(
         eixo: com.github.mikephil.charting.components.YAxis,
         valores: List<Float>
     ) {
-        val maiorValor = max(
-            10f,
-            valores.maxOrNull() ?: 10f
-        )
+        val maiorValor = valores.maxOrNull()?.coerceAtLeast(0f) ?: 0f
 
-        val intervalo = when {
-            maiorValor <= 50f -> 10f
-            maiorValor <= 100f -> 20f
-            maiorValor <= 500f -> 100f
-            else -> 200f
+        // Adiciona 5% de espaço acima do maior consumo
+        val limiteSuperior = if (maiorValor > 0f) {
+            maiorValor * 1.05f
+        } else {
+            0.00001f
         }
 
         eixo.axisMinimum = 0f
-        eixo.axisMaximum =
-            ceil(maiorValor / intervalo) * intervalo
+        eixo.axisMaximum = limiteSuperior
 
-        eixo.setLabelCount(
-            (eixo.axisMaximum / intervalo).toInt() + 1,
-            true
-        )
+        // Mantém cinco marcações no eixo Y
+        eixo.setLabelCount(5, true)
+
+        eixo.granularity = limiteSuperior / 4f
+        eixo.isGranularityEnabled = true
+
+        // Formata os valores pequenos sem transformá-los em zero
+        val casasDecimais = when {
+            maiorValor < 0.001f -> 7
+            maiorValor < 0.01f -> 6
+            maiorValor < 0.1f -> 5
+            maiorValor < 1f -> 3
+            else -> 2
+        }
+
+        eixo.valueFormatter = object : ValueFormatter() {
+            override fun getAxisLabel(
+                value: Float,
+                axis: AxisBase?
+            ): String {
+                return String.format(
+                    java.util.Locale("pt", "BR"),
+                    "%.${casasDecimais}f",
+                    value
+                )
+            }
+        }
+    }
+
+
+    // =====================================================
+    // FORMATAÇÃO DOS VALORES
+    // =====================================================
+
+    private fun configurarFormatacaoEixoY(
+        eixo: YAxis,
+        maiorValor: Float
+    ) {
+
+        val casasDecimais = when {
+
+            maiorValor > 0f && maiorValor < 0.01f -> 6
+
+            maiorValor < 1f -> 5
+
+            maiorValor < 10f -> 3
+
+            else -> 2
+        }
+
+        eixo.valueFormatter = object : ValueFormatter() {
+
+            override fun getAxisLabel(
+                value: Float,
+                axis: AxisBase?
+            ): String {
+
+                return String.format(
+                    Locale("pt", "BR"),
+                    "%.${casasDecimais}f",
+                    value
+                )
+            }
+        }
     }
 }
