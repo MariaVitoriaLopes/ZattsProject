@@ -16,11 +16,12 @@ services:
     build: .
     container_name: zatts_backend
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       - zatts_mongo
     environment:
-      SPRING_DATA_MONGODB_URI: "mongodb+srv://1234:SUA_SENHA_AQUI@clusterdsm.xxxx.mongodb.net/zatts_db?retryWrites=true&w=majority"
+      SPRING_DATA_MONGODB_URI: "mongodb+srv://1234:6AdFhASiWB7ULiq2@clusterdsm.xxxx.mongodb.net/zatts_db?retryWrites=true&w=majority"
+      SERVER_PORT: "8081"
       TZ: "America/Sao_Paulo"
 
 volumes:
