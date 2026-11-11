@@ -1,4 +1,3 @@
-
 package br.edu.fatec.zattsproject.backend.controller;
 
 import br.edu.fatec.zattsproject.backend.model.Configuracao;
@@ -13,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Controller
@@ -132,6 +133,81 @@ public class ConfiguracaoController {
         }
 
         return "redirect:/configuracoes";
+    }
+
+    // ==========================================
+    // GERENCIAMENTO DE METAS (WEB FORM REDIRECT)
+    // ==========================================
+
+    @PostMapping("/meta")
+    public String salvarMetaForm(
+            @RequestParam String tipoMeta, // "CONSUMO" ou "VALOR"
+            @RequestParam BigDecimal valorMeta,
+            HttpSession session,
+            RedirectAttributes redirect) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
+
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            configuracaoService.editarMeta(usuario.getId(), tipoMeta, valorMeta);
+            redirect.addFlashAttribute("mensagem", "Meta atualizada com sucesso!");
+        } catch (IllegalStateException e) {
+            try {
+                configuracaoService.criarMeta(usuario.getId(), tipoMeta, valorMeta);
+                redirect.addFlashAttribute("mensagem", "Meta criada com sucesso!");
+            } catch (Exception ex) {
+                redirect.addFlashAttribute("erro", ex.getMessage());
+            }
+        } catch (Exception e) {
+            redirect.addFlashAttribute("erro", e.getMessage());
+        }
+
+        return "redirect:/configuracoes";
+    }
+
+    // ==========================================
+    // GERENCIAMENTO DE METAS (AJAX / REST)
+    // ==========================================
+
+    @PostMapping("/api/meta")
+    @ResponseBody
+    public ResponseEntity<?> salvarMetaAjax(
+            @RequestParam String tipoMeta,
+            @RequestParam BigDecimal valorMeta,
+            @RequestHeader(value = "usuarioId", required = false) String usuarioIdHeader,
+            HttpSession session) {
+
+        String usuarioId = usuarioIdHeader;
+
+        if (usuarioId == null || usuarioId.isBlank()) {
+            Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
+            if (usuario != null) {
+                usuarioId = usuario.getId();
+            }
+        }
+
+        if (usuarioId == null || usuarioId.isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("erro", "Sessão expirada ou usuário não identificado."));
+        }
+
+        try {
+            Configuracao config = configuracaoService.editarMeta(usuarioId, tipoMeta, valorMeta);
+            return ResponseEntity.ok(Map.of("mensagem", "Meta atualizada com sucesso!", "configuracao", config));
+        } catch (IllegalStateException e) {
+            try {
+                Configuracao config = configuracaoService.criarMeta(usuarioId, tipoMeta, valorMeta);
+                return ResponseEntity.ok(Map.of("mensagem", "Meta criada com sucesso!", "configuracao", config));
+            } catch (Exception ex) {
+                return ResponseEntity.badRequest().body(Map.of("erro", ex.getMessage()));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
+        }
     }
 
     // ==========================================

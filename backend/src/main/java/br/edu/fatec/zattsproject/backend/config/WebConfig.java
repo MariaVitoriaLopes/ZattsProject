@@ -1,4 +1,3 @@
-
 package br.edu.fatec.zattsproject.backend.config;
 
 import lombok.RequiredArgsConstructor;
@@ -43,5 +42,15 @@ public class WebConfig implements WebMvcConfigurer {
                         "/configuracoes",
                         "/configuracoes/**"
                 );
+    }
+
+    // Adicionado para suportar CORS no deploy (Web + Android HTTPS)
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOriginPatterns("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }

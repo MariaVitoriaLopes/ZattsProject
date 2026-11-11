@@ -32,9 +32,8 @@ public class DashboardService {
     private static final ZoneId ZONE_UTC = ZoneId.of("UTC");
 
     public DashboardDTO obterDadosDashboard(String usuarioId) {
-        // Obter momento atual no fuso de São Paulo
+        // Momento atual no fuso de São Paulo
         ZonedDateTime agoraSP = ZonedDateTime.now(ZONE_SP);
-        LocalDateTime agora = agoraSP.toLocalDateTime();
 
         // Intervalo do dia atual em São Paulo convertido para UTC
         LocalDateTime inicioHoje = agoraSP.toLocalDate().atStartOfDay(ZONE_SP)
@@ -42,10 +41,11 @@ public class DashboardService {
         LocalDateTime fimHoje = agoraSP.toLocalDate().atTime(23, 59, 59).atZone(ZONE_SP)
                 .withZoneSameInstant(ZONE_UTC).toLocalDateTime();
 
-        // 1. Configuração do usuário
+        // 1. Configuração do usuário dinâmica vinda do MongoDB
         Configuracao config = configuracaoRepository.findByUsuarioId(usuarioId)
                 .orElse(Configuracao.builder()
-                        .metaConsumoKwh(250.0)
+                        .usuarioId(usuarioId)
+                        .metaConsumoKwh(250.0) // Padrão se o usuário nunca definiu
                         .metaGastoReais(300.0)
                         .bandeiraAtual(BandeiraTarifaria.VERDE)
                         .build());
@@ -53,11 +53,17 @@ public class DashboardService {
         BandeiraTarifaria bandeira = config.getBandeiraAtual() != null ?
                 config.getBandeiraAtual() : BandeiraTarifaria.VERDE;
 
+        // Meta escolhida pelo usuário (dinâmica)
+        double metaLimiteKwh = (config.getMetaConsumoKwh() != null && config.getMetaConsumoKwh() > 0)
+                ? config.getMetaConsumoKwh()
+                : 250.0;
+
         // 2. CONSUMO ACUMULADO DO MÊS ATUAL
         LocalDateTime inicioMesAtual = YearMonth.from(agoraSP).atDay(1).atStartOfDay(ZONE_SP)
                 .withZoneSameInstant(ZONE_UTC).toLocalDateTime();
 
-        List<Consumo> consumosMesAtual = consumoRepository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioMesAtual, agoraSP.withZoneSameInstant(ZONE_UTC).toLocalDateTime());
+        List<Consumo> consumosMesAtual = consumoRepository.findByUsuarioIdAndDataHoraBetween(
+                usuarioId, inicioMesAtual, agoraSP.withZoneSameInstant(ZONE_UTC).toLocalDateTime());
 
         double consumoAcumuladoMesKwh = consumosMesAtual.stream()
                 .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
@@ -69,7 +75,7 @@ public class DashboardService {
                 .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
                 .sum();
 
-        // Custo financeiro direto somente de hoje
+        // Custo financeiro direto de hoje
         double custoDiarioDiretoReais = calculadoraTarifaService.calcularCustoDiretoAFerroEFogo(consumoTotalHojeKwh);
 
         // CONTA DE LUZ ACUMULATIVA DO MÊS
@@ -141,7 +147,6 @@ public class DashboardService {
             historicoContasReais.add(new DashboardDTO.PontoGraficoMes(nomeMes, Math.round(valorContaMes * 100.0) / 100.0));
         }
 
-        double metaLimiteKwh = config.getMetaConsumoKwh() != null ? config.getMetaConsumoKwh() : 250.0;
         double percentualMeta = metaLimiteKwh > 0 ? (consumoAcumuladoMesKwh / metaLimiteKwh) * 100 : 0.0;
 
         return DashboardDTO.builder()
