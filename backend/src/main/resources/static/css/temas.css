@@ -234,13 +234,43 @@ html[data-tema="escuro"] .dashboard-card {
 
 html[data-tema="escuro"] .cardMeta {
     background: #1C1C1C;
-    border-color: #2FBF8A;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-html[data-tema="escuro"] .textoMeta h2,
-html[data-tema="escuro"] span.material-symbols-outlined.bandeiraMeta {
+html[data-tema="escuro"] .status-verde {
+    border-color: #2FBF8A;
+}
+
+html[data-tema="escuro"] .status-verde .bandeiraMeta,
+html[data-tema="escuro"] .status-verde .textoMeta h2 {
     color: #2FBF8A;
+}
+
+html[data-tema="escuro"] .status-laranja {
+    border-color: #F59E0B;
+}
+
+html[data-tema="escuro"] .status-laranja .bandeiraMeta,
+html[data-tema="escuro"] .status-laranja .textoMeta h2 {
+    color: #FBBF24;
+}
+
+html[data-tema="escuro"] .status-vermelho {
+    border-color: #EF4444;
+}
+
+html[data-tema="escuro"] .status-vermelho .bandeiraMeta,
+html[data-tema="escuro"] .status-vermelho .textoMeta h2 {
+    color: #F87171;
+}
+
+html[data-tema="escuro"] .status-sem-meta {
+    border-color: #6B7280;
+}
+
+html[data-tema="escuro"] .status-sem-meta .bandeiraMeta,
+html[data-tema="escuro"] .status-sem-meta .textoMeta h2 {
+    color: #9CA3AF;
 }
 
 html[data-tema="escuro"] .titulo-dashboard p,
