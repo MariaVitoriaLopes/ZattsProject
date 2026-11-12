@@ -817,8 +817,8 @@ html[data-tema="escuro"] .btn-salvar {
     width: 100%;
     padding: 6px;
     margin-bottom: 20px;
-    background: var(--fundo-700);
-    border: 1px solid var(--fundo-900);
+    background: #EDEDED;
+    border: 1px solid #E3E3E3;
     border-radius: 14px;
     overflow: visible;
     box-sizing: border-box;
@@ -842,7 +842,7 @@ html[data-tema="escuro"] .btn-salvar {
 }
 
 .abas-config .aba:hover {
-    background: var(--fundo-700);
+    background: #E3E3E3;
 }
 
 .abas-config .aba.ativo {
@@ -862,6 +862,94 @@ html[data-tema="escuro"] .abas-config .aba.ativo {
     color: #F2F2F2;
 }
 
+html[data-tema="escuro"] .abas-config .aba:hover {
+    background: #3A3A3A;
+}
+.topo-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 8px;
+}
+
+.btn-topo {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    background: var(--textos-pretos);
+    color: var(--textos-brancos);
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn-topo:hover {
+    box-shadow: 0 0 8px var(--cor-primaria-400);
+}
+
+.btn-topo-perigo {
+    background: #b60011;
+}
+
+.notificacao-acoes {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: auto;
+}
+
+.notificacao-acoes .notificacao-excluir {
+    margin-left: 0;
+}
+
+.notificacao-lida {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #0D734C;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.notificacao-lida:hover {
+    transform: scale(1.15);
+}
+
+.notificacao-lida .material-symbols-outlined {
+    font-size: 24px;
+}
+
+.lista-notificacoes .notificacao:not([data-lida="true"]) .notificacao-titulo {
+    font-weight: 700;
+}
+
+.lista-notificacoes .notificacao[data-lida="true"] .notificacao-lida {
+    display: none;
+}
+
+html[data-tema="escuro"] .btn-topo {
+    background: #2A2A2A;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .btn-topo-perigo {
+    background: #b60011;
+    color: #FFFFFF;
+}
+
+html[data-tema="escuro"] .notificacao-lida {
+    color: #2FBF8A;
+}
+
+@media (max-width: 600px) {
+    .topo-pagina {
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+}
 @media (max-width: 480px) {
     .abas-config {
         gap: 5px;

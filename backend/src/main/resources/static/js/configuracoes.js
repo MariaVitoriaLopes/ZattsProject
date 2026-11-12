@@ -236,15 +236,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnSair = document.querySelector(".btn-sair");
 
     if (btnSair) {
+        btnSair.addEventListener("click", async function (e) {
+            e.preventDefault(); // Evita comportamento padrão se for link/botão direto
 
-        btnSair.addEventListener("click", function () {
+            const confirmar = await Dialogo.confirmar(
+                "Deseja realmente sair da sessão atual?",
+                {
+                    titulo: "Sair da sessão",
+                    textoConfirmar: "Sair",
+                    perigo: false
+                }
+            );
 
-            if (confirm("Deseja realmente sair desta sessão?")) {
-                enviarAcao("/configuracoes/sair");
+            if (confirmar) {
+                enviarAcao("/logout");
             }
-
         });
-
     }
 
     // ==========================================
@@ -255,11 +262,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (btnExcluir) {
 
-        btnExcluir.addEventListener("click", function () {
+        btnExcluir.addEventListener("click", async function (e) {
+            e.preventDefault();
 
-            const confirmar = confirm(
+            const confirmar = await Dialogo.confirmar(
                 "Tem certeza que deseja excluir sua conta?\n\n" +
-                "Todos os seus dados serão excluídos permanentemente."
+                "Todos os seus dados serão excluídos permanentemente.",
+                {
+                    titulo: "Excluir conta",
+                    textoConfirmar: "Excluir conta",
+                    perigo: true
+                }
             );
 
             if (confirmar) {

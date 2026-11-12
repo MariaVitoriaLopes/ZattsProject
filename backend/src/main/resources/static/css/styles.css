@@ -1370,3 +1370,187 @@ p.aviso {
         z-index: 1000;
     }
 }
+
+.zd-fundo {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.zd-fundo.zd-visivel {
+    opacity: 1;
+}
+
+.zd-caixa {
+    width: 100%;
+    max-width: 420px;
+    padding: 28px 24px 22px;
+    border-radius: 20px;
+    background: var(--fundo-0);
+    color: var(--textos-pretos);
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    transform: translateY(12px) scale(0.97);
+    transition: transform 0.15s ease;
+}
+
+.zd-fundo.zd-visivel .zd-caixa {
+    transform: none;
+}
+
+.zd-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    font-size: 30px;
+    background: rgba(120, 120, 120, 0.15);
+    color: currentColor;
+}
+
+.zd-sucesso .zd-icone {
+    background: rgba(13, 115, 76, 0.14);
+    color: #0D734C;
+}
+
+.zd-erro .zd-icone {
+    background: rgba(220, 38, 38, 0.14);
+    color: #DC2626;
+}
+
+.zd-aviso .zd-icone {
+    background: rgba(245, 158, 11, 0.16);
+    color: #C76A00;
+}
+
+.zd-titulo {
+    margin: 0 0 8px;
+    font-family: "Cal Sans", Inter, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.zd-mensagem {
+    margin: 0 0 22px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #555;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    cursor: default;
+}
+
+.zd-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.zd-botao {
+    min-width: 120px;
+    padding: 11px 22px;
+    border: none;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.zd-botao:focus-visible {
+    outline: 2px solid var(--cor-primaria-400);
+    outline-offset: 2px;
+}
+
+.zd-botao-principal {
+    background: #181818;
+    color: #fff;
+}
+
+.zd-botao-principal:hover {
+    background: var(--cor-primaria-400);
+    color: #000;
+}
+
+.zd-botao-perigo {
+    background: #b60011;
+    color: #fff;
+}
+
+.zd-botao-perigo:hover {
+    background: #8F0010;
+}
+
+.zd-botao-secundario {
+    background: #F3F4F6;
+    color: #111827;
+}
+
+.zd-botao-secundario:hover {
+    background: #E5E7EB;
+}
+
+html[data-tema="escuro"] .zd-caixa {
+    background: #1C1C1C;
+    color: #F2F2F2;
+    border: 1px solid #2C2C2C;
+}
+
+html[data-tema="escuro"] .zd-mensagem {
+    color: #A3A3A3;
+}
+
+html[data-tema="escuro"] .zd-botao-principal {
+    background: #2A2A2A;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .zd-botao-principal:hover {
+    background: var(--cor-primaria-400);
+    color: #000;
+}
+
+html[data-tema="escuro"] .zd-botao-secundario {
+    background: #2A2A2A;
+    color: #F2F2F2;
+}
+
+html[data-tema="escuro"] .zd-botao-secundario:hover {
+    background: #333333;
+}
+
+@media (max-width: 480px) {
+    .zd-acoes {
+        flex-direction: column-reverse;
+    }
+
+    .zd-botao {
+        width: 100%;
+    }
+}
+
+.zd-caixa .zd-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    line-height: 1;
+}
+
+.zd-pergunta .zd-icone {
+    background: rgba(245, 158, 11, 0.16);
+    color: #C76A00;
+}

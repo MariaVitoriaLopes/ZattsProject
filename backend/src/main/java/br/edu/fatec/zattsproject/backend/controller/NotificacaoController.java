@@ -101,6 +101,55 @@ public class NotificacaoController {
                 Map.of("mensagem", "Notificações marcadas como lidas.")
         );
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> excluir(
+            @PathVariable String id,
+            HttpSession session) {
+
+        Usuario usuario =
+                (Usuario) session.getAttribute("usuarioLogado");
+
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "erro",
+                            "Sua sessão expirou. Faça login novamente."
+                    ));
+        }
+
+        boolean excluida = notificacaoService.excluir(
+                id,
+                usuario.getId()
+        );
+
+        if (!excluida) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> excluirTodas(
+            HttpSession session) {
+
+        Usuario usuario =
+                (Usuario) session.getAttribute("usuarioLogado");
+
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "erro",
+                            "Sua sessão expirou. Faça login novamente."
+                    ));
+        }
+
+        notificacaoService.excluirTodas(
+                usuario.getId()
+        );
+
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping("/nao-lidas/contagem")
     public ResponseEntity<?> contarNaoLidas(

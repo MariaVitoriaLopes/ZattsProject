@@ -8,6 +8,109 @@ document.addEventListener("DOMContentLoaded", function () {
         personalizados: document.getElementById("aba-personalizados")
     };
 
+    const chaveOcultas = "zatts:notificacoesOcultas";
+    const listaGeral = document.querySelector("#aba-geral .lista-notificacoes");
+    const vazioGeral = document.getElementById("vazioGeral");
+    const topoAcoes = document.getElementById("topoAcoes");
+
+    function lerOcultas() {
+        try {
+            return JSON.parse(localStorage.getItem(chaveOcultas)) || [];
+        } catch (erro) {
+            return [];
+        }
+    }
+
+    function salvarOcultas(ids) {
+        try {
+            localStorage.setItem(chaveOcultas, JSON.stringify(ids));
+        } catch (erro) {
+            console.error(erro);
+        }
+    }
+
+    function atualizarTopo() {
+        if (!topoAcoes) {
+            return;
+        }
+
+        const restantes = listaGeral
+            ? listaGeral.querySelectorAll(".notificacao").length
+            : 0;
+
+        topoAcoes.hidden = !secoes.geral || secoes.geral.hidden || restantes === 0;
+    }
+
+    function verificarListaVazia() {
+        if (listaGeral && vazioGeral) {
+            const restantes = listaGeral.querySelectorAll(".notificacao").length;
+            listaGeral.hidden = restantes === 0;
+            vazioGeral.hidden = restantes > 0;
+        }
+
+        atualizarTopo();
+    }
+
+    function removerItem(item) {
+        item.remove();
+        verificarListaVazia();
+    }
+
+    async function excluirNoServidor(url) {
+        try {
+            const resposta = await fetch(url, {
+                method: "DELETE",
+                credentials: "same-origin"
+            });
+
+            if (resposta.status === 401) {
+                window.location.href = "/login";
+                return false;
+            }
+
+            return resposta.ok || resposta.status === 404;
+        } catch (erro) {
+            console.error("Erro ao excluir notificação:", erro);
+            return false;
+        }
+    }
+
+    async function enviarLida(id) {
+        try {
+            const resposta = await fetch(
+                "/notificacoes/" + encodeURIComponent(id) + "/lida",
+                {
+                    method: "POST",
+                    credentials: "same-origin"
+                }
+            );
+
+            if (resposta.status === 401) {
+                window.location.href = "/login";
+                return false;
+            }
+
+            return resposta.ok;
+        } catch (erro) {
+            console.error("Erro ao marcar notificação como lida:", erro);
+            return false;
+        }
+    }
+
+    async function garantirLida(item) {
+        if (item.dataset.lida === "true") {
+            return true;
+        }
+
+        const ok = await enviarLida(item.dataset.notificacaoId);
+
+        if (ok) {
+            item.dataset.lida = "true";
+        }
+
+        return ok;
+    }
+
     function selecionarAba(nomeAba) {
 
         if (!secoes[nomeAba]) {
@@ -23,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         Object.entries(secoes).forEach(([nome, secao]) => {
-
+            atualizarTopo();
             if (secao) {
                 secao.hidden = nome !== nomeAba;
             }
@@ -158,6 +261,20 @@ document.addEventListener("DOMContentLoaded", function () {
         selecionarAba("metas");
     }
 
+    const ocultas = lerOcultas();
+
+    if (listaGeral) {
+        listaGeral
+            .querySelectorAll(".notificacao[data-notificacao-id]")
+            .forEach(item => {
+                if (ocultas.includes(item.dataset.notificacaoId)) {
+                    item.remove();
+                }
+            });
+    }
+
+    verificarListaVazia();
+
     document
         .querySelectorAll(
             "#aba-geral .notificacao[data-notificacao-id]"
@@ -171,6 +288,67 @@ document.addEventListener("DOMContentLoaded", function () {
                     marcarComoLida(item);
                 }
             );
+
+            const botaoLida = item.querySelector('[data-acao="lida"]');
+            const botaoExcluir = item.querySelector('[data-acao="excluir"]');
+
+            if (botaoLida) {
+                botaoLida.addEventListener("click", async function (evento) {
+                    evento.stopPropagation();
+
+                    if (await garantirLida(item)) {
+                        await atualizarPontoNaoLidas();
+                    }
+                });
+            }
+
+            if (botaoExcluir) {
+                botaoExcluir.addEventListener("click", async function (evento) {
+                    evento.stopPropagation();
+
+                    const url = "/notificacoes/" + encodeURIComponent(item.dataset.notificacaoId);
+
+                    if (await excluirNoServidor(url)) {
+                        removerItem(item);
+                        await atualizarPontoNaoLidas();
+                    }
+                });
+            }
         });
+
+    const btnMarcarTodas = document.getElementById("btnMarcarTodas");
+    const btnLimparTodas = document.getElementById("btnLimparTodas");
+
+    if (btnMarcarTodas && listaGeral) {
+        btnMarcarTodas.addEventListener("click", async function () {
+            const itens = Array.from(
+                listaGeral.querySelectorAll(".notificacao[data-notificacao-id]")
+            );
+
+            await Promise.all(itens.map(garantirLida));
+            await atualizarPontoNaoLidas();
+        });
+    }
+
+    if (btnLimparTodas && listaGeral) {
+        btnLimparTodas.addEventListener("click", async function () {
+            const confirmado = await Dialogo.confirmar(
+                "Todas as notificações serão apagadas e essa ação não pode ser desfeita.",
+                { titulo: "Limpar notificações", textoConfirmar: "Limpar", perigo: true }
+            );
+
+            if (!confirmado) {
+                return;
+            }
+
+            if (await excluirNoServidor("/notificacoes")) {
+                listaGeral
+                    .querySelectorAll(".notificacao")
+                    .forEach(removerItem);
+
+                await atualizarPontoNaoLidas();
+            }
+        });
+    }
 
 });

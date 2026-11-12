@@ -120,6 +120,14 @@ public class NotificacaoService {
                     !Boolean.FALSE.equals(
                             configuracao.getNotifMeta()
                     );
+
         };
+    }
+    public boolean excluir(String id, String usuarioId) {
+        return repository.deleteByIdAndUsuarioId(id, usuarioId) > 0;
+    }
+
+    public void excluirTodas(String usuarioId) {
+        repository.deleteByUsuarioId(usuarioId);
     }
 }
