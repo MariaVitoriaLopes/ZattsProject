@@ -2,6 +2,7 @@ package com.zattsproject.mobile
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
@@ -75,6 +76,10 @@ class MainActivity : AppCompatActivity() {
             R.id.btn_comecar
         )
 
+        val btnSemDispositivo = findViewById<Button>(
+            R.id.btn_naoTenhoDispositivo
+        )
+
         btnComecar.setOnClickListener {
 
             val intent = Intent(
@@ -82,6 +87,14 @@ class MainActivity : AppCompatActivity() {
                 CadastroActivity::class.java
             )
 
+            startActivity(intent)
+        }
+
+        btnSemDispositivo.setOnClickListener {
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://zattsproject.onrender.com/")
+            )
             startActivity(intent)
         }
 

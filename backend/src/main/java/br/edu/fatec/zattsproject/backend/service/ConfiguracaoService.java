@@ -302,4 +302,51 @@ public class ConfiguracaoService {
 
         return repository.save(configuracao);
     }
+
+    public Configuracao salvarMetaMobile(
+            String usuarioId,
+            String tipoMeta,
+            BigDecimal valorMeta) {
+
+        if (valorMeta == null || valorMeta.signum() <= 0) {
+            throw new IllegalArgumentException(
+                    "A meta deve ser maior que zero."
+            );
+        }
+
+        if (tipoMeta == null) {
+            throw new IllegalArgumentException(
+                    "Selecione o tipo da meta."
+            );
+        }
+
+        String tipo = tipoMeta.trim().toUpperCase();
+
+        if (!"CONSUMO".equals(tipo) && !"VALOR".equals(tipo)) {
+            throw new IllegalArgumentException(
+                    "Tipo de meta inválido."
+            );
+        }
+
+        Configuracao configuracao = buscarPorUsuario(usuarioId);
+
+        if (configuracao == null) {
+            configuracao = Configuracao.builder()
+                    .usuarioId(usuarioId)
+                    .build();
+        }
+
+        if ("CONSUMO".equals(tipo)) {
+
+            configuracao.setMetaConsumoKwh(valorMeta.doubleValue());
+            configuracao.setMetaGastoReais(null);
+
+        } else {
+
+            configuracao.setMetaGastoReais(valorMeta.doubleValue());
+            configuracao.setMetaConsumoKwh(null);
+        }
+
+        return repository.save(configuracao);
+    }
 }

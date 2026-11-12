@@ -151,7 +151,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="95,56 Reais"
+                        android:text="00,00 Reais"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="21sp"
                         android:textStyle="bold" />
@@ -189,7 +189,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="32,8 kWh"
+                        android:text="0,00 kWh"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="21sp"
                         android:textStyle="bold" />
@@ -235,7 +235,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="3,57 Reais"
+                        android:text="00,00 Reais"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="21sp"
                         android:textStyle="bold" />
@@ -272,7 +272,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="250 kWh"
+                        android:text="000 kWh"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="21sp"
                         android:textStyle="bold" />
@@ -381,13 +381,33 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <TextView
+                <!-- TÍTULO E BOTÃO DE EDIÇÃO DA META -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Meta de consumo mensal"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Meta de consumo mensal"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <ImageButton
+                        android:id="@+id/btnEditarMeta"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Editar meta"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_conta_editar"
+                        app:tint="?attr/colorOnSurface" />
+
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"

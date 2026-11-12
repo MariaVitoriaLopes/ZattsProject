@@ -23,13 +23,17 @@ class UsuarioRepository {
         login: Login
     ): Response<AutenticacaoResponse> {
 
-        val resposta =
-            api.login(login)
+        val resposta = api.login(login)
 
         if (resposta.isSuccessful) {
 
-            RetrofitClient
-                .marcarSessaoAutenticada()
+            RetrofitClient.marcarSessaoAutenticada()
+
+            resposta.body()?.usuarioId?.let { id ->
+                if (id.isNotBlank()) {
+                    RetrofitClient.salvarUsuarioId(id)
+                }
+            }
         }
 
         return resposta
@@ -37,7 +41,19 @@ class UsuarioRepository {
 
     suspend fun verificarSessao(
     ): Response<AutenticacaoResponse> {
-        return api.verificarSessao()
+
+        val resposta = api.verificarSessao()
+
+        if (resposta.isSuccessful) {
+
+            resposta.body()?.usuarioId?.let { id ->
+                if (id.isNotBlank()) {
+                    RetrofitClient.salvarUsuarioId(id)
+                }
+            }
+        }
+
+        return resposta
     }
 
     suspend fun logout(): Response<MensagemResponse> {
@@ -46,6 +62,7 @@ class UsuarioRepository {
 
         if (resposta.isSuccessful) {
             RetrofitClient.limparCookies()
+            RetrofitClient.limparUsuarioId()
         }
 
         return resposta
