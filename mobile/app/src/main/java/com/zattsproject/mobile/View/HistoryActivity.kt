@@ -31,6 +31,7 @@ class HistoryActivity : AppCompatActivity() {
         SEMANAL, MENSAL, COMPARATIVO
     }
 
+    private val cipMensal = 12.50
     private var corAplicada = ""
 
     private lateinit var txvTituloHistorico: TextView
@@ -101,6 +102,16 @@ class HistoryActivity : AppCompatActivity() {
         if (corAtual != corAplicada) {
             recreate()
         }
+    }
+
+    private fun calcularTotalMensalComCip(
+        dados: List<ConsumoDiario>
+    ): Double {
+        if (dados.isEmpty()) {
+            return 0.0
+        }
+
+        return dados.sumOf { it.reais } + cipMensal
     }
 
     private fun inicializarComponentes() {
@@ -464,9 +475,9 @@ class HistoryActivity : AppCompatActivity() {
         val totalKwh =
             dadosMesAtual.sumOf { it.kwh }
         val totalReais =
-            dadosMesAtual.sumOf { it.reais }
+            calcularTotalMensalComCip(dadosMesAtual)
         val totalReaisMesAnterior =
-            dadosMesAnterior.sumOf { it.reais }
+            calcularTotalMensalComCip(dadosMesAnterior)
         val quantidadeDias =
             fimMes.get(Calendar.DAY_OF_MONTH)
         val valoresGrafico =
@@ -648,9 +659,9 @@ class HistoryActivity : AppCompatActivity() {
                         consumo.dia <= fimAnteriorApi
             }
         val totalReaisAtual =
-            dadosMesAtual.sumOf { it.reais }
+            calcularTotalMensalComCip(dadosMesAtual)
         val totalReaisAnterior =
-            dadosMesAnterior.sumOf { it.reais }
+            calcularTotalMensalComCip(dadosMesAnterior)
         val diasMesAtual =
             fimMesAtual.get(Calendar.DAY_OF_MONTH)
         val diasMesAnterior =
