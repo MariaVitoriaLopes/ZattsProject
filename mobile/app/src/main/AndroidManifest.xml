@@ -50,10 +50,10 @@
             android:name=".HistoryActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-<!--        <activity-->
-<!--            android:name=".AppNavBar"-->
-<!--            android:exported="false"-->
-<!--            android:windowSoftInputMode="adjustResize" />-->
+        <!-- <activity -->
+        <!-- android:name=".AppNavBar" -->
+        <!-- android:exported="false" -->
+        <!-- android:windowSoftInputMode="adjustResize" /> -->
         <activity
             android:name=".AlertsActivity"
             android:exported="false"
@@ -98,10 +98,14 @@
             android:name=".AjudaSuporteActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-<!--        <activity-->
-<!--            android:name=".HistoricoActivity"-->
-<!--            android:exported="false"-->
-<!--            android:windowSoftInputMode="adjustResize" />-->
+        <!-- <activity -->
+        <!-- android:name=".HistoricoActivity" -->
+        <!-- android:exported="false" -->
+        <!-- android:windowSoftInputMode="adjustResize" /> -->
+        <activity
+            android:name=".MetaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

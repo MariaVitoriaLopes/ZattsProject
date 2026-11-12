@@ -40,6 +40,7 @@ interface ApiService {
         @Header("usuarioId") usuarioId: String
     ): Response<DashboardDTO>
 
+
     // CADASTRO
     @POST("api/mobile/auth/cadastro")
     suspend fun cadastrar(
@@ -83,6 +84,22 @@ interface ApiService {
     suspend fun atualizarConta(
         @Body conta: Conta
     ): Response<Conta>
+
+    // METAS
+
+    @FormUrlEncoded
+    @POST("metas/editar")
+    suspend fun editarMeta(
+        @Field("tipo") tipo: String,
+        @Field("valor") valor: String
+    ): Response<Unit>
+
+    @FormUrlEncoded
+    @POST("metas/criar")
+    suspend fun criarMeta(
+        @Field("tipo") tipo: String,
+        @Field("valor") valor: String
+    ): Response<Unit>
 
     // HISTÓRICO
     @GET("api/consumos/diario")

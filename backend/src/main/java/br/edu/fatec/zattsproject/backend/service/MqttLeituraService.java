@@ -87,6 +87,14 @@ public class MqttLeituraService {
             String horaMinutoAtualStr = consumoInstantaneo.getDataHora().format(DateTimeFormatter.ofPattern("HH:mm"));
             double valKwh = valorPositivoOuZero(consumoInstantaneo.getConsumoKwh());
 
+            log.info("========== TESTE MQTT ==========");
+            log.info("Usuário: {}", usuarioId);
+            log.info("Data: {}", consumoInstantaneo.getDataHora());
+            log.info("Consumo recebido: {}", consumoInstantaneo.getConsumoKwh());
+            log.info("Potência recebida: {}", consumoInstantaneo.getPotenciaWatts());
+            log.info("Consumo validado: {}", valKwh);
+            log.info("================================");
+
             // 1. GRAVAÇÃO MINUTO A MINUTO (Salva em consumo_realtime na troca de minuto)
             LocalDateTime minutoAtualTruncado = consumoInstantaneo.getDataHora().truncatedTo(ChronoUnit.MINUTES);
 

@@ -117,6 +117,7 @@ public class ConsumoService {
         consumoTotalDiarioKwh += realtimeHoje.stream()
                 .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0).sum();
 
+
         // 2. ACUMULADO MENSAL (BANCO PERMANENTE + REALTIME DO DIA)
         double acumuladoMesKwh = obterConsumoAcumuladoMesAtual(usuarioId);
 

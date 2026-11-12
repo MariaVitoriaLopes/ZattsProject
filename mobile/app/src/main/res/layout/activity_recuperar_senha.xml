@@ -82,6 +82,7 @@
         app:boxCornerRadiusTopEnd="14dp"
         app:boxCornerRadiusTopStart="14dp"
         app:boxStrokeColor="?attr/colorOnSurface"
+        app:hintTextColor="?attr/colorOnSurface"
         app:boxStrokeWidth="1dp"
         app:boxStrokeWidthFocused="2dp"
         app:layout_constraintEnd_toEndOf="parent"

@@ -1,9 +1,9 @@
-
 package com.zattsproject.mobile.View
 
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.FrameLayout
@@ -22,7 +22,6 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import java.util.Locale
-import kotlin.math.max
 
 class GraficoConsumoView @JvmOverloads constructor(
     context: Context,
@@ -135,7 +134,9 @@ class GraficoConsumoView @JvmOverloads constructor(
                 grafico.setDrawGridBackground(false)
                 grafico.setDrawBarShadow(false)
                 grafico.setDrawBorders(false)
-                grafico.setFitBars(true)
+                // A largura das colunas será controlada diretamente pelo BarData.
+                // Desativar o ajuste automático evita diferenças visuais nas margens.
+                grafico.setFitBars(false)
                 grafico.axisRight.isEnabled = false
             }
 
@@ -204,7 +205,8 @@ class GraficoConsumoView @JvmOverloads constructor(
 
     fun atualizarGrafico(
         novosValores: List<Float>,
-        novosRotulos: List<String>
+        novosRotulos: List<String>,
+        casasDecimais: Int = 2
     ) {
 
         require(novosValores.size == novosRotulos.size) {
@@ -241,7 +243,8 @@ class GraficoConsumoView @JvmOverloads constructor(
         }
 
         graficoBarras.data = BarData(conjunto).apply {
-            barWidth = 0.62f
+            // Todas as colunas usam exatamente a mesma largura.
+            barWidth = 0.55f
         }
 
         configurarEixoX(
@@ -249,9 +252,23 @@ class GraficoConsumoView @JvmOverloads constructor(
             novosRotulos
         )
 
+        // Centraliza cada coluna no seu rótulo e mantém margens simétricas.
+        graficoBarras.xAxis.axisMinimum = -0.5f
+
+        graficoBarras.xAxis.axisMaximum =
+            novosRotulos.size - 0.5f
+
+        graficoBarras.xAxis.granularity = 1f
+
+        graficoBarras.xAxis.setLabelCount(
+            novosRotulos.size,
+            false
+        )
+
         configurarEscala(
             graficoBarras.axisLeft,
-            novosValores
+            novosValores,
+            casasDecimais
         )
 
         graficoBarras.notifyDataSetChanged()
@@ -318,14 +335,41 @@ class GraficoConsumoView @JvmOverloads constructor(
 
         graficoLinha.data = LineData(conjunto)
 
+        Log.d(
+            "TESTE_MPCHART",
+            "Entradas: ${conjunto.entryCount}"
+        )
+
+        Log.d(
+            "TESTE_MPCHART",
+            "Valores: ${conjunto.values.map { it.y }}"
+        )
+
+        Log.d(
+            "TESTE_MPCHART",
+            "Altura: ${graficoLinha.height} | " +
+                    "Largura: ${graficoLinha.width}"
+        )
+
+        Log.d(
+            "TESTE_MPCHART",
+            "Visibilidade: ${graficoLinha.visibility}"
+        )
+
         configurarEixoX(
             graficoLinha.xAxis,
             novosRotulos
         )
 
+        // Evita sobreposição: exibe aproximadamente um rótulo a cada 3 minutos.
+        graficoLinha.xAxis.granularity = 1f
+        graficoLinha.xAxis.isGranularityEnabled = true
+        graficoLinha.xAxis.setLabelCount(5, true)
+
         configurarEscala(
             graficoLinha.axisLeft,
-            novosValores
+            novosValores,
+            4
         )
 
         graficoLinha.resetZoom()
@@ -349,17 +393,18 @@ class GraficoConsumoView @JvmOverloads constructor(
 
             axisMinimum = 0f
 
-            axisMaximum =
-                if (rotulos.size > 1) {
-                    (rotulos.size - 1).toFloat()
-                } else {
-                    1f
-                }
+            axisMaximum = if (rotulos.size > 1) {
+                (rotulos.size - 1).toFloat()
+            } else {
+                1f
+            }
 
             granularity = 1f
             isGranularityEnabled = true
 
-            setLabelCount(rotulos.size, true)
+            // Solicita todos os rótulos sem forçar
+            // intervalos fracionários.
+            setLabelCount(rotulos.size, false)
 
             setAvoidFirstLastClipping(true)
 
@@ -379,43 +424,41 @@ class GraficoConsumoView @JvmOverloads constructor(
 
 
     private fun configurarEscala(
-        eixo: com.github.mikephil.charting.components.YAxis,
-        valores: List<Float>
+        eixo: YAxis,
+        valores: List<Float>,
+        casasDecimais: Int
     ) {
-        val maiorValor = valores.maxOrNull()?.coerceAtLeast(0f) ?: 0f
+        val maiorValor = valores.maxOrNull()
+            ?.coerceAtLeast(0f) ?: 0f
 
-        // Adiciona 5% de espaço acima do maior consumo
-        val limiteSuperior = if (maiorValor > 0f) {
-            maiorValor * 1.05f
-        } else {
-            0.00001f
-        }
+        val unidade = Math.pow(
+            10.0,
+            -casasDecimais.toDouble()
+        ).toFloat()
+
+        val limiteCalculado = maiorValor * 1.2f
+
+        val limiteSuperior = maxOf(
+            unidade * 4f,
+            kotlin.math.ceil(limiteCalculado / unidade) * unidade
+        )
 
         eixo.axisMinimum = 0f
         eixo.axisMaximum = limiteSuperior
 
-        // Mantém cinco marcações no eixo Y
         eixo.setLabelCount(5, true)
 
         eixo.granularity = limiteSuperior / 4f
         eixo.isGranularityEnabled = true
 
-        // Formata os valores pequenos sem transformá-los em zero
-        val casasDecimais = when {
-            maiorValor < 0.001f -> 7
-            maiorValor < 0.01f -> 6
-            maiorValor < 0.1f -> 5
-            maiorValor < 1f -> 3
-            else -> 2
-        }
-
         eixo.valueFormatter = object : ValueFormatter() {
+
             override fun getAxisLabel(
                 value: Float,
                 axis: AxisBase?
             ): String {
                 return String.format(
-                    java.util.Locale("pt", "BR"),
+                    Locale("pt", "BR"),
                     "%.${casasDecimais}f",
                     value
                 )
@@ -432,18 +475,6 @@ class GraficoConsumoView @JvmOverloads constructor(
         eixo: YAxis,
         maiorValor: Float
     ) {
-
-        val casasDecimais = when {
-
-            maiorValor > 0f && maiorValor < 0.01f -> 6
-
-            maiorValor < 1f -> 5
-
-            maiorValor < 10f -> 3
-
-            else -> 2
-        }
-
         eixo.valueFormatter = object : ValueFormatter() {
 
             override fun getAxisLabel(
@@ -453,10 +484,11 @@ class GraficoConsumoView @JvmOverloads constructor(
 
                 return String.format(
                     Locale("pt", "BR"),
-                    "%.${casasDecimais}f",
+                    "%.2f",
                     value
                 )
             }
         }
     }
 }
+
