@@ -72,7 +72,16 @@ document.addEventListener(
                         ? "Deseja desconectar este dispositivo? Você será levado para a tela de login."
                         : "Deseja desconectar este dispositivo da sua conta?";
 
-                if (!confirm(mensagem)) {
+                const confirmado = await Dialogo.confirmar(
+                    mensagem,
+                    {
+                        titulo: "Desconectar dispositivo",
+                        textoConfirmar: "Desconectar",
+                        perigo: true
+                    }
+                );
+
+                if (!confirmado) {
                     return;
                 }
 

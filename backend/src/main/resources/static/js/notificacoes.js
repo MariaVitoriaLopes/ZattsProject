@@ -332,7 +332,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (btnLimparTodas && listaGeral) {
         btnLimparTodas.addEventListener("click", async function () {
-            if (!confirm("Limpar todas as notificações?")) {
+            const confirmado = await Dialogo.confirmar(
+                "Todas as notificações serão apagadas e essa ação não pode ser desfeita.",
+                { titulo: "Limpar notificações", textoConfirmar: "Limpar", perigo: true }
+            );
+
+            if (!confirmado) {
                 return;
             }
 
