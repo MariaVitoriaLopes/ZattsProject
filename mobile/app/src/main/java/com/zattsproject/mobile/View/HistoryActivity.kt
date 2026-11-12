@@ -31,6 +31,8 @@ class HistoryActivity : AppCompatActivity() {
         SEMANAL, MENSAL, COMPARATIVO
     }
 
+    private var corAplicada = ""
+
     private lateinit var txvTituloHistorico: TextView
     private lateinit var tabSemanal: TextView
     private lateinit var tabMensal: TextView
@@ -75,6 +77,8 @@ class HistoryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         AparenciaManager.aplicarCor(this)
         super.onCreate(savedInstanceState)
+
+        corAplicada = AparenciaManager.obterCor(this)
         setContentView(R.layout.activity_history)
 
         findViewById<AppNavBar>(R.id.navBar)
@@ -87,6 +91,16 @@ class HistoryActivity : AppCompatActivity() {
         atualizarTela(TipoHistorico.SEMANAL)
 
         carregarHistorico()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val corAtual = AparenciaManager.obterCor(this)
+
+        if (corAtual != corAplicada) {
+            recreate()
+        }
     }
 
     private fun inicializarComponentes() {

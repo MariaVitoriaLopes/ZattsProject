@@ -21,6 +21,8 @@ import java.util.Locale
 
 class AlertsActivity : AppCompatActivity() {
 
+    private var corAplicada = ""
+
     private lateinit var listaAlertas: LinearLayout
     private var alertas: List<Alerta> = emptyList()
 
@@ -28,6 +30,7 @@ class AlertsActivity : AppCompatActivity() {
         AparenciaManager.aplicarCor(this)
         super.onCreate(savedInstanceState)
 
+        corAplicada = AparenciaManager.obterCor(this)
         setContentView(R.layout.activity_alerts)
 
         // Seleciona Alertas na navbar
@@ -45,6 +48,14 @@ class AlertsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        val corAtual = AparenciaManager.obterCor(this)
+
+        if (corAtual != corAplicada) {
+            recreate()
+            return
+        }
+
         carregarAlertas()
     }
 

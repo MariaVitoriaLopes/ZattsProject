@@ -141,25 +141,15 @@ public class SessaoService {
         if (sessionId == null || sessionId.isBlank()) {
             return;
         }
-
         repository.findBySessionId(sessionId)
-                .ifPresent(sessao -> {
-                    if (sessao.isAtiva()) {
-                        sessao.setAtiva(false);
-                        sessao.setUltimoAcesso(LocalDateTime.now());
-                        repository.save(sessao);
-                    }
-                });
+                .ifPresent(repository::delete);
     }
 
     public void desativar(Sessao sessao) {
         if (sessao == null) {
             return;
         }
-
-        sessao.setAtiva(false);
-        sessao.setUltimoAcesso(LocalDateTime.now());
-        repository.save(sessao);
+        repository.delete(sessao);
     }
 
     public List<SessaoDTO> listarAtivasParaTela(

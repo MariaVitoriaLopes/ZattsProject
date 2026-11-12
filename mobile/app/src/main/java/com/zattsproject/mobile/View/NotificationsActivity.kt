@@ -17,6 +17,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 class NotificationsActivity : AppCompatActivity() {
 
+    private var corAplicada = ""
+
     private lateinit var listaNotificacoes: LinearLayout
     private lateinit var txvQuantidade: TextView
 
@@ -28,6 +30,7 @@ class NotificationsActivity : AppCompatActivity() {
         AparenciaManager.aplicarCor(this)
         super.onCreate(savedInstanceState)
 
+        corAplicada = AparenciaManager.obterCor(this)
         setContentView(R.layout.activity_notifications)
 
         findViewById<AppNavBar>(R.id.navBar)
@@ -43,6 +46,16 @@ class NotificationsActivity : AppCompatActivity() {
         configurarAbas()
         selecionarAba(abaGeral)
         carregarNotificacoes()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val corAtual = AparenciaManager.obterCor(this)
+
+        if (corAtual != corAplicada) {
+            recreate()
+        }
     }
 
     private fun configurarAbas() {

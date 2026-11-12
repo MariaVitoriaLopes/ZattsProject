@@ -61,9 +61,13 @@ document.addEventListener("DOMContentLoaded", function () {
         botoesEdicao.hidden = true;
     }
 
-    btnEditar.addEventListener("click", ativarEdicao);
+    if (btnEditar) {
+        btnEditar.addEventListener("click", ativarEdicao);
+    }
 
-    btnCancelar.addEventListener("click", cancelarEdicao);
+    if (btnCancelar) {
+        btnCancelar.addEventListener("click", cancelarEdicao);
+    }
 
     // ==========================================
     // BUSCAR ENDEREÇO PELO CEP
