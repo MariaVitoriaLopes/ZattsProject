@@ -71,9 +71,9 @@ class HistoryActivity : AppCompatActivity() {
     private val historicoRepository = HistoricoRepository()
 
     private var historicoDiario: List<ConsumoDiario> = emptyList()
-
-    private val verde = android.graphics.Color.rgb(220, 255, 0)
     private val laranja = android.graphics.Color.rgb(255, 88, 0)
+
+    private val azulComparativo = android.graphics.Color.rgb(59, 29, 228)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AparenciaManager.aplicarCor(this)
@@ -356,7 +356,7 @@ class HistoryActivity : AppCompatActivity() {
             modo = GraficoHistoricoView.Modo.LINHA_AREA,
             valores = valoresGrafico,
             rotulos = rotulosGrafico,
-            corPrincipal = verde
+            corPrincipal = AparenciaManager.corHex(this)
         )
         indicadorRolagemGrafico.visibility =
             View.GONE
@@ -595,7 +595,7 @@ class HistoryActivity : AppCompatActivity() {
             modo = GraficoHistoricoView.Modo.BARRAS,
             valores = valoresGrafico,
             rotulos = rotulosGrafico,
-            corPrincipal = verde
+            corPrincipal = AparenciaManager.corHex(this)
         )
         indicadorRolagemGrafico.visibility =
             View.VISIBLE
@@ -818,13 +818,19 @@ class HistoryActivity : AppCompatActivity() {
             "Consumo em $nomeMesAtual",
             "Consumo em $nomeMesAnterior"
         )
+        val corSecundariaComparativo =
+            if (AparenciaManager.obterCor(this) == "vermelho") {
+                azulComparativo
+            } else {
+                laranja
+            }
         graficoHistorico.configurar(
             modo = GraficoHistoricoView.Modo.COMPARATIVO,
             valores = valoresMesAtual,
             valoresSecundarios = valoresMesAnterior,
             rotulos = rotulosGrafico,
-            corPrincipal = verde,
-            corSecundaria = laranja
+            corPrincipal = AparenciaManager.corHex(this),
+            corSecundaria = corSecundariaComparativo
         )
         indicadorRolagemGrafico.visibility =
             View.VISIBLE
@@ -834,7 +840,9 @@ class HistoryActivity : AppCompatActivity() {
 
     private fun configurarLegenda(principal: String, secundaria: String?) {
         txvLegenda1.text = principal
-        corLegenda1.setBackgroundColor(verde)
+        corLegenda1.setBackgroundColor(
+            AparenciaManager.corHex(this)
+        )
 
         val temSegundaLegenda = secundaria != null
         corLegenda2.visibility = if (temSegundaLegenda) View.VISIBLE else View.GONE
@@ -842,7 +850,13 @@ class HistoryActivity : AppCompatActivity() {
 
         if (secundaria != null) {
             txvLegenda2.text = secundaria
-            corLegenda2.setBackgroundColor(laranja)
+            val corSecundaria =
+                if (AparenciaManager.obterCor(this) == "vermelho") {
+                    azulComparativo
+                } else {
+                    laranja
+                }
+            corLegenda2.setBackgroundColor(corSecundaria)
         }
     }
 
