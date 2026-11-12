@@ -28,4 +28,12 @@ public interface NotificacaoRepository
     long countByUsuarioIdAndLidaFalse(
             String usuarioId
     );
+    long deleteByIdAndUsuarioId(
+            String id,
+            String usuarioId
+    );
+
+    long deleteByUsuarioId(
+            String usuarioId
+    );
 }
