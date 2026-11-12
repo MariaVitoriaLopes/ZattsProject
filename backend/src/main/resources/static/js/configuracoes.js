@@ -249,7 +249,7 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             if (confirmar) {
-                enviarAcao("/logout");
+                enviarAcao("/configuracoes/sair");
             }
         });
     }
