@@ -1117,3 +1117,256 @@ p.aviso {
     }
 
 }
+@media (max-width: 1200px) {
+    .hero {
+        padding: 0 50px;
+    }
+
+    .textosHero {
+        width: 55%;
+    }
+
+    .textosHero h1 {
+        width: 100%;
+        font-size: 44px;
+    }
+
+    .imgCasaBanner {
+        width: 45%;
+    }
+
+    .textosApp p {
+        width: 100%;
+    }
+
+    .cards {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 24px;
+    }
+
+    .cards .card {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 1000px) {
+    .hero {
+        flex-direction: column;
+        padding: 40px 24px 0;
+    }
+
+    .textosHero {
+        width: 100%;
+    }
+
+    .textosHero h1 {
+        font-size: 40px;
+    }
+
+    .textosHero h2 {
+        width: 100%;
+    }
+
+    .imgCasaBanner {
+        width: 100%;
+        max-width: 460px;
+        margin: 30px 0;
+    }
+
+    .aplicativo {
+        flex-direction: column;
+        gap: 40px;
+        padding: 20px;
+    }
+
+    .instalacaoResidencial {
+        height: auto;
+        min-height: 400px;
+    }
+
+    .instalacaoResidencial-text {
+        padding: 60px 24px;
+        text-align: center;
+    }
+
+    .instalacaoResidencial h1 {
+        font-size: 36px;
+    }
+
+    .perguntasFreq {
+        margin: 45px 20px;
+    }
+
+    .accordion {
+        width: 100%;
+    }
+
+    footer {
+        padding: 40px;
+    }
+
+    .footer-container {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .footer-brand {
+        width: 100%;
+    }
+
+    .footer-brand p {
+        margin-bottom: 30px;
+    }
+
+    body.login,
+    body.cadastro {
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        height: auto;
+        min-height: 100vh;
+        padding: 15px;
+        gap: 20px;
+    }
+
+    .login .gradiente,
+    .cadastro .gradiente {
+        width: 100%;
+        height: auto;
+        min-height: 140px;
+        flex-direction: row;
+        align-items: center;
+        padding: 20px 25px;
+    }
+
+    .gradiente img {
+        max-width: 110px;
+    }
+
+    .login .formulario,
+    .cadastro .formulario {
+        width: 100%;
+        height: auto;
+        padding: 10px 0 30px;
+    }
+
+    .formulario form {
+        width: 100%;
+    }
+
+    .alert.alert-danger {
+        width: 100%;
+    }
+
+    .requisitos div {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .hero {
+        padding: 30px 20px 0;
+        border-radius: 24px;
+    }
+
+    .textosHero h1 {
+        font-size: 32px;
+    }
+
+    .imgCasaBanner {
+        margin: 20px 0;
+    }
+
+    .app-telefone {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .hoverMockup {
+        position: static;
+        left: 0;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .hoverMockup .r {
+        left: 0;
+    }
+
+    .textosApp h1 {
+        font-size: 30px;
+    }
+
+    .textosApp p {
+        text-align: left;
+        letter-spacing: 0;
+        word-spacing: 0;
+    }
+
+    .beneficios {
+        margin: 30px 0;
+        padding: 10px;
+    }
+
+    .beneficios h1 {
+        width: 100%;
+        font-size: 28px;
+    }
+
+    .instalacaoResidencial h1 {
+        font-size: 28px;
+    }
+
+    .instalacaoResidencial h4 {
+        font-size: 16px;
+    }
+
+    .perguntasFreq {
+        margin: 30px 16px;
+    }
+
+    .perguntasFreq h3 {
+        font-size: 16px;
+    }
+
+    footer {
+        padding: 30px 20px 20px;
+    }
+
+    .footer-brand h2 {
+        font-size: 26px;
+    }
+
+    .slogan {
+        font-size: 22px;
+    }
+
+    .boasvindas h1 {
+        font-size: 30px;
+    }
+
+    .boasvindas > h4 {
+        font-size: 20px;
+    }
+
+    .formulario .voltar {
+        font-size: 16px;
+    }
+}
+@media (max-width: 1000px) {
+    .login .gradiente,
+    .cadastro .gradiente {
+        display: none;
+    }
+}
+@media (max-width: 900px) {
+    .pos-f-t {
+        display: block;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+}
