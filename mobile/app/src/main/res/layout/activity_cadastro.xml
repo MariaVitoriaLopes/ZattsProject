@@ -84,6 +84,7 @@
         app:boxStrokeColor="?attr/colorOnSurface"
         app:boxStrokeWidth="1dp"
         app:boxStrokeWidthFocused="2dp"
+        app:hintTextColor="?attr/colorOnSurface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txv_labelEmail">
@@ -127,6 +128,7 @@
         app:endIconMode="password_toggle"
         app:endIconTint="?attr/colorOnSurface"
         app:boxStrokeColor="?attr/colorOnSurface"
+        app:hintTextColor="?attr/colorOnSurface"
         app:boxStrokeWidth="1dp"
         app:boxStrokeWidthFocused="2dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -171,6 +173,7 @@
         app:endIconMode="password_toggle"
         app:endIconTint="?attr/colorOnSurface"
         app:boxStrokeColor="?attr/colorOnSurface"
+        app:hintTextColor="?attr/colorOnSurface"
         app:boxStrokeWidth="1dp"
         app:boxStrokeWidthFocused="2dp"
         app:layout_constraintEnd_toEndOf="parent"

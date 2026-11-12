@@ -189,12 +189,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
             formulario.addEventListener(
                 "submit",
-                function (event) {
+                async function (event) {
 
-                    if (!confirm(
-                        "Tem certeza que deseja excluir este alerta?"
-                    )) {
-                        event.preventDefault();
+                    event.preventDefault();
+
+                    const confirmado = await Dialogo.confirmar(
+                        "Tem certeza que deseja excluir este alerta?",
+                        {
+                            titulo: "Excluir alerta",
+                            textoConfirmar: "Excluir",
+                            perigo: true
+                        }
+                    );
+
+                    if (confirmado) {
+                        formulario.submit();
                     }
                 }
             );
@@ -258,8 +267,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             checkbox.checked =
                                 estadoAnterior;
 
-                            alert(
-                                "Sua sessão expirou. Faça login novamente."
+                            await Dialogo.alerta(
+                                "Sua sessão expirou. Faça login novamente.",
+                                { tipo: "aviso", titulo: "Sessão expirada" }
                             );
 
                             window.location.href =

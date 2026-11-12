@@ -284,8 +284,8 @@
                     android:paddingHorizontal="18dp"
                     android:text="Criar novo alerta"
                     android:textAllCaps="false"
-                    android:textColor="@color/textos_pretos"
-                    android:backgroundTint="@color/cor_primaria_400"/>
+                    android:textColor="?attr/colorOnPrimary"
+                    android:backgroundTint="?attr/colorPrimary"/>
 
             </LinearLayout>
 

@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const CIP_MENSAL = 12.50;
     const abas = document.querySelectorAll('.hist-aba');
     const vistas = {
         semanal: document.getElementById('vistaSemanal'),
@@ -120,6 +121,10 @@ document.addEventListener('DOMContentLoaded', function () {
             reais += item.reais;
             leituras++;
         });
+
+        if (leituras > 0) {
+            reais += CIP_MENSAL;
+        }
 
         return { ano: ano, mes: mes, dias: dias, kwhPorDia: kwhPorDia, kwh: kwh, reais: reais, leituras: leituras };
     }

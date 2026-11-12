@@ -134,6 +134,7 @@ object RetrofitClient {
         }
 
         limparCookies()
+        limparUsuarioId()
 
         Handler(
             Looper.getMainLooper()
@@ -189,5 +190,27 @@ object RetrofitClient {
         }
 
         return "$fabricante $modelo"
+    }
+    private val preferencias by lazy {
+        appContext.getSharedPreferences(
+            "zatts_sessao",
+            Context.MODE_PRIVATE
+        )
+    }
+
+    fun salvarUsuarioId(usuarioId: String) {
+        preferencias.edit()
+            .putString("usuarioId", usuarioId)
+            .apply()
+    }
+
+    fun obterUsuarioId(): String? {
+        return preferencias.getString("usuarioId", null)
+    }
+
+    fun limparUsuarioId() {
+        preferencias.edit()
+            .remove("usuarioId")
+            .apply()
     }
 }

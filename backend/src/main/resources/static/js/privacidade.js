@@ -92,7 +92,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     btnExportar.addEventListener('click', async function () {
-        if (!confirm('Deseja exportar uma cópia dos seus dados?')) {
+        const confirmado = await Dialogo.confirmar(
+            'Deseja exportar uma cópia dos seus dados?',
+            {
+                titulo: 'Exportar dados',
+                textoConfirmar: 'Exportar'
+            }
+        );
+
+        if (!confirmado) {
             return;
         }
 
@@ -155,9 +163,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     btnApagar.addEventListener('click', async function () {
-        const confirmar = confirm(
+        const confirmar = await Dialogo.confirmar(
             'Tem certeza que deseja apagar o histórico de consumo?\n\n' +
-            'Todas as leituras salvas serão removidas e a ação não pode ser desfeita.'
+            'Todas as leituras salvas serão removidas e a ação não pode ser desfeita.',
+            {
+                titulo: 'Apagar histórico',
+                textoConfirmar: 'Apagar',
+                perigo: true
+            }
         );
 
         if (!confirmar) {

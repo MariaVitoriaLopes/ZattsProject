@@ -32,6 +32,10 @@
 
     <div class="topo-pagina">
         <h1 class="titulo-pagina">Notificações</h1>
+        <div class="topo-acoes" id="topoAcoes">
+            <button type="button" class="btn-topo" id="btnMarcarTodas">Marcar todas como lidas</button>
+            <button type="button" class="btn-topo btn-topo-perigo" id="btnLimparTodas">Limpar todas</button>
+        </div>
     </div>
 
     <!-- ABAS -->
@@ -100,9 +104,24 @@
 
                 </div>
 
+                <div class="notificacao-acoes">
+                    <button type="button" class="notificacao-lida" data-acao="lida" aria-label="Marcar como lida" title="Marcar como lida">
+                        <span class="material-symbols-outlined">done</span>
+                    </button>
+                    <button type="button" class="notificacao-excluir" data-acao="excluir" aria-label="Excluir notificação" title="Excluir">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+
             </li>
 
         </ul>
+
+        <div class="alertas-vazio" id="vazioGeral" hidden>
+            <span class="material-symbols-outlined">notifications_off</span>
+            <h3>Nenhuma notificação recebida</h3>
+            <p>Suas notificações aparecerão aqui quando houver novidades.</p>
+        </div>
 
         <div class="alertas-vazio"
              th:if="${notificacoes == null or #lists.isEmpty(notificacoes)}">

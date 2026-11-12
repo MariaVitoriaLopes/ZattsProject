@@ -1,19 +1,19 @@
 package com.zattsproject.mobile
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.zattsproject.mobile.Model.Consumo
 import com.zattsproject.mobile.Model.DashboardDTO
 import com.zattsproject.mobile.Network.RetrofitClient
-import com.zattsproject.mobile.Network.SseClient
 import com.zattsproject.mobile.View.GraficoConsumoView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +29,6 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
-import java.util.TreeMap
 
 class HomeActivity : AppCompatActivity() {
 
@@ -48,19 +47,14 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var cardMetaMensal: View
     private lateinit var grafico: GraficoConsumoView
 
-    private var sseClient: SseClient? = null
     private var dashboardDados: DashboardDTO? = null
 
-    private var consumoDiarioAtualKwh = 0.0
-    private val tarifaKwhEstimada = 0.85
+    // Evita requisições sobrepostas quando o polling dispara de 5 em 5 s.
+    private var requisicaoEmAndamento = false
 
     private val handler = Handler(Looper.getMainLooper())
 
-    // Histórico de consumo acumulado por minuto.
-    private val consumoPorMinuto = TreeMap<Long, Double>()
-
-    // Histórico de consumo acumulado por hora via SSE.
-    private val consumoPorHoraSse = TreeMap<Long, Double>()
+    private val consumoPorMinuto = sortedMapOf<Long, Double>()
 
     private var abaAtual = ABA_TEMPO_REAL
 
@@ -69,12 +63,21 @@ class HomeActivity : AppCompatActivity() {
         private const val ABA_CONSUMO = 1
         private const val ABA_CONTA = 2
 
+        // Mesma janela que o backend envia (10 minutos).
         private const val INTERVALO_MINUTOS = 5
-        private const val LIMITE_HORAS = 10
+        private const val LIMITE_HORAS = 12
+
+        // Mês atual + 2 anteriores.
         private const val LIMITE_MESES = 3
 
+        // Atualização do dashboard (igual ao web).
+        private const val INTERVALO_ATUALIZACAO_MS = 5000L
+
         private const val TAG_GRAFICO = "GRAFICO_CONSUMO"
-        private val ZONA_HORARIA = ZoneId.of("America/Sao_Paulo")
+        private const val TAG_HOME = "HOME_API"
+
+        private val ZONA_HORARIA =
+            ZoneId.of("America/Sao_Paulo")
     }
 
     private val formatoHora = SimpleDateFormat(
@@ -101,10 +104,28 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private val atualizarDashboard = object : Runnable {
+        override fun run() {
+            carregarDadosDashboardBackend()
+            handler.postDelayed(this, INTERVALO_ATUALIZACAO_MS)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AparenciaManager.aplicarCor(this)
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_home)
+
+        carregarHistoricoConsumoLocal()
+        inicializarComponentes()
+        configurarBotoes()
+        configurarBotaoEditarMeta()
+
+        // O carregamento dos dados é disparado no onStart (polling).
+    }
+
+    private fun inicializarComponentes() {
 
         txvHorario = findViewById(R.id.txv_horario)
         txvData = findViewById(R.id.txv_data)
@@ -113,16 +134,17 @@ class HomeActivity : AppCompatActivity() {
         btnConsumo = findViewById(R.id.btn_consumo)
         btnValorConta = findViewById(R.id.btn_valorConta)
 
-        txvTituloGrafico = findViewById(R.id.txv_tituloGrafico)
-        txvSubtituloGrafico = findViewById(R.id.txv_subtituloGrafico)
+        txvTituloGrafico =
+            findViewById(R.id.txv_tituloGrafico)
 
-        cardMetaMensal = findViewById(R.id.card_metaMensal)
-        grafico = findViewById(R.id.graficoConsumo)
+        txvSubtituloGrafico =
+            findViewById(R.id.txv_subtituloGrafico)
 
-        configurarBotoes()
+        cardMetaMensal =
+            findViewById(R.id.card_metaMensal)
 
-        carregarDadosDashboardBackend()
-        iniciarConexaoSse()
+        grafico =
+            findViewById(R.id.graficoConsumo)
     }
 
     override fun onResume() {
@@ -138,11 +160,24 @@ class HomeActivity : AppCompatActivity() {
         corAplicada = corAtual
     }
 
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 1001 && resultCode == RESULT_OK) {
+            carregarDadosDashboardBackend()
+        }
+    }
+
     // =====================================================
     // RELÓGIO
     // =====================================================
 
     private fun atualizarDataHora() {
+
         val agora = Date()
         val idioma = Locale("pt", "BR")
         val fusoSP = TimeZone.getTimeZone("America/Sao_Paulo")
@@ -163,11 +198,10 @@ class HomeActivity : AppCompatActivity() {
 
         txvHorario.text = formatoHoraCompleta.format(agora)
 
-        val dataFormatada = formatoData.format(agora)
-
-        txvData.text = dataFormatada.replaceFirstChar {
-            it.titlecase(idioma)
-        }
+        txvData.text = formatoData.format(agora)
+            .replaceFirstChar {
+                it.titlecase(idioma)
+            }
     }
 
     // =====================================================
@@ -175,41 +209,62 @@ class HomeActivity : AppCompatActivity() {
     // =====================================================
 
     private fun carregarDadosDashboardBackend() {
+
+        if (requisicaoEmAndamento) return
+
+        requisicaoEmAndamento = true
+
         lifecycleScope.launch(Dispatchers.IO) {
+
             try {
-                val usuarioIdLogado = "6ae2afdbe3f4de30aa7d8f38"
+
+                val usuarioIdLogado =
+                    RetrofitClient.obterUsuarioId()
+
+                Log.d(
+                    TAG_HOME,
+                    "USUÁRIO DO DASHBOARD: $usuarioIdLogado"
+                )
+
+                if (usuarioIdLogado.isNullOrBlank()) {
+
+                    Log.e(
+                        TAG_HOME,
+                        "ID do usuário não encontrado na sessão."
+                    )
+
+                    return@launch
+                }
 
                 val resposta =
                     RetrofitClient.apiService.obterDadosDashboard(
                         usuarioIdLogado
                     )
 
-                if (resposta.isSuccessful && resposta.body() != null) {
+                if (resposta.isSuccessful) {
 
-                    val dto = resposta.body()!!
+                    val dto = resposta.body()
 
-                    Log.d(
-                        "GRAFICO_HORAS",
-                        "Quantidade de horas recebidas: ${dto.consumoDiarioHoras.size}"
-                    )
+                    if (dto == null) {
 
-                    dto.consumoDiarioHoras.forEach {
-                        Log.d(
-                            "GRAFICO_HORAS",
-                            "Hora: ${it.hora} | Consumo: ${it.consumoKwh} kWh"
+                        Log.e(
+                            TAG_HOME,
+                            "Dashboard retornou resposta vazia."
                         )
+
+                        return@launch
                     }
 
                     withContext(Dispatchers.Main) {
 
                         dashboardDados = dto
 
-                        consumoDiarioAtualKwh =
-                            dto.consumoTotalDiarioKwh
-
-                        sincronizarHistoricoTempoReal(dto)
-
                         atualizarIndicadoresComDadosReais(dto)
+
+                        Log.d(
+                            TAG_HOME,
+                            "DADOS RECEBIDOS DA API: ${dto.consumoTempoReal}"
+                        )
 
                         when (abaAtual) {
                             ABA_TEMPO_REAL -> mostrarTempoReal()
@@ -219,18 +274,24 @@ class HomeActivity : AppCompatActivity() {
                     }
 
                 } else {
+
                     Log.e(
-                        "HOME_API",
-                        "Erro ao carregar dados: ${resposta.code()}"
+                        TAG_HOME,
+                        "Erro HTTP ${resposta.code()}: ${resposta.message()}"
                     )
                 }
 
             } catch (e: Exception) {
+
                 Log.e(
-                    "HOME_API",
-                    "Falha de conexão na API: ${e.message}",
+                    TAG_HOME,
+                    "Falha ao carregar Dashboard.",
                     e
                 )
+
+            } finally {
+
+                requisicaoEmAndamento = false
             }
         }
     }
@@ -240,6 +301,7 @@ class HomeActivity : AppCompatActivity() {
     // =====================================================
 
     private fun obterMinutoAtual(): Long {
+
         val calendario = Calendar.getInstance(
             TimeZone.getTimeZone("America/Sao_Paulo")
         )
@@ -250,7 +312,9 @@ class HomeActivity : AppCompatActivity() {
         return calendario.timeInMillis
     }
 
-    private fun converterHoraParaMinuto(hora: String?): Long? {
+    private fun converterHoraParaMinuto(
+        hora: String?
+    ): Long? {
 
         if (hora.isNullOrBlank()) return null
 
@@ -270,6 +334,8 @@ class HomeActivity : AppCompatActivity() {
 
                 hora.contains("T") -> {
 
+                    // LocalDateTime do Backend representa
+                    // o horário local de São Paulo.
                     LocalDateTime.parse(
                         hora,
                         DateTimeFormatter.ISO_DATE_TIME
@@ -278,6 +344,7 @@ class HomeActivity : AppCompatActivity() {
 
                 else -> {
 
+                    // Formato "HH:mm" enviado pelo backend.
                     val horario = hora.takeLast(5)
                     val partes = horario.split(":")
 
@@ -286,7 +353,10 @@ class HomeActivity : AppCompatActivity() {
                     val horaInt = partes[0].toInt()
                     val minutoInt = partes[1].toInt()
 
-                    if (horaInt !in 0..23 || minutoInt !in 0..59) {
+                    if (
+                        horaInt !in 0..23 ||
+                        minutoInt !in 0..59
+                    ) {
                         return null
                     }
 
@@ -324,37 +394,18 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun sincronizarHistoricoTempoReal(dto: DashboardDTO) {
+    private fun sincronizarHistoricoTempoReal(
+        dto: DashboardDTO
+    ) {
 
-        val pontos = dto.consumoTempoReal
+        consumoPorMinuto.clear()
 
-        Log.d(
-            TAG_GRAFICO,
-            "Quantidade de pontos recebidos do dashboard: ${pontos.size}"
-        )
-
-        pontos.forEach { ponto ->
+        dto.consumoTempoReal.forEach { ponto ->
 
             val minuto = converterHoraParaMinuto(ponto.hora)
 
             if (minuto != null) {
-
-                // Preserva uma leitura SSE já recebida.
-                consumoPorMinuto.putIfAbsent(
-                    minuto,
-                    ponto.consumoKwh
-                )
-
-                Log.d(
-                    TAG_GRAFICO,
-                    "Histórico: ${ponto.hora} = ${ponto.consumoKwh} kWh"
-                )
-
-            } else {
-                Log.w(
-                    TAG_GRAFICO,
-                    "Horário inválido recebido do dashboard: ${ponto.hora}"
-                )
+                consumoPorMinuto[minuto] = ponto.consumoKwh
             }
         }
 
@@ -362,7 +413,8 @@ class HomeActivity : AppCompatActivity() {
 
         Log.d(
             TAG_GRAFICO,
-            "Histórico após sincronização: $consumoPorMinuto"
+            "Pontos recebidos: ${dto.consumoTempoReal.size} | " +
+                    "Histórico sincronizado: $consumoPorMinuto"
         )
     }
 
@@ -380,42 +432,96 @@ class HomeActivity : AppCompatActivity() {
 
     private fun mostrarGraficoTempoReal() {
 
-        val agora = obterMinutoAtual()
+        val pontos = dashboardDados
+            ?.consumoTempoReal
+            ?: emptyList()
 
-        val valores = mutableListOf<Float>()
-        val horarios = mutableListOf<String>()
+        val ultimoPonto = pontos.lastOrNull()
 
-        // Exibe os cinco minutos, incluindo o atual.
-        for (i in INTERVALO_MINUTOS - 1 downTo 0) {
+        // Identifica o minuto mais recente recebido da API.
+        val minutoReferencia = ultimoPonto
+            ?.hora
+            ?.let { converterHoraParaMinuto(it) }
+            ?: obterMinutoAtual()
 
-            val minuto = agora - i * 60_000L
+        // Recupera medições anteriores que a API disponibilizar.
+        // Não sobrescreve valores locais com zeros do histórico.
+        pontos.dropLast(1).forEach { ponto ->
 
-            val consumo = consumoPorMinuto[minuto] ?: 0.0
+            val minuto = converterHoraParaMinuto(ponto.hora)
+                ?: return@forEach
 
-            horarios.add(
-                formatoHora.format(Date(minuto))
-            )
-
-            valores.add(consumo.toFloat())
+            if (ponto.consumoKwh > 0.0) {
+                consumoPorMinuto[minuto] = maxOf(
+                    consumoPorMinuto[minuto] ?: 0.0,
+                    ponto.consumoKwh
+                )
+            }
         }
 
-        limparHistoricoAntigo()
+        // Atualiza o valor do minuto atual.
+        // Como ele é acumulado, substituímos o valor anterior,
+        // em vez de somá-lo novamente.
+        if (ultimoPonto != null) {
+
+            val consumoRecebido = ultimoPonto.consumoKwh
+
+            consumoPorMinuto[minutoReferencia] = maxOf(
+                consumoPorMinuto[minutoReferencia] ?: 0.0,
+                consumoRecebido
+            )
+        }
+
+        // Mantém somente os últimos 5 minutos.
+        val inicio = minutoReferencia -
+                (INTERVALO_MINUTOS - 1) * 60_000L
+
+        consumoPorMinuto.keys
+            .filter {
+                it < inicio || it > minutoReferencia
+            }
+            .forEach {
+                consumoPorMinuto.remove(it)
+            }
+
+        // Cria os cinco horários consecutivos.
+        val minutosExibidos = (0 until INTERVALO_MINUTOS)
+            .map { indice ->
+                inicio + indice * 60_000L
+            }
+
+        // Recupera os consumos armazenados.
+        val valores = minutosExibidos.map { minuto ->
+            (consumoPorMinuto[minuto] ?: 0.0).toFloat()
+        }
+
+        // Formata os horários.
+        val horarios = minutosExibidos.map { minuto ->
+            formatoHora.format(Date(minuto))
+        }
 
         Log.d(
             TAG_GRAFICO,
-            """
-            ===== GRÁFICO EM TEMPO REAL =====
-            Horários: $horarios
-            Valores: $valores
-            Histórico armazenado: $consumoPorMinuto
-            =================================
-            """.trimIndent()
+            "===== GRÁFICO TEMPO REAL ====="
         )
+
+        Log.d(
+            TAG_GRAFICO,
+            "Horários: $horarios"
+        )
+
+        Log.d(
+            TAG_GRAFICO,
+            "Consumos: $valores"
+        )
+
+        salvarHistoricoConsumoLocal()
 
         grafico.atualizarGraficoLinha(
             valores,
             horarios
         )
+
     }
 
     // =====================================================
@@ -438,177 +544,98 @@ class HomeActivity : AppCompatActivity() {
     }
 
     // =====================================================
-    // SSE
-    // =====================================================
-
-
-    private fun iniciarConexaoSse() {
-
-        sseClient = SseClient { consumoRecebido ->
-            runOnUiThread {
-                processarNovaLeituraSse(consumoRecebido)
-            }
-        }
-
-        val urlSse = "${BuildConfig.BASE_URL}api/v1/web/dashboard/sse"
-
-        sseClient?.iniciarConexao(urlSse)
-    }
-
-
-    private fun processarNovaLeituraSse(consumo: Consumo) {
-
-        Log.d(
-            "GRAFICO_SSE",
-            """
-    Consumo recebido: ${consumo.consumoKwh}
-    Potência: ${consumo.potenciaWatts}
-    Corrente: ${consumo.correnteAmperes}
-    Tensão: ${consumo.voltagem}
-    Data: ${consumo.dataHora}
-    """.trimIndent()
-        )
-
-        val deltaKwh = consumo.consumoKwh.coerceAtLeast(0.0)
-
-        consumoDiarioAtualKwh += deltaKwh
-
-        // Identifica o minuto da leitura.
-        val minuto = converterHoraParaMinuto(consumo.dataHora)
-            ?: obterMinutoAtual()
-
-        val agora = obterMinutoAtual()
-
-        val inicioJanela = agora -
-                (INTERVALO_MINUTOS - 1) * 60_000L
-
-        // Acumula as leituras recebidas no mesmo minuto.
-        consumoPorMinuto[minuto] =
-            (consumoPorMinuto[minuto] ?: 0.0) + deltaKwh
-
-        // Identifica a hora da leitura recebida.
-        val hora = Math.floorDiv(
-            minuto,
-            3_600_000L
-        ) * 3_600_000L
-
-        // Acumula o consumo recebido pelo SSE naquela hora.
-        consumoPorHoraSse[hora] =
-            (consumoPorHoraSse[hora] ?: 0.0) + deltaKwh
-
-        Log.d(
-            TAG_GRAFICO,
-            """
-            ===== ACUMULAÇÃO =====
-            Minuto convertido: ${Date(minuto)}
-            Minuto atual: ${Date(agora)}
-            Dentro da janela: ${minuto >= inicioJanela && minuto <= agora}
-            Consumo acumulado: ${consumoPorMinuto[minuto]}
-            ======================
-            """.trimIndent()
-        )
-
-        limparHistoricoAntigo()
-
-        val txvConsumoDiario =
-            findViewById<TextView>(R.id.txv_consumoDiario)
-
-        val txvCustoDiario =
-            findViewById<TextView>(R.id.txv_custoDiario)
-
-        txvConsumoDiario.text = String.format(
-            Locale("pt", "BR"),
-            "%.4f kWh",
-            consumoDiarioAtualKwh
-        )
-
-        val custoEstimadoDiario =
-            consumoDiarioAtualKwh * tarifaKwhEstimada
-
-        txvCustoDiario.text = String.format(
-            Locale("pt", "BR"),
-            "R$ %.2f",
-            custoEstimadoDiario
-        )
-
-        when (abaAtual) {
-            ABA_TEMPO_REAL -> mostrarGraficoTempoReal()
-            ABA_CONSUMO -> mostrarConsumo()
-        }
-    }
-
-    // =====================================================
     // INDICADORES
     // =====================================================
 
-    private fun atualizarIndicadoresComDadosReais(dto: DashboardDTO) {
+    private fun formatarConsumo(valor: Double): String {
 
-        val consumoMensal = dto.metaConsumoMensalAtualKwh
+        return String.format(
+            Locale("pt", "BR"),
+            "%.2f kWh",
+            valor
+        )
+    }
 
-        val metaMensal =
-            if (dto.metaConsumoMensalLimiteKwh > 0)
-                dto.metaConsumoMensalLimiteKwh
-            else
-                250.0
+    private fun formatarMoeda(valor: Double): String {
 
-        val porcentagem = dto.percentualMetaAtingida.toInt()
+        return String.format(
+            Locale("pt", "BR"),
+            "R$ %.2f",
+            valor
+        )
+    }
 
-        findViewById<TextView>(R.id.txv_consumoDiario).text =
-            String.format(
-                Locale("pt", "BR"),
-                "%.2f kWh",
-                dto.consumoTotalDiarioKwh
-            )
+    private fun atualizarIndicadoresComDadosReais(
+        dto: DashboardDTO
+    ) {
 
-        findViewById<TextView>(R.id.txv_custoDiario).text =
-            String.format(
-                Locale("pt", "BR"),
-                "R$ %.2f",
-                dto.custoDiarioReais
-            )
+        findViewById<TextView>(
+            R.id.txv_consumoDiario
+        ).text = formatarConsumo(
+            dto.consumoTotalDiarioKwh
+        )
 
-        findViewById<TextView>(R.id.txv_metaGasto).text =
-            String.format(
-                Locale("pt", "BR"),
-                "%.0f kWh",
-                metaMensal
-            )
+        findViewById<TextView>(
+            R.id.txv_custoDiario
+        ).text = formatarMoeda(
+            dto.custoDiarioReais
+        )
 
-        findViewById<TextView>(R.id.txv_economia).text =
-            String.format(
-                Locale("pt", "BR"),
-                "R$ %.2f",
-                dto.valorContaEstimadoMesReais
-            )
+        findViewById<TextView>(
+            R.id.txv_economia
+        ).text = formatarMoeda(
+            dto.valorContaEstimadoMesReais
+        )
 
-        findViewById<TextView>(R.id.txv_metaDescricao).text =
-            "↗ $porcentagem% da meta atingida"
+        findViewById<TextView>(
+            R.id.txv_consumoMensal
+        ).text = formatarConsumo(
+            dto.metaConsumoMensalAtualKwh
+        )
 
-        findViewById<TextView>(R.id.txv_consumoMensal).text =
-            String.format(
-                Locale("pt", "BR"),
-                "%.1f kWh",
-                consumoMensal
-            )
+        atualizarStatusMeta(
+            dto.metaConsumoMensalAtualKwh,
+            dto.metaConsumoMensalLimiteKwh,
+            dto.mensagemStatusMeta
+        )
 
-        findViewById<TextView>(R.id.txv_metaMensal).text =
-            String.format(
-                Locale("pt", "BR"),
-                "%.0f kWh",
-                metaMensal
-            )
+        Log.d("CARDS_HOME", "========== DADOS DOS CARDS ==========")
+
+        Log.d("CARDS_HOME", "Consumo diário: ${dto.consumoTotalDiarioKwh}")
+
+        Log.d("CARDS_HOME", "Custo diário: ${dto.custoDiarioReais}")
+
+        Log.d("CARDS_HOME", "Conta estimada: ${dto.valorContaEstimadoMesReais}")
+
+        Log.d("CARDS_HOME", "Meta mensal atual: ${dto.metaConsumoMensalAtualKwh}")
+
+        Log.d("CARDS_HOME", "Limite da meta: ${dto.metaConsumoMensalLimiteKwh}")
+
+        Log.d("CARDS_HOME", "Mensagem da meta: ${dto.mensagemStatusMeta}")
+
+        Log.d("CARDS_HOME", "====================================")
+    }
+
+    private fun atualizarStatusMeta(
+        consumoMensal: Double,
+        limiteMeta: Double,
+        mensagem: String? = null
+    ) {
+
+        val txvMetaGasto =
+            findViewById<TextView>(R.id.txv_metaGasto)
+
+        val txvMetaMensal =
+            findViewById<TextView>(R.id.txv_metaMensal)
+
+        val txvMetaDescricao =
+            findViewById<TextView>(R.id.txv_metaDescricao)
 
         val txvStatusMeta =
             findViewById<TextView>(R.id.txv_statusMeta)
 
         val txvStatusDescricao =
             findViewById<TextView>(R.id.txv_statusDescricao)
-
-        txvStatusMeta.text =
-            dto.mensagemStatusMeta ?: "Você está dentro da sua meta!"
-
-        txvStatusDescricao.text =
-            "O consumo está em $porcentagem% da sua meta."
 
         val progressoMeta =
             findViewById<ProgressBar>(R.id.progressoMeta)
@@ -618,8 +645,41 @@ class HomeActivity : AppCompatActivity() {
         progressoMeta.progressTintList =
             ColorStateList.valueOf(corSelecionada)
 
+        if (limiteMeta <= 0.0) {
+
+            txvMetaGasto.text = "Não definida"
+            txvMetaMensal.text = "Não definida"
+
+            txvMetaDescricao.text = "Cadastre uma meta para acompanhar"
+
+            txvStatusMeta.text = "Nenhuma meta cadastrada"
+
+            txvStatusDescricao.text =
+                "Cadastre uma meta para acompanhar seu consumo."
+
+            progressoMeta.progress = 0
+
+            return
+        }
+
+        val percentual = (
+                consumoMensal / limiteMeta * 100.0
+                ).toInt()
+
+        txvMetaGasto.text = formatarConsumo(limiteMeta)
+        txvMetaMensal.text = formatarConsumo(limiteMeta)
+
+        txvMetaDescricao.text =
+            "↗ $percentual% da meta atingida"
+
+        txvStatusMeta.text =
+            mensagem ?: "Acompanhamento da sua meta"
+
+        txvStatusDescricao.text =
+            "O consumo está em $percentual% da sua meta."
+
         progressoMeta.progress =
-            porcentagem.coerceIn(0, 100)
+            percentual.coerceIn(0, 100)
     }
 
     // =====================================================
@@ -641,7 +701,9 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun selecionarBotao(selecionado: TextView) {
+    private fun selecionarBotao(
+        selecionado: TextView
+    ) {
 
         val botoes = listOf(
             btnTempoReal,
@@ -659,6 +721,43 @@ class HomeActivity : AppCompatActivity() {
     }
 
     // =====================================================
+    // EDITAR META
+    // =====================================================
+
+    private fun configurarBotaoEditarMeta() {
+
+        val btnEditar = findViewById<ImageButton>(
+            R.id.btnEditarMeta
+        )
+
+        btnEditar.setOnClickListener {
+
+            val dto = dashboardDados
+
+            val possuiMeta =
+                dto != null &&
+                        dto.metaConsumoMensalLimiteKwh > 0.0
+
+            val tipo = "CONSUMO"
+
+            val valor =
+                dto?.metaConsumoMensalLimiteKwh ?: 0.0
+
+            val intent = Intent(
+                this,
+                MetaActivity::class.java
+            ).apply {
+
+                putExtra("tipoMeta", tipo)
+                putExtra("valorMeta", valor)
+                putExtra("possuiMeta", possuiMeta)
+            }
+
+            startActivityForResult(intent, 1001)
+        }
+    }
+
+    // =====================================================
     // GRÁFICO EM TEMPO REAL
     // =====================================================
 
@@ -670,7 +769,8 @@ class HomeActivity : AppCompatActivity() {
 
         cardMetaMensal.visibility = View.GONE
 
-        txvTituloGrafico.text = "Consumo de energia atual"
+        txvTituloGrafico.text =
+            "Consumo de energia atual"
 
         txvSubtituloGrafico.text =
             "Veja o consumo de energia em tempo real"
@@ -682,7 +782,6 @@ class HomeActivity : AppCompatActivity() {
     // GRÁFICO DE CONSUMO POR HORA
     // =====================================================
 
-
     private fun mostrarConsumo() {
 
         abaAtual = ABA_CONSUMO
@@ -691,56 +790,34 @@ class HomeActivity : AppCompatActivity() {
 
         cardMetaMensal.visibility = View.VISIBLE
 
-        txvTituloGrafico.text = "Consumo de energia"
+        txvTituloGrafico.text =
+            "Consumo de energia"
 
         txvSubtituloGrafico.text =
             "Veja o consumo de energia (kWh) por hora"
 
-        // Recupera as últimas 10 horas disponibilizadas pelo Back-end.
         val pontos = dashboardDados
             ?.consumoDiarioHoras
             ?.takeLast(LIMITE_HORAS)
             ?: emptyList()
 
-        val inicioHoraAtual = Math.floorDiv(
-            System.currentTimeMillis(),
-            3_600_000L
-        ) * 3_600_000L
-
-        val calendario = Calendar.getInstance(
-            TimeZone.getTimeZone("America/Sao_Paulo")
-        )
-        val horaAtual = calendario.get(Calendar.HOUR_OF_DAY)
-
-        val valores = pontos.map { ponto ->
-
-            val horaPonto = ponto.hora
-                .removeSuffix("h")
-                .toIntOrNull()
-
-            val consumoBackend = ponto.consumoKwh
-
-            // Usa o acumulado SSE na hora atual, sem somá-lo ao Back-end.
-            // Isso evita contar duas vezes leituras já gravadas no banco.
-            val consumoFinal = if (horaPonto == horaAtual) {
-                consumoPorHoraSse[inicioHoraAtual] ?: consumoBackend
-            } else {
-                consumoBackend
-            }
-
-            consumoFinal.toFloat()
+        val valores = pontos.map {
+            it.consumoKwh.toFloat()
         }
 
-        val horas = pontos.map { it.hora }
+        val horas = pontos.map {
+            it.hora
+        }
 
         Log.d(
             "GRAFICO_HORAS",
-            "Horários: $horas | Valores enviados: $valores | Histórico SSE: $consumoPorHoraSse"
+            "Horários: $horas | Valores: $valores"
         )
 
         grafico.atualizarGrafico(
             valores,
-            horas
+            horas,
+            4
         )
     }
 
@@ -756,11 +833,13 @@ class HomeActivity : AppCompatActivity() {
 
         cardMetaMensal.visibility = View.GONE
 
-        txvTituloGrafico.text = "Valor da conta (estimado)"
+        txvTituloGrafico.text =
+            "Valor da conta (estimado)"
 
         txvSubtituloGrafico.text =
-            "Comparativo dos últimos meses"
+            "Mês atual e dois anteriores"
 
+        // Mês atual + 2 anteriores (o backend envia em ordem cronológica).
         val pontos = dashboardDados
             ?.valorContaEstimadoReais
             ?.takeLast(LIMITE_MESES)
@@ -774,9 +853,85 @@ class HomeActivity : AppCompatActivity() {
             it.mes
         }
 
+        Log.d(
+            TAG_GRAFICO,
+            "Histórico de contas: $meses | Valores: $valores"
+        )
+
         grafico.atualizarGrafico(
             valores,
-            meses
+            meses,
+            2
+        )
+    }
+
+    private val preferenciasHistorico by lazy {
+        getSharedPreferences(
+            "historico_consumo",
+            MODE_PRIVATE
+        )
+    }
+
+    private fun carregarHistoricoConsumoLocal() {
+
+        consumoPorMinuto.clear()
+
+        val historico = preferenciasHistorico
+            .getString("consumo_por_minuto", null)
+            ?: return
+
+        historico.split(";").forEach { registro ->
+
+            val partes = registro.split(":", limit = 2)
+
+            if (partes.size == 2) {
+
+                val minuto = partes[0].toLongOrNull()
+                val consumo = partes[1].toDoubleOrNull()
+
+                if (minuto != null && consumo != null) {
+                    consumoPorMinuto[minuto] = consumo
+                }
+            }
+        }
+
+        // Mantém somente os últimos 10 minutos.
+        val agora = obterMinutoAtual()
+        val inicio = agora - (9 * 60_000L)
+
+        consumoPorMinuto.keys
+            .filter { it < inicio || it > agora }
+            .toList()
+            .forEach { consumoPorMinuto.remove(it) }
+
+        Log.d(
+            "HISTORICO_LOCAL",
+            "Histórico recuperado: $consumoPorMinuto"
+        )
+    }
+
+    private fun salvarHistoricoConsumoLocal() {
+
+        val agora = obterMinutoAtual()
+        val inicio = agora - (9 * 60_000L)
+
+        consumoPorMinuto.keys
+            .filter { it < inicio || it > agora }
+            .toList()
+            .forEach { consumoPorMinuto.remove(it) }
+
+        val historico = consumoPorMinuto.entries
+            .joinToString(";") {
+                "${it.key}:${it.value}"
+            }
+
+        preferenciasHistorico.edit()
+            .putString("consumo_por_minuto", historico)
+            .apply()
+
+        Log.d(
+            "HISTORICO_LOCAL",
+            "Histórico salvo: $consumoPorMinuto"
         )
     }
 
@@ -788,21 +943,21 @@ class HomeActivity : AppCompatActivity() {
         super.onStart()
 
         handler.post(atualizarRelogio)
+
+        // Consulta imediata e depois a cada 5 s.
+        handler.post(atualizarDashboard)
+
         agendarAtualizacaoMinuto()
     }
 
     override fun onStop() {
 
         handler.removeCallbacks(atualizarRelogio)
+
+        handler.removeCallbacks(atualizarDashboard)
+
         handler.removeCallbacks(atualizarJanelaMinutos)
 
         super.onStop()
-    }
-
-    override fun onDestroy() {
-
-        sseClient?.fecharConexao()
-
-        super.onDestroy()
     }
 }

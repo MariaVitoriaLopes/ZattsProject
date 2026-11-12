@@ -31,6 +31,9 @@ class HistoryActivity : AppCompatActivity() {
         SEMANAL, MENSAL, COMPARATIVO
     }
 
+    private val cipMensal = 12.50
+    private var corAplicada = ""
+
     private lateinit var txvTituloHistorico: TextView
     private lateinit var tabSemanal: TextView
     private lateinit var tabMensal: TextView
@@ -68,13 +71,15 @@ class HistoryActivity : AppCompatActivity() {
     private val historicoRepository = HistoricoRepository()
 
     private var historicoDiario: List<ConsumoDiario> = emptyList()
-
-    private val verde = android.graphics.Color.rgb(220, 255, 0)
     private val laranja = android.graphics.Color.rgb(255, 88, 0)
+
+    private val azulComparativo = android.graphics.Color.rgb(59, 29, 228)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AparenciaManager.aplicarCor(this)
         super.onCreate(savedInstanceState)
+
+        corAplicada = AparenciaManager.obterCor(this)
         setContentView(R.layout.activity_history)
 
         findViewById<AppNavBar>(R.id.navBar)
@@ -87,6 +92,26 @@ class HistoryActivity : AppCompatActivity() {
         atualizarTela(TipoHistorico.SEMANAL)
 
         carregarHistorico()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val corAtual = AparenciaManager.obterCor(this)
+
+        if (corAtual != corAplicada) {
+            recreate()
+        }
+    }
+
+    private fun calcularTotalMensalComCip(
+        dados: List<ConsumoDiario>
+    ): Double {
+        if (dados.isEmpty()) {
+            return 0.0
+        }
+
+        return dados.sumOf { it.reais } + cipMensal
     }
 
     private fun inicializarComponentes() {
@@ -331,7 +356,7 @@ class HistoryActivity : AppCompatActivity() {
             modo = GraficoHistoricoView.Modo.LINHA_AREA,
             valores = valoresGrafico,
             rotulos = rotulosGrafico,
-            corPrincipal = verde
+            corPrincipal = AparenciaManager.corHex(this)
         )
         indicadorRolagemGrafico.visibility =
             View.GONE
@@ -450,9 +475,9 @@ class HistoryActivity : AppCompatActivity() {
         val totalKwh =
             dadosMesAtual.sumOf { it.kwh }
         val totalReais =
-            dadosMesAtual.sumOf { it.reais }
+            calcularTotalMensalComCip(dadosMesAtual)
         val totalReaisMesAnterior =
-            dadosMesAnterior.sumOf { it.reais }
+            calcularTotalMensalComCip(dadosMesAnterior)
         val quantidadeDias =
             fimMes.get(Calendar.DAY_OF_MONTH)
         val valoresGrafico =
@@ -570,7 +595,7 @@ class HistoryActivity : AppCompatActivity() {
             modo = GraficoHistoricoView.Modo.BARRAS,
             valores = valoresGrafico,
             rotulos = rotulosGrafico,
-            corPrincipal = verde
+            corPrincipal = AparenciaManager.corHex(this)
         )
         indicadorRolagemGrafico.visibility =
             View.VISIBLE
@@ -634,9 +659,9 @@ class HistoryActivity : AppCompatActivity() {
                         consumo.dia <= fimAnteriorApi
             }
         val totalReaisAtual =
-            dadosMesAtual.sumOf { it.reais }
+            calcularTotalMensalComCip(dadosMesAtual)
         val totalReaisAnterior =
-            dadosMesAnterior.sumOf { it.reais }
+            calcularTotalMensalComCip(dadosMesAnterior)
         val diasMesAtual =
             fimMesAtual.get(Calendar.DAY_OF_MONTH)
         val diasMesAnterior =
@@ -793,13 +818,19 @@ class HistoryActivity : AppCompatActivity() {
             "Consumo em $nomeMesAtual",
             "Consumo em $nomeMesAnterior"
         )
+        val corSecundariaComparativo =
+            if (AparenciaManager.obterCor(this) == "vermelho") {
+                azulComparativo
+            } else {
+                laranja
+            }
         graficoHistorico.configurar(
             modo = GraficoHistoricoView.Modo.COMPARATIVO,
             valores = valoresMesAtual,
             valoresSecundarios = valoresMesAnterior,
             rotulos = rotulosGrafico,
-            corPrincipal = verde,
-            corSecundaria = laranja
+            corPrincipal = AparenciaManager.corHex(this),
+            corSecundaria = corSecundariaComparativo
         )
         indicadorRolagemGrafico.visibility =
             View.VISIBLE
@@ -809,7 +840,9 @@ class HistoryActivity : AppCompatActivity() {
 
     private fun configurarLegenda(principal: String, secundaria: String?) {
         txvLegenda1.text = principal
-        corLegenda1.setBackgroundColor(verde)
+        corLegenda1.setBackgroundColor(
+            AparenciaManager.corHex(this)
+        )
 
         val temSegundaLegenda = secundaria != null
         corLegenda2.visibility = if (temSegundaLegenda) View.VISIBLE else View.GONE
@@ -817,7 +850,13 @@ class HistoryActivity : AppCompatActivity() {
 
         if (secundaria != null) {
             txvLegenda2.text = secundaria
-            corLegenda2.setBackgroundColor(laranja)
+            val corSecundaria =
+                if (AparenciaManager.obterCor(this) == "vermelho") {
+                    azulComparativo
+                } else {
+                    laranja
+                }
+            corLegenda2.setBackgroundColor(corSecundaria)
         }
     }
 
