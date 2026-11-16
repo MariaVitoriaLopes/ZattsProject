@@ -29,6 +29,11 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 class HomeActivity : AppCompatActivity() {
 
@@ -117,12 +122,36 @@ class HomeActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_home)
 
+        solicitarPermissaoNotificacoes()
+        NotificacaoWorker.agendar(this)
+
         carregarHistoricoConsumoLocal()
         inicializarComponentes()
         configurarBotoes()
         configurarBotaoEditarMeta()
 
         // O carregamento dos dados é disparado no onStart (polling).
+    }
+
+    private fun solicitarPermissaoNotificacoes() {
+
+        if (
+            Build.VERSION.SDK_INT >=
+            Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.POST_NOTIFICATIONS
+                ),
+                2001
+            )
+        }
     }
 
     private fun inicializarComponentes() {
