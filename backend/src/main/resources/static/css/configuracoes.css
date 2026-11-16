@@ -52,9 +52,9 @@
 
 .card-config {
     display: grid;
-    grid-template-columns: 602fr 583fr 528fr;
-    gap: 40px 10%;
-    padding: 40px 4% 70px 5.6%;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 38px;
+    padding: 24px 40px;
     background-color: var(--fundo-0);
     border: 1px solid #ECECEC;
     border-radius: 28px;
@@ -64,13 +64,13 @@
 .coluna-config {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 24px;
     min-width: 0;
 }
 
 .configuracoes-container .secao-titulo {
     font-family: "Cal Sans", sans-serif;
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--fundo-900);
     margin-bottom: 14px;
@@ -83,7 +83,7 @@
 }
 
 .configuracoes-container .coluna-config .campo label {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--fundo-900);
 }
@@ -316,7 +316,7 @@
 
 .linha-campos {
     display: flex;
-    gap: 5.6%;
+    gap: 12px;
 }
 
 .linha-campos .campo {
