@@ -39,14 +39,17 @@
                     android:id="@+id/btn_voltar"
                     android:layout_width="40dp"
                     android:layout_height="48dp"
+                    android:layout_gravity="center_vertical"
                     android:clickable="true"
                     android:contentDescription="Voltar"
+                    android:foregroundGravity="center"
+                    android:rotation="90"
                     app:backgroundTint="?attr/corFundoTela"
-                    app:tint="?attr/colorOnSurface"
                     app:elevation="0dp"
-                    app:pressedTranslationZ="0dp"
                     app:fabSize="mini"
-                    app:srcCompat="?attr/homeAsUpIndicator" />
+                    app:pressedTranslationZ="0dp"
+                    app:srcCompat="@drawable/ic_expand_more"
+                    app:tint="?attr/colorOnSurface" />
 
                 <TextView
                     android:layout_width="wrap_content"
