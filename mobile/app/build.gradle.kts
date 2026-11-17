@@ -34,7 +34,7 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"http://127.0.0.1:8081/\""
+                "\"https://zattsproject.onrender.com/\""
             )
         }
 
@@ -46,7 +46,7 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"http://127.0.0.1:8081/\""
+                "\"https://zattsproject.onrender.com/\""
             )
         }
     }

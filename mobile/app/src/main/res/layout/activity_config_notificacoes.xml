@@ -93,7 +93,9 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:contentDescription="Ativar notificações gerais"
-                    app:showText="false"/>
+                    app:showText="false"
+                    app:track="@drawable/switch_track"
+                    app:trackTint="@null"/>
 
             </LinearLayout>
 
@@ -142,7 +144,9 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:contentDescription="Ativar notificações de conta"
-                    app:showText="false"/>
+                    app:showText="false"
+                    app:track="@drawable/switch_track"
+                    app:trackTint="@null"/>
 
             </LinearLayout>
 
@@ -191,7 +195,9 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:contentDescription="Ativar notificações de consumo"
-                    app:showText="false"/>
+                    app:showText="false"
+                    app:track="@drawable/switch_track"
+                    app:trackTint="@null"/>
 
             </LinearLayout>
 
@@ -240,7 +246,9 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:contentDescription="Ativar notificações de meta"
-                    app:showText="false"/>
+                    app:showText="false"
+                    app:track="@drawable/switch_track"
+                    app:trackTint="@null"/>
 
             </LinearLayout>
 
@@ -289,7 +297,9 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:contentDescription="Ativar notificações de alerta"
-                    app:showText="false"/>
+                    app:showText="false"
+                    app:track="@drawable/switch_track"
+                    app:trackTint="@null"/>
 
             </LinearLayout>
 
