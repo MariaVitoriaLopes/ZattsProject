@@ -35,10 +35,6 @@ public class ConsumoController {
         return service.salvar(consumo);
     }
 
-    /*
-     * Rota antiga mantida temporariamente por compatibilidade.
-     * Agora ela só permite consultar o próprio usuário.
-     */
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<?> listarPorUsuario(
             @PathVariable String usuarioId,
@@ -48,23 +44,15 @@ public class ConsumoController {
 
         if (usuario == null) {
             return ResponseEntity.status(401)
-                    .body(Map.of(
-                            "erro",
-                            "Usuário não autenticado."
-                    ));
+                    .body(Map.of("erro", "Usuário não autenticado."));
         }
 
         if (!usuario.getId().equals(usuarioId)) {
             return ResponseEntity.status(403)
-                    .body(Map.of(
-                            "erro",
-                            "Você não possui permissão para acessar estes dados."
-                    ));
+                    .body(Map.of("erro", "Você não possui permissão para acessar estes dados."));
         }
 
-        return ResponseEntity.ok(
-                service.listarPorUsuario(usuario.getId())
-        );
+        return ResponseEntity.ok(service.listarPorUsuario(usuario.getId()));
     }
 
     @GetMapping("/diario")
@@ -83,30 +71,18 @@ public class ConsumoController {
 
         if (usuario == null) {
             return ResponseEntity.status(401)
-                    .body(Map.of(
-                            "erro",
-                            "Usuário não autenticado."
-                    ));
+                    .body(Map.of("erro", "Usuário não autenticado."));
         }
 
         try {
-
             List<ConsumoDiarioDTO> resultado =
-                    service.listarTotaisDiarios(
-                            usuario.getId(),
-                            inicio,
-                            fim
-                    );
+                    service.listarTotaisDiarios(usuario.getId(), inicio, fim);
 
             return ResponseEntity.ok(resultado);
 
         } catch (IllegalArgumentException e) {
-
             return ResponseEntity.badRequest()
-                    .body(Map.of(
-                            "erro",
-                            e.getMessage()
-                    ));
+                    .body(Map.of("erro", e.getMessage()));
         }
     }
 
@@ -116,32 +92,24 @@ public class ConsumoController {
         return sseService.addEmitter();
     }
 
-    /*
-     * Endpoint legado. Agora também usa exclusivamente
-     * o usuário autenticado.
-     */
     @GetMapping("/historico")
-    public ResponseEntity<?> getHistorico(
-            HttpSession session) {
-
+    public ResponseEntity<?> getHistorico(HttpSession session) {
         Usuario usuario = obterUsuarioLogado(session);
 
         if (usuario == null) {
             return ResponseEntity.status(401)
-                    .body(Map.of(
-                            "erro",
-                            "Usuário não autenticado."
-                    ));
+                    .body(Map.of("erro", "Usuário não autenticado."));
         }
 
-        return ResponseEntity.ok(
-                service.listarPorUsuario(usuario.getId())
-        );
+        return ResponseEntity.ok(service.listarPorUsuario(usuario.getId()));
     }
 
-    // ALTERAÇÃO DO CÓDIGO ORIGINAL
     @GetMapping("/estimativa-mensal")
-    public ResponseEntity<?> obterEstimativaMensal(@RequestParam int ano, @RequestParam int mes, HttpSession session) {
+    public ResponseEntity<?> obterEstimativaMensal(
+            @RequestParam int ano,
+            @RequestParam int mes,
+            HttpSession session) {
+
         Usuario usuario = obterUsuarioLogado(session);
 
         if (usuario == null) {
@@ -149,7 +117,6 @@ public class ConsumoController {
         }
 
         YearMonth periodo = YearMonth.of(ano, mes);
-
         double estimativa = service.obterEstimativaMes(usuario.getId(), periodo);
 
         return ResponseEntity.ok(estimativa);
