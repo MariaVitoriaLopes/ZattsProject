@@ -371,8 +371,8 @@ p.quest-aviso {
    ===================================================== */
 
 .quest-ajuda-conta {
-    width: 100%;
-    max-width: 420px;
+    width: fit-content;
+    max-width: 500px;
     text-align: left;
     display: flex;
     gap: 20px;
@@ -380,10 +380,11 @@ p.quest-aviso {
 
 .quest-ajuda-conta img {
     display: block;
-    width: 30%;
+    width: 420px;
     height: auto;
     border-radius: 12px;
     border: 1px solid #E3E3E3;
+    object-fit: cover;
 }
 
 .quest-ajuda-conta figcaption {
