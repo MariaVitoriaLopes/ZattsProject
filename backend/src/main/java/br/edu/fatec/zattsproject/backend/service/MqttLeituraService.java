@@ -9,6 +9,7 @@ import br.edu.fatec.zattsproject.backend.repository.DispositivoRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @RequiredArgsConstructor
 public class MqttLeituraService {
 
+    @Lazy
     private final ConsumoService consumoService;
     private final ConsumoRealtimeRepository realtimeRepository;
     private final DispositivoRepository dispositivoRepository;
@@ -33,7 +35,7 @@ public class MqttLeituraService {
     private final AlertaDisparoService alertaDisparoService;
     private final CalculadoraTarifaService calculadoraTarifaService;
 
-    // Buffer da hora utiliza chave composta: "usuarioId_horaISO"
+    // Buffer da hora utiliza chave composta: "chaveIsolamento_horaISO"
     private final Map<String, AcumuladorHora> bufferAcumulado = new ConcurrentHashMap<>();
     private final Map<String, AcumuladorMinuto> bufferMinutoRealtime = new ConcurrentHashMap<>();
     private final Map<String, List<DashboardDTO.PontoGraficoMinuto>> bufferPontosGrafico = new ConcurrentHashMap<>();
@@ -44,10 +46,12 @@ public class MqttLeituraService {
         public double somaPotenciaWatts;
         public double somaCorrenteAmperes;
         public int quantidadeLeituras;
+        public String usuarioId;
         public String dispositivoId;
 
-        AcumuladorHora(LocalDateTime horaChave, String dispositivoId) {
+        AcumuladorHora(LocalDateTime horaChave, String usuarioId, String dispositivoId) {
             this.horaChave = horaChave;
+            this.usuarioId = usuarioId;
             this.dispositivoId = dispositivoId;
             this.somaKwh = 0.0;
             this.somaPotenciaWatts = 0.0;
@@ -59,9 +63,13 @@ public class MqttLeituraService {
     public static class AcumuladorMinuto {
         public LocalDateTime minutoChave;
         public double somaKwh;
+        public String usuarioId;
+        public String dispositivoId;
 
-        AcumuladorMinuto(LocalDateTime minutoChave) {
+        AcumuladorMinuto(LocalDateTime minutoChave, String usuarioId, String dispositivoId) {
             this.minutoChave = minutoChave;
+            this.usuarioId = usuarioId;
+            this.dispositivoId = dispositivoId;
             this.somaKwh = 0.0;
         }
     }
@@ -70,12 +78,11 @@ public class MqttLeituraService {
         try {
             Consumo consumoInstantaneo = objectMapper.readValue(payloadJson, Consumo.class);
 
-            // Garante o fuso horário correto de Brasília (America/Sao_Paulo)
             if (consumoInstantaneo.getDataHora() == null) {
                 consumoInstantaneo.setDataHora(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
             }
 
-            String usuarioId = resolverUsuario(consumoInstantaneo);
+            String usuarioId = resolverUsuarioEDispositivo(consumoInstantaneo);
 
             if (usuarioId == null) {
                 log.warn("Leitura MQTT ignorada: usuário não identificado.");
@@ -83,30 +90,24 @@ public class MqttLeituraService {
             }
 
             consumoInstantaneo.setUsuarioId(usuarioId);
+            String dispositivoId = consumoInstantaneo.getDispositivoId();
+            String chaveIsolamento = (dispositivoId != null && !dispositivoId.isBlank()) ? dispositivoId : usuarioId;
 
             String horaMinutoAtualStr = consumoInstantaneo.getDataHora().format(DateTimeFormatter.ofPattern("HH:mm"));
             double valKwh = valorPositivoOuZero(consumoInstantaneo.getConsumoKwh());
 
-            log.info("========== TESTE MQTT ==========");
-            log.info("Usuário: {}", usuarioId);
-            log.info("Data: {}", consumoInstantaneo.getDataHora());
-            log.info("Consumo recebido: {}", consumoInstantaneo.getConsumoKwh());
-            log.info("Potência recebida: {}", consumoInstantaneo.getPotenciaWatts());
-            log.info("Consumo validado: {}", valKwh);
-            log.info("================================");
-
             // 1. GRAVAÇÃO MINUTO A MINUTO (Salva em consumo_realtime na troca de minuto)
             LocalDateTime minutoAtualTruncado = consumoInstantaneo.getDataHora().truncatedTo(ChronoUnit.MINUTES);
 
-            bufferMinutoRealtime.compute(usuarioId, (id, acMinuto) -> {
+            bufferMinutoRealtime.compute(chaveIsolamento, (chave, acMinuto) -> {
                 if (acMinuto != null && !acMinuto.minutoChave.equals(minutoAtualTruncado)) {
                     double consumoMinuto = Math.round(acMinuto.somaKwh * 100000.0) / 100000.0;
-                    consumoService.salvarRealtimeMinuto(id, consumoMinuto, acMinuto.minutoChave);
+                    consumoService.salvarRealtimeMinuto(acMinuto.usuarioId, acMinuto.dispositivoId, consumoMinuto, acMinuto.minutoChave);
                     acMinuto = null;
                 }
 
                 if (acMinuto == null) {
-                    acMinuto = new AcumuladorMinuto(minutoAtualTruncado);
+                    acMinuto = new AcumuladorMinuto(minutoAtualTruncado, usuarioId, dispositivoId);
                 }
 
                 acMinuto.somaKwh += valKwh;
@@ -114,7 +115,8 @@ public class MqttLeituraService {
             });
 
             // 2. ATUALIZA GRÁFICO EM MEMÓRIA
-            List<DashboardDTO.PontoGraficoMinuto> listaPontos = bufferPontosGrafico.computeIfAbsent(usuarioId, k -> new CopyOnWriteArrayList<>());
+            List<DashboardDTO.PontoGraficoMinuto> listaPontos =
+                    bufferPontosGrafico.computeIfAbsent(chaveIsolamento, k -> new CopyOnWriteArrayList<>());
 
             if (!listaPontos.isEmpty()) {
                 DashboardDTO.PontoGraficoMinuto ultimoPonto = listaPontos.get(listaPontos.size() - 1);
@@ -129,7 +131,10 @@ public class MqttLeituraService {
             }
 
             // 3. CÁLCULO E ENVIO DO VALOR ACUMULADO DA CONTA VIA SSE
-            double totalKwhMes = consumoService.obterConsumoAcumuladoMesAtual(usuarioId);
+            double totalKwhMes = (dispositivoId != null && !dispositivoId.isBlank())
+                    ? consumoService.obterConsumoAcumuladoMesAtualPorDispositivo(dispositivoId) + obterConsumoAcumuladoHoraAtualPorDispositivo(dispositivoId)
+                    : consumoService.obterConsumoAcumuladoMesAtual(usuarioId) + obterConsumoAcumuladoHoraAtual(usuarioId);
+
             double estimativaContaReais = calculadoraTarifaService.calcularEstimativaOficialContaMensal(
                     totalKwhMes, CalculadoraTarifaService.BandeiraTarifaria.VERDE
             );
@@ -140,13 +145,13 @@ public class MqttLeituraService {
             double potenciaWatts = valorPositivoOuZero(consumoInstantaneo.getPotenciaWatts());
             double correnteAmperes = valorPositivoOuZero(consumoInstantaneo.getCorrenteAmperes());
 
-            // 4. ACUMULADOR DA HORA EM MEMÓRIA (Com chave composta única por Usuário + Hora)
+            // 4. ACUMULADOR DA HORA EM MEMÓRIA
             LocalDateTime horaAtualTruncada = consumoInstantaneo.getDataHora().truncatedTo(ChronoUnit.HOURS);
-            String chaveBufferHora = usuarioId + "_" + horaAtualTruncada.toString();
+            String chaveBufferHora = chaveIsolamento + "_" + horaAtualTruncada.toString();
 
             AcumuladorHora acumuladorAtual = bufferAcumulado.compute(chaveBufferHora, (chave, acumulador) -> {
                 if (acumulador == null) {
-                    acumulador = new AcumuladorHora(horaAtualTruncada, consumoInstantaneo.getDispositivoId());
+                    acumulador = new AcumuladorHora(horaAtualTruncada, usuarioId, dispositivoId);
                 }
 
                 acumulador.somaKwh += valKwh;
@@ -178,7 +183,6 @@ public class MqttLeituraService {
         }
     }
 
-    // 5. CONSOLIDAÇÃO E GRAVAÇÃO AGENDADA DE HORA EM HORA NO ATLAS
     @Scheduled(cron = "0 0 * * * *", zone = "America/Sao_Paulo")
     public void consolidarEGravarHorasFechadas() {
         log.info(">>> FECHANDO E CONSOLIDANDO CONSUMO DA HORA NO ATLAS <<<");
@@ -191,8 +195,7 @@ public class MqttLeituraService {
 
         copiaParaProcessamento.forEach((chave, acumulador) -> {
             if (acumulador != null && acumulador.quantidadeLeituras > 0) {
-                String usuarioId = chave.split("_")[0];
-                salvarConsumoFechadoNoAtlas(usuarioId, acumulador);
+                salvarConsumoFechadoNoAtlas(acumulador.usuarioId, acumulador);
                 bufferAcumulado.remove(chave);
             }
         });
@@ -209,23 +212,29 @@ public class MqttLeituraService {
         }
     }
 
-    private String resolverUsuario(Consumo consumo) {
+    private String resolverUsuarioEDispositivo(Consumo consumo) {
+        if (consumo.getMacAddress() != null && !consumo.getMacAddress().isBlank()) {
+            Optional<Dispositivo> dispositivo = dispositivoRepository.findByMacAddress(consumo.getMacAddress());
+            if (dispositivo.isPresent() && dispositivo.get().isAtivo()) {
+                consumo.setDispositivoId(dispositivo.get().getId());
+                if (consumo.getUsuarioId() == null || consumo.getUsuarioId().isBlank()) {
+                    consumo.setUsuarioId(dispositivo.get().getUsuarioId());
+                }
+                return dispositivo.get().getUsuarioId();
+            }
+        }
+
         if (consumo.getUsuarioId() != null && !consumo.getUsuarioId().isBlank()) {
+            if (consumo.getDispositivoId() == null || consumo.getDispositivoId().isBlank()) {
+                List<Dispositivo> lista = dispositivoRepository.findByUsuarioId(consumo.getUsuarioId());
+                if (lista != null && !lista.isEmpty()) {
+                    consumo.setDispositivoId(lista.get(0).getId());
+                }
+            }
             return consumo.getUsuarioId();
         }
 
-        if (consumo.getMacAddress() == null || consumo.getMacAddress().isBlank()) {
-            return null;
-        }
-
-        Optional<Dispositivo> dispositivo = dispositivoRepository.findByMacAddress(consumo.getMacAddress());
-
-        if (dispositivo.isEmpty() || !dispositivo.get().isAtivo()) {
-            return null;
-        }
-
-        consumo.setDispositivoId(dispositivo.get().getId());
-        return dispositivo.get().getUsuarioId();
+        return null;
     }
 
     private void salvarConsumoFechadoNoAtlas(String usuarioId, AcumuladorHora acumulador) {
@@ -256,9 +265,18 @@ public class MqttLeituraService {
     public double obterConsumoAcumuladoHoraAtual(String usuarioId) {
         if (usuarioId == null) return 0.0;
 
-        return bufferAcumulado.entrySet().stream()
-                .filter(e -> e.getKey().startsWith(usuarioId + "_"))
-                .mapToDouble(e -> e.getValue().somaKwh)
+        return bufferAcumulado.values().stream()
+                .filter(ac -> usuarioId.equals(ac.usuarioId))
+                .mapToDouble(ac -> ac.somaKwh)
+                .sum();
+    }
+
+    public double obterConsumoAcumuladoHoraAtualPorDispositivo(String dispositivoId) {
+        if (dispositivoId == null) return 0.0;
+
+        return bufferAcumulado.values().stream()
+                .filter(ac -> dispositivoId.equals(ac.dispositivoId))
+                .mapToDouble(ac -> ac.somaKwh)
                 .sum();
     }
 
@@ -279,7 +297,42 @@ public class MqttLeituraService {
                     .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
                     .sum();
 
-            AcumuladorMinuto acMinuto = bufferMinutoRealtime.get(usuarioId);
+            for (AcumuladorMinuto acMinuto : bufferMinutoRealtime.values()) {
+                if (usuarioId.equals(acMinuto.usuarioId)
+                        && acMinuto.minutoChave.equals(minutoAlvo.truncatedTo(ChronoUnit.MINUTES))) {
+                    consumoMinuto += acMinuto.somaKwh;
+                }
+            }
+
+            DashboardDTO.PontoGraficoMinuto p = new DashboardDTO.PontoGraficoMinuto();
+            p.setHora(horaMinutoStr);
+            p.setConsumoKwh(Math.round(consumoMinuto * 100000.0) / 100000.0);
+            pontos.add(p);
+        }
+
+        return pontos;
+    }
+
+    public List<DashboardDTO.PontoGraficoMinuto> obterPontosGraficoTempoRealPorDispositivo(String dispositivoId) {
+        if (dispositivoId == null) return new ArrayList<>();
+
+        LocalDateTime agora = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
+        List<DashboardDTO.PontoGraficoMinuto> pontos = new ArrayList<>();
+
+        for (int i = 9; i >= 0; i--) {
+            LocalDateTime minutoAlvo = agora.minusMinutes(i);
+            LocalDateTime inicioMinuto = minutoAlvo.withSecond(0).withNano(0);
+            LocalDateTime fimMinuto = minutoAlvo.withSecond(59).withNano(999999999);
+            String horaMinutoStr = minutoAlvo.format(DateTimeFormatter.ofPattern("HH:mm"));
+
+            List<ConsumoRealtime> leiturasBanco = realtimeRepository.findByDispositivoIdAndDataHoraBetween(
+                    dispositivoId, inicioMinuto, fimMinuto
+            );
+            double consumoMinuto = leiturasBanco.stream()
+                    .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
+                    .sum();
+
+            AcumuladorMinuto acMinuto = bufferMinutoRealtime.get(dispositivoId);
             if (acMinuto != null && acMinuto.minutoChave.equals(minutoAlvo.truncatedTo(ChronoUnit.MINUTES))) {
                 consumoMinuto += acMinuto.somaKwh;
             }

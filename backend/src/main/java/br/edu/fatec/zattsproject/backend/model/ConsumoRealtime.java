@@ -15,6 +15,7 @@ public class ConsumoRealtime {
     @Id
     private String id;
     private String usuarioId;
+    private String dispositivoId;
     private Double consumoKwh;
     private LocalDateTime dataHora;
 

@@ -12,19 +12,16 @@ import java.util.Optional;
 @Repository
 public interface ConsumoRepository extends MongoRepository<Consumo, String> {
 
-    // Lista todos os consumos de um utilizador
     List<Consumo> findByUsuarioId(String usuarioId);
 
-    // Lista consumos ordenados do mais recente para o mais antigo
     List<Consumo> findByUsuarioIdOrderByDataHoraDesc(String usuarioId);
 
-    // Lista consumos dentro de um intervalo de datas (para relatórios/histórico)
     List<Consumo> findByUsuarioIdAndDataHoraBetween(String usuarioId, LocalDateTime inicio, LocalDateTime fim);
 
-    // Retorna a ÚLTIMA leitura recebida de um utilizador específico (Usado no Dashboard)
+    List<Consumo> findByDispositivoIdAndDataHoraBetween(String dispositivoId, LocalDateTime inicio, LocalDateTime fim);
+
     Optional<Consumo> findTopByUsuarioIdOrderByDataHoraDesc(String usuarioId);
 
-    // Retorna a ÚLTIMA leitura geral do sistema (Caso o MQTT ainda não grave o usuarioId de imediato)
     Optional<Consumo> findTopByOrderByDataHoraDesc();
 
     @Query(
@@ -36,5 +33,6 @@ public interface ConsumoRepository extends MongoRepository<Consumo, String> {
             LocalDateTime inicio,
             LocalDateTime fim
     );
+
     long deleteByUsuarioId(String usuarioId);
 }
