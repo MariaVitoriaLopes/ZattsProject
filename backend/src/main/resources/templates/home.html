@@ -289,13 +289,15 @@
                     `${formatarNumero(percentual)}% da meta atingida`;
             }
 
-            const meses = Array.isArray(dash.valorContaEstimadoReais)
-                ? dash.valorContaEstimadoReais
-                : [];
+<!--            const meses = Array.isArray(dash.valorContaEstimadoReais)-->
+<!--                ? dash.valorContaEstimadoReais-->
+<!--                : [];-->
 
-            const estimativaAtual = meses.length
-                ? numero(meses[meses.length - 1].valor)
-                : null;
+<!--            const estimativaAtual = meses.length-->
+<!--                ? numero(meses[meses.length - 1].valor)-->
+<!--                : null;-->
+
+            const estimativaAtual = dash.valorContaEstimadoMesReais;
 
             if (elConta && estimativaAtual !== null) {
                 elConta.textContent = formatarReais(estimativaAtual)

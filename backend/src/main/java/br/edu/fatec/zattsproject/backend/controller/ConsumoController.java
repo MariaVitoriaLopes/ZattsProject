@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 
@@ -136,5 +137,21 @@ public class ConsumoController {
         return ResponseEntity.ok(
                 service.listarPorUsuario(usuario.getId())
         );
+    }
+
+    // ALTERAÇÃO DO CÓDIGO ORIGINAL
+    @GetMapping("/estimativa-mensal")
+    public ResponseEntity<?> obterEstimativaMensal(@RequestParam int ano, @RequestParam int mes, HttpSession session) {
+        Usuario usuario = obterUsuarioLogado(session);
+
+        if (usuario == null) {
+            return ResponseEntity.status(401).body("Usuário não autenticado.");
+        }
+
+        YearMonth periodo = YearMonth.of(ano, mes);
+
+        double estimativa = service.obterEstimativaMes(usuario.getId(), periodo);
+
+        return ResponseEntity.ok(estimativa);
     }
 }

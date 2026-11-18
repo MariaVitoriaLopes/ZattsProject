@@ -12,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -120,6 +117,13 @@ public class ConsumoService {
 
         // 2. ACUMULADO MENSAL (BANCO PERMANENTE + REALTIME DO DIA)
         double acumuladoMesKwh = obterConsumoAcumuladoMesAtual(usuarioId);
+        //ALTERAÇÃO DO CÓDIGO ORIGINAL
+        CalculadoraTarifaService.BandeiraTarifaria bandeira = configuracao != null && configuracao.getBandeiraAtual() != null
+                        ? configuracao.getBandeiraAtual()
+                        : CalculadoraTarifaService.BandeiraTarifaria.VERDE;
+
+        double valorContaEstimadoMesReais = calculadoraTarifaService
+                                            .calcularEstimativaOficialContaMensal(acumuladoMesKwh, bandeira);
 
         DashboardDTO dto = new DashboardDTO();
 
@@ -127,6 +131,10 @@ public class ConsumoService {
         dto.setMetaConsumoMensalAtualKwh(arredondar(acumuladoMesKwh, 2));
         dto.setMetaConsumoMensalLimiteKwh(limiteMeta);
         dto.setMetaGastoKwh(limiteMeta);
+
+        dto.setValorContaEstimadoMesReais(arredondar(valorContaEstimadoMesReais, 2));
+
+        dto.setStatusEstimativaConta("Estimativa oficial CPFL (com impostos e CIP)");
 
         double percentual = limiteMeta > 0 ? (acumuladoMesKwh / limiteMeta) * 100.0 : 0.0;
         dto.setPercentualMetaAtingida(arredondar(percentual, 1));
@@ -216,6 +224,44 @@ public class ConsumoService {
         dto.setValorContaEstimadoReais(pontosGrafico3);
 
         return dto;
+    }
+    // ALTERAÇÃO DO CÓDIGO ORIGINAL
+    public double calcularEstimativaContaMensal(String usuarioId, double consumoMensalKwh) {
+        Configuracao configuracao = configuracaoService.buscarPorUsuario(usuarioId);
+
+        CalculadoraTarifaService.BandeiraTarifaria bandeira = configuracao != null && configuracao.getBandeiraAtual() != null
+                        ? configuracao.getBandeiraAtual()
+                        : CalculadoraTarifaService.BandeiraTarifaria.VERDE;
+
+        return arredondar(calculadoraTarifaService.calcularEstimativaOficialContaMensal(consumoMensalKwh, bandeira), 2);
+    }
+    // ALTERAÇÃO DO CÓDIGO ORIGINAL
+    public double calcularEstimativaMes(String usuarioId, YearMonth mes, double consumoAcumuladoKwh) {
+        LocalDate hoje = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
+        double consumoConsiderado = consumoAcumuladoKwh;
+        // Projeta somente o mês atual.
+        if (mes.equals(YearMonth.from(hoje))) {
+            int diasDecorridos = hoje.getDayOfMonth();
+
+            consumoConsiderado = diasDecorridos > 0 ? (consumoAcumuladoKwh / diasDecorridos) * mes.lengthOfMonth() : 0.0;
+        }
+
+        return calcularEstimativaContaMensal(usuarioId, consumoConsiderado);
+    }
+    //
+    // ALTERAÇÃO DO CÓDIGO ORIGINAL
+    public double obterEstimativaMes(String usuarioId, YearMonth mes) {
+        LocalDateTime inicioMes = mes.atDay(1).atStartOfDay();
+
+        LocalDateTime fimMes = mes.atEndOfMonth().plusDays(1).atStartOfDay().minusNanos(1);
+
+        List<Consumo> leituras = repository.findByUsuarioIdAndDataHoraBetween(usuarioId, inicioMes, fimMes);
+
+        double consumoAcumulado = leituras.stream()
+                .mapToDouble(c -> c.getConsumoKwh() != null ? c.getConsumoKwh() : 0.0)
+                .sum();
+
+        return calcularEstimativaMes(usuarioId, mes, consumoAcumulado);
     }
 
     public List<Consumo> listarPorUsuario(String usuarioId) {

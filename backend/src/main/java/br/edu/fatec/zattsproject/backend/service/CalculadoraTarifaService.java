@@ -36,15 +36,19 @@ public class CalculadoraTarifaService {
 
     public double calcularEstimativaOficialContaMensal(double consumoProjetadoMesKwh, BandeiraTarifaria bandeira) {
         if (consumoProjetadoMesKwh <= 0) {
-            return 0.0; // Sem consumo registrado, sem custo estimado
+            //return 0.0; // Sem consumo registrado, sem custo estimado
+            //ALTERAÇÃO DO CÓDIGO ORIGINAL
+            return CIP_PRAIA_GRANDE_ESTIMADA;
+            //
         }
 
-
-        double consumoFaturavel = Math.max(consumoProjetadoMesKwh, CONSUMO_MINIMO_BIFASICO_KWH);
+        //double consumoFaturavel = Math.max(consumoProjetadoMesKwh, CONSUMO_MINIMO_BIFASICO_KWH);
 
         double valorBandeira = (bandeira != null) ? bandeira.getAdicionalKwh() : 0.0;
         double tarifaFinalComImpostos = TARIFA_EFETIVA_COM_IMPOSTOS_KWH + valorBandeira;
-
-        return (consumoFaturavel * tarifaFinalComImpostos) + CIP_PRAIA_GRANDE_ESTIMADA;
+        // ALTERAÇÃO DO CÓDIGO ORIGINAL
+        //return (consumoFaturavel * tarifaFinalComImpostos) + CIP_PRAIA_GRANDE_ESTIMADA;
+        return (consumoProjetadoMesKwh * tarifaFinalComImpostos) + CIP_PRAIA_GRANDE_ESTIMADA;
+        //
     }
 }

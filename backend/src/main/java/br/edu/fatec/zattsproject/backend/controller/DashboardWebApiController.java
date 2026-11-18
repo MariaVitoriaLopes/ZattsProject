@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.List;
 
 @RestController
@@ -52,6 +55,18 @@ public class DashboardWebApiController {
         double totalDiario = dto.getConsumoTotalDiarioKwh() + emMemoria;
         double totalMensal = dto.getMetaConsumoMensalAtualKwh() + emMemoria;
 
+        // bi - aqui amg ALTERAÇÃO DO CÓDIGO ORIGINAL
+       // double valorContaAtualizado = consumoService.calcularEstimativaContaMensal(usuarioId, totalMensal);
+        LocalDate hoje = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
+        YearMonth mesAtual = YearMonth.from(hoje);
+
+        double consumoMensalProjetado = (totalMensal / hoje.getDayOfMonth()) * mesAtual.lengthOfMonth();
+
+        // Calcula a estimativa financeira da conta
+        double valorContaAtualizado = consumoService.calcularEstimativaContaMensal(usuarioId, consumoMensalProjetado);
+
+        dto.setValorContaEstimadoMesReais(valorContaAtualizado);
+        //
         // 3. Atualiza os kWh no DTO
         dto.setConsumoTotalDiarioKwh(Math.round(totalDiario * 100000.0) / 100000.0);
         dto.setMetaConsumoMensalAtualKwh(Math.round(totalMensal * 100000.0) / 100000.0);
