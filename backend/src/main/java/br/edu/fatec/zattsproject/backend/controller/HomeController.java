@@ -18,6 +18,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.List;
 
 @Controller
@@ -50,21 +52,25 @@ public class HomeController {
         // 1. Pega dados consolidados salvos no Banco
         DashboardDTO dashboardData = consumoService.obterDadosDashboard(usuarioId);
 
-        System.out.println("===== DASHBOARD HOME =====");
-        System.out.println("Usuário: " + usuarioId);
-        System.out.println("Meta recebida: " + dashboardData.getMetaGastoKwh());
-        System.out.println("Limite mensal: " + dashboardData.getMetaConsumoMensalLimiteKwh());
-        System.out.println("==========================");
-
         // 2. Soma o acumulado em memória da hora atual aos totais
         double emMemoria = mqttLeituraService.obterConsumoAcumuladoHoraAtual(usuarioId);
         double totalDiario = dashboardData.getConsumoTotalDiarioKwh() + emMemoria;
         double totalMensal = dashboardData.getMetaConsumoMensalAtualKwh() + emMemoria;
 
+        // 3. Garante que a abertura inicial use a mesma estimativa do polling de 5s e do /historico
+        YearMonth mesAtual = YearMonth.now(ZoneId.of("America/Sao_Paulo"));
+        double valorContaAtualizado = consumoService.calcularEstimativaMes(usuarioId, mesAtual, totalMensal);
+
+        dashboardData.setValorContaEstimadoMesReais(valorContaAtualizado);
+        if (dashboardData.getValorContaEstimadoReais() != null && !dashboardData.getValorContaEstimadoReais().isEmpty()) {
+            dashboardData.getValorContaEstimadoReais().get(dashboardData.getValorContaEstimadoReais().size() - 1)
+                    .setValor(valorContaAtualizado);
+        }
+
         dashboardData.setConsumoTotalDiarioKwh(Math.round(totalDiario * 100000.0) / 100000.0);
         dashboardData.setMetaConsumoMensalAtualKwh(Math.round(totalMensal * 100000.0) / 100000.0);
 
-        // 3. Preenche a lista do gráfico em tempo real usando PontoGraficoMinuto
+        // 4. Preenche a lista do gráfico em tempo real usando PontoGraficoMinuto
         List<DashboardDTO.PontoGraficoMinuto> pontosMemoria = mqttLeituraService.obterPontosGraficoTempoReal(usuarioId);
         if (pontosMemoria != null && !pontosMemoria.isEmpty()) {
             dashboardData.setConsumoTempoReal(pontosMemoria);

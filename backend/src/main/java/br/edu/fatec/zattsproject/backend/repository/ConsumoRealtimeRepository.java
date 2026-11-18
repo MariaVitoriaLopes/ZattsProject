@@ -12,4 +12,5 @@ public interface ConsumoRealtimeRepository extends MongoRepository<ConsumoRealti
 
     List<ConsumoRealtime> findByUsuarioIdAndDataHoraBetween(String usuarioId, LocalDateTime inicio, LocalDateTime fim);
 
+    List<ConsumoRealtime> findByDispositivoIdAndDataHoraBetween(String dispositivoId, LocalDateTime inicio, LocalDateTime fim);
 }

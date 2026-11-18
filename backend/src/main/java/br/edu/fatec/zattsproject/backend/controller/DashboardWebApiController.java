@@ -2,10 +2,10 @@ package br.edu.fatec.zattsproject.backend.controller;
 
 import br.edu.fatec.zattsproject.backend.dto.DashboardDTO;
 import br.edu.fatec.zattsproject.backend.model.Usuario;
+import br.edu.fatec.zattsproject.backend.service.ConfiguracaoService;
 import br.edu.fatec.zattsproject.backend.service.ConsumoService;
 import br.edu.fatec.zattsproject.backend.service.MqttLeituraService;
 import br.edu.fatec.zattsproject.backend.service.SseService;
-import br.edu.fatec.zattsproject.backend.service.ConfiguracaoService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.List;
 
 @RestController
@@ -52,23 +54,34 @@ public class DashboardWebApiController {
         double totalDiario = dto.getConsumoTotalDiarioKwh() + emMemoria;
         double totalMensal = dto.getMetaConsumoMensalAtualKwh() + emMemoria;
 
-        // 3. Atualiza os kWh no DTO
+        // 3. Projeção oficial mensal idêntica à do /historico (TE + TUSD + ICMS + PIS/COFINS + Bandeira + CIP)
+        YearMonth mesAtual = YearMonth.now(ZoneId.of("America/Sao_Paulo"));
+        double valorContaAtualizado = consumoService.calcularEstimativaMes(usuarioId, mesAtual, totalMensal);
+
+        dto.setValorContaEstimadoMesReais(valorContaAtualizado);
+        if (dto.getValorContaEstimadoReais() != null && !dto.getValorContaEstimadoReais().isEmpty()) {
+            dto.getValorContaEstimadoReais().get(dto.getValorContaEstimadoReais().size() - 1)
+                    .setValor(valorContaAtualizado);
+        }
+
+        // 4. Atualiza os kWh no DTO a cada 5 segundos
         dto.setConsumoTotalDiarioKwh(Math.round(totalDiario * 100000.0) / 100000.0);
         dto.setMetaConsumoMensalAtualKwh(Math.round(totalMensal * 100000.0) / 100000.0);
 
-        // 4. RECALCULA O VALOR EM REAIS DO CARD USANDO O MÉTODO EXISTENTE NO DTO
+        // 5. Recalcula o custo diário em R$
         double tarifaKwh = configuracaoService.obterTarifaKwh(usuarioId);
+        if (tarifaKwh <= 0) tarifaKwh = 0.85;
         double custoAtualizado = totalDiario * tarifaKwh;
         dto.setMetaGastoKwh(Math.round(custoAtualizado * 100.0) / 100.0);
 
-        // 5. RECALCULA A PORCENTAGEM DA META DINAMICAMENTE
+        // 6. Recalcula a porcentagem da meta dinamicamente
         double limiteMeta = dto.getMetaConsumoMensalLimiteKwh();
         if (limiteMeta > 0) {
             double percentual = (totalMensal / limiteMeta) * 100.0;
             dto.setPercentualMetaAtingida(Math.round(percentual * 10.0) / 10.0);
         }
 
-        // 6. Gráfico Tempo Real
+        // 7. Gráfico Tempo Real (últimos 10 minutos)
         List<DashboardDTO.PontoGraficoMinuto> pontosMemoria = mqttLeituraService.obterPontosGraficoTempoReal(usuarioId);
         if (pontosMemoria != null && !pontosMemoria.isEmpty()) {
             dto.setConsumoTempoReal(pontosMemoria);

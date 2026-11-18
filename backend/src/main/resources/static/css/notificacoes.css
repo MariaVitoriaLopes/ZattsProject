@@ -37,7 +37,8 @@
     display: flex;
     flex-direction: column;
     min-height: max(480px, calc(100vh - 340px));
-    padding: 21px 25px;
+    /*padding: 21px 25px;*/
+    overflow: clip;
     background-color: var(--fundo-0);
     border: 1px solid #ECECEC;
     border-radius: 28px;
@@ -55,7 +56,7 @@
     align-items: center;
     gap: 12px;
     min-height: 92px;
-    padding: 14px 24px 14px 14px;
+    padding: 24px;
     border-bottom: 1px solid #E3E3E3;
     transition: background-color 0.3s ease;
 }
@@ -93,7 +94,8 @@
    ===================================================== */
 
 .notificacao-texto {
-    max-width: 230px;
+    /*max-width: 230px;*/
+    width: 100%;
 }
 
 .notificacao-titulo {
@@ -168,7 +170,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding: 14px 10px 24px;
+    padding: 28px;
 }
 
 .alertas-topo h2 {
@@ -428,7 +430,8 @@
     }
 
     .card-notificacoes {
-        padding: 16px 12px;
+        /*padding: 16px 12px;*/
+        border-radius: 12px;
     }
 
     .lista-notificacoes .notificacao {
@@ -639,7 +642,7 @@ html[data-tema="escuro"] .btn-salvar {
 
     .card-notificacoes {
         min-height: 400px;
-        padding: 14px;
+        /*padding: 14px;*/
         border-radius: 20px;
     }
 

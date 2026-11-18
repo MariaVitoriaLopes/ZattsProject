@@ -34,7 +34,7 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"http://127.0.0.1:8081/\""
+                "\"https://zattsproject.onrender.com/\""
             )
         }
 
@@ -46,7 +46,7 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"http://127.0.0.1:8081/\""
+                "\"https://zattsproject.onrender.com/\""
             )
         }
     }
@@ -77,6 +77,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
 
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    implementation("androidx.work:work-runtime-ktx:2.12.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
