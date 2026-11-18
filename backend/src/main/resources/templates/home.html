@@ -693,6 +693,13 @@
                 existente.destroy();
             }
 
+            if (pontos.length > 0) {
+                pontos[pontos.length - 1] = {
+                    ...pontos[pontos.length - 1],
+                    valor: dash.valorContaEstimadoMesReais
+                };
+            }
+
             chartValorConta = new Chart(canvas, {
 
                 type: "bar",
@@ -798,24 +805,25 @@
         }
 
         function atualizarGraficoValorConta(dash) {
-
-            if (!chartValorConta) {
-
-                criarGraficoValorConta(dash);
-
-                return;
-            }
-
-            const cores = obterCoresTema();
-
             const pontos = Array.isArray(dash?.valorContaEstimadoReais)
-                ? dash.valorContaEstimadoReais
+                ? [...dash.valorContaEstimadoReais]
                 : [];
+
+            const estimativaAtual = Number(dash?.valorContaEstimadoMesReais);
+
+            if (pontos.length > 0 && Number.isFinite(estimativaAtual)) {
+                pontos[pontos.length - 1] = {
+                    ...pontos[pontos.length - 1],
+                    valor: estimativaAtual
+                };
+            }
 
             chartValorConta.data.labels = pontos.map(p => p.mes || "");
 
             chartValorConta.data.datasets[0].data =
                 pontos.map(p => numero(p.valor));
+
+            chartValorConta.update("none");
 
             chartValorConta.data.datasets[0].backgroundColor = cores.linha;
 

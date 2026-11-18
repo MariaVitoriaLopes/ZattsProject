@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         return valor;
     }
-
+    /*
     function desenharMensal() {
         if (!ultimoMensal || typeof Chart === 'undefined') {
             return;
@@ -300,6 +300,93 @@ document.addEventListener('DOMContentLoaded', function () {
                         },
                         ticks: {
                             maxRotation: 0
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        border: {
+                            display: false
+                        },
+                        grid: {
+                            color: cores.grade
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    */
+    function desenharMensal() {
+        if (!ultimoMensal || typeof Chart === 'undefined') {
+            return;
+        }
+
+        const cores = coresDoTema();
+        const mesTexto = String(ultimoMensal.mes).padStart(2, '0');
+
+        const rotulos = ultimoMensal.kwhPorDia.map(function (valor, indice) {
+            return String(indice + 1).padStart(2, '0') + '/' + mesTexto;
+        });
+
+        const valores = ultimoMensal.kwhPorDia.map(function (valor) {
+            return Math.round(valor * 100) / 100;
+        });
+
+        if (graficoMensal) {
+            graficoMensal.destroy();
+        }
+
+        // ALTERAÇÃO DO CÓDIGO ORIGINAL
+        // Reserva 48px para cada dia, permitindo visualizar todas as barras.
+        const conteudoGrafico = document.getElementById('graficoMensalConteudo');
+
+        conteudoGrafico.style.width =
+            Math.max(720, rotulos.length * 48) + 'px';
+
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = cores.texto;
+
+        graficoMensal = new Chart(canvasMensal, {
+            type: 'bar',
+            data: {
+                labels: rotulos,
+                datasets: [{
+                    data: valores,
+                    backgroundColor: cores.destaque,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    maxBarThickness: 40
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: cores.tooltip,
+                        callbacks: {
+                            label: function (contexto) {
+                                return formatarNumero(contexto.raw, 0, 2)
+                                    + ' kWh';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        border: {
+                            display: false
+                        },
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: false
                         }
                     },
                     y: {
@@ -766,7 +853,7 @@ document.addEventListener('DOMContentLoaded', function () {
             seletorComparativo.appendChild(opcao);
         });
     }
-
+    /*
     function desenharComparativo() {
         if (
             !ultimoComparativo
@@ -822,8 +909,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 labels: rotulos,
                 datasets: [
                     {
-                        label: 'Consumo em '
-                            + nomeMes(atual.ano, atual.mes),
+                        label: 'Consumo em ' + nomeMes(atual.ano, atual.mes),
                         data: valoresAtual,
                         borderColor: cores.destaque,
                         borderWidth: 3,
@@ -836,8 +922,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         pointBorderWidth: 2
                     },
                     {
-                        label: 'Consumo em '
-                            + nomeMes(anterior.ano, anterior.mes),
+                        label: 'Consumo em ' + nomeMes(anterior.ano, anterior.mes),
                         data: valoresAnterior,
                         borderColor: corSecundaria,
                         borderWidth: 3,
@@ -901,6 +986,130 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    */
+    function desenharComparativo() {
+        if (
+            !ultimoComparativo
+            || typeof Chart === 'undefined'
+            || vistas.comparativo.hidden
+        ) {
+            return;
+        }
+
+        const atual = ultimoComparativo.atual;
+        const anterior = ultimoComparativo.anterior;
+
+        const cores = coresDoTema();
+
+        const escuro =
+            document.documentElement.getAttribute('data-tema') === 'escuro';
+
+        const corSecundaria = '#FF5A00';
+        const borda = escuro ? '#1C1C1C' : '#FFFFFF';
+
+        const rotulos = atual.kwhPorDia.map(function (valor, indice) {
+            return doisDigitos(indice + 1);
+        });
+
+        const valoresAtual = atual.kwhPorDia.map(function (valor) {
+            return Math.round(valor * 100) / 100;
+        });
+
+        const valoresAnterior = Array.from(
+            { length: atual.dias },
+            function (_, indice) {
+                const valor = anterior.kwhPorDia[indice];
+
+                return valor === undefined
+                    ? null
+                    : Math.round(valor * 100) / 100;
+            }
+        );
+
+        if (graficoComparativo) {
+            graficoComparativo.destroy();
+        }
+
+        // ALTERAÇÃO DO CÓDIGO ORIGINAL
+        // Mantém espaço suficiente para os dias dos dois meses.
+        const conteudoGrafico = document.getElementById(
+            'graficoComparativoConteudo'
+        );
+
+        conteudoGrafico.style.width =
+            Math.max(720, rotulos.length * 48) + 'px';
+
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = cores.texto;
+
+        graficoComparativo = new Chart(canvasComparativo, {
+            type: 'line',
+            data: {
+                labels: rotulos,
+                datasets: [
+                    {
+                        label: 'Consumo em ' + nomeMes(atual.ano, atual.mes),
+                        data: valoresAtual,
+                        borderColor: cores.destaque,
+                        borderWidth: 3,
+                        cubicInterpolationMode: 'monotone',
+                        fill: false,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: cores.destaque,
+                        pointBorderColor: borda,
+                        pointBorderWidth: 2
+                    },
+                    {
+                        label: 'Consumo em ' + nomeMes(anterior.ano, anterior.mes),
+                        data: valoresAnterior,
+                        borderColor: corSecundaria,
+                        borderWidth: 3,
+                        cubicInterpolationMode: 'monotone',
+                        fill: false,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: corSecundaria,
+                        pointBorderColor: borda,
+                        pointBorderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: cores.tooltip,
+                        callbacks: {
+                            title: function (itens) {
+                                return 'Dia ' + itens[0].label;
+                            },
+                            label: function (contexto) {
+                                return contexto.dataset.label + ': '
+                                    + formatarNumero(contexto.raw, 0, 2)
+                                    + ' kWh';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { maxRotation: 0, autoSkip: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        border: { display: false },
+                        grid: { color: cores.grade }
+                    }
+                }
+            }
+        });
+    }
 
     // ALTERAÇÃO DO CÓDIGO ORIGINAL
     // Os valores financeiros comparados usam a mesma estimativa do backend
@@ -946,10 +1155,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const variacaoTexto =
             document.getElementById('comparativoVariacaoTexto');
 
-        variacao.classList.remove(
-            'hist-variacao-economia',
-            'hist-variacao-aumento'
-        );
+        variacao.classList.remove('hist-variacao-economia','hist-variacao-aumento');
 
         variacao.textContent = '—';
         variacaoTexto.textContent = 'Calculando comparação...';
@@ -981,15 +1187,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            document.getElementById('comparativoValorAtual').textContent =
-                formatarReais(estimativaAtual);
+            document.getElementById('comparativoValorAtual').textContent = formatarReais(estimativaAtual);
 
-            document.getElementById('comparativoValorAnterior').textContent =
-                formatarReais(estimativaAnterior);
+            document.getElementById('comparativoValorAnterior').textContent = formatarReais(estimativaAnterior);
 
-            const diferenca = Math.round(
-                (estimativaAtual - estimativaAnterior) * 100
-            ) / 100;
+            const diferenca = Math.round((estimativaAtual - estimativaAnterior) * 100) / 100;
 
             if (atual.leituras === 0 || anterior.leituras === 0) {
                 variacao.textContent = formatarReais(0);
