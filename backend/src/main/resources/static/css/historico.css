@@ -325,11 +325,12 @@
     position: relative;
     height: 420px;
 }
-
+/*
 .hist-grafico canvas {
     width: 100% !important;
     height: 100% !important;
 }
+*/
 
 .hist-nota {
     display: flex;
